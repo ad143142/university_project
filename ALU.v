@@ -46,7 +46,9 @@ module ALU (
                     ifmaps_reg_30|ifmaps_reg_31|ifmaps_reg_32|ifmaps_reg_33|ifmaps_reg_34|
                     ifmaps_reg_40|ifmaps_reg_41|ifmaps_reg_42|ifmaps_reg_43|ifmaps_reg_44;
 
-    assign MAC_out = operation ? {4'd0,pooling}:bitcount;//pooling isnt implement
+    //operation  ->  1: Do Pooling  0: Do MUL
+    assign MAC_out = operation ? {4'd0,pooling}:bitcount; //TODO:pooling isnt implement
+    
 
     wire kenel_2,kenel_3,kenel_4,kenel_5;
     assign kenel_2=(kernel_size[4]|kernel_size[3]|kernel_size[2]|kernel_size[1]);
