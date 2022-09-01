@@ -31,8 +31,9 @@ module MAC #
     reg load_ifmaps_buf_1t;
 
     wire ifmaps_fifo_row0_out,ifmaps_fifo_row1_out,ifmaps_fifo_row2_out,ifmaps_fifo_row3_out,ifmaps_fifo_row4_out;
-    wire fifo_full,fifo_empty;//unuse
+    wire fifo_full,fifo_empty;//unuse 如果發生full或是empty代表硬體設計有誤
 
+    //FIFO的output有reg因此MAC須慢1t才能load
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             load_ifmaps_buf_1t<=0;

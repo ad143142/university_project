@@ -32,7 +32,10 @@ module bram_control #(
     output wire data_valid
 
 );
-
+    /*
+        bram_control再準備好值之後等待read_en將值讀走，FSM會再根據讀取長度(只讀portA還是讀A和B)，決定是否要
+        更新address並且讀取下筆資料。
+    */
     localparam S0=2'd0,S1=2'd1,VALID_A=2'd2,VALID_B=2'd3;
     
     reg [1:0] state;

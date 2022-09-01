@@ -19,11 +19,12 @@ module ALU (
     input wire load_weight,
 
     input wire operation,
-    input wire [4:0] kernel_size
+    input wire [4:0] kernel_size //one hot vector
 
 );
     integer idx;
-
+    //ifmaps和weight皆從右邊idx=4進入往左推，這樣在看波型時才不會鏡像相反
+    //用不到的reg會有預設值ifmaps=0 weight=1，目的是為了xnor才會=0不會引響bitcount結果
     reg ifmaps_reg_00,ifmaps_reg_01,ifmaps_reg_02,ifmaps_reg_03,ifmaps_reg_04;
     reg ifmaps_reg_10,ifmaps_reg_11,ifmaps_reg_12,ifmaps_reg_13,ifmaps_reg_14;
     reg ifmaps_reg_20,ifmaps_reg_21,ifmaps_reg_22,ifmaps_reg_23,ifmaps_reg_24;
@@ -49,7 +50,7 @@ module ALU (
     //operation  ->  1: Do Pooling  0: Do MUL
     assign MAC_out = operation ? {4'd0,pooling}:bitcount; 
     
-
+    //kernel後的數字代表設定的kernel_size是否有比他大
     wire kenel_2,kenel_3,kenel_4,kenel_5;
     assign kenel_2=(kernel_size[4]|kernel_size[3]|kernel_size[2]|kernel_size[1]);
     assign kenel_3=(kernel_size[4]|kernel_size[3]|kernel_size[2]);
@@ -86,6 +87,7 @@ module ALU (
     assign xnor_op[23] = ifmaps_reg_43 ^~ weight_reg_43;
     assign xnor_op[24] = ifmaps_reg_44 ^~ weight_reg_44;
 
+    //bitcount，此為verilog的寫法
     always @(*) begin
         bitcount=0;
         for(idx=0;idx<25;idx=idx+1) begin

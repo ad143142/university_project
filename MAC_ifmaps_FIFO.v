@@ -48,8 +48,6 @@ module MAC_ifmaps_FIFO #
     reg [DATA_WIDTH-1:0] ifmaps_fifo_row3 [0:FIFO_SIZE-1];
     reg [DATA_WIDTH-1:0] ifmaps_fifo_row4 [0:FIFO_SIZE-1];
 
-    
-
     reg [bit_num-1:0] fifo_write_ptr;
 	reg [bit_num-1:0] fifo_read_ptr;
 	reg [bit_num:0] fifo_cnt;
@@ -63,12 +61,6 @@ module MAC_ifmaps_FIFO #
     // assign write_en=(~fifo_full & ifmaps_input_valid) | (fifo_full & ifmaps_input_valid & fifo_read);
     assign write_en=ifmaps_input_valid & ((~fifo_full) | fifo_read);
     assign read_en=~fifo_empty & fifo_read;
-
-	//////////////////////////////////////////////////////
-    //                                                  //
-    //                  fifo                            //
-    //                                                  //
-    //////////////////////////////////////////////////////
 
     always @(posedge clk or negedge rst_n) begin
 		if(!rst_n) begin
@@ -152,14 +144,5 @@ module MAC_ifmaps_FIFO #
             end
         end
     end
-
-    //////////////////////////////////////////////////////
-    //                                                  //
-    //                  fifo                            //
-    //                                                  //
-    //////////////////////////////////////////////////////
-
-
-
 
 endmodule

@@ -21,6 +21,13 @@ module MAC_array_control #(
     input wire [4:0] kernel_size
 
 );
+    /*
+        0901
+        目前bram_control已修好，其他的control_path皆有問題。
+        bram_control再準備好值之後等待read_en將值讀走，FSM會再根據讀取長度(只讀portA還是讀A和B)，決定是否要更新address並且讀取下筆資料。
+    */
+    //TODO:還沒有實作AXI input的control path因此load_weight_FSM_start，或是要load weight給bram的data path、control path都還沒辦法實作
+
     //FIXME:需先將bram_control修好，state會少一半
     //K=>kernelsize
     localparam LOAD_WEIGHT_IDLE=5'd0,RESET_ADDR=5'd1,K1_0=5'd2,K2_0=5'd3,K2_1=5'd4,K3_0=5'd5,K3_1=5'd6,K3_2=5'd7,
@@ -28,7 +35,7 @@ module MAC_array_control #(
                K1_LOAD_WEIGHT=5'd17,K2_LOAD_WEIGHT=5'd18,K3_LOAD_WEIGHT=5'd19,K4_LOAD_WEIGHT=5'd20,K5_LOAD_WEIGHT=5'd21;
     reg  [4:0] load_weight_state;
 
-    //TODO:
+    //TODO: 雙斜線的是指還沒實作
     wire ifmaps_input_valid;//
 
     wire load_ifmaps;//
@@ -55,7 +62,7 @@ module MAC_array_control #(
     //                                             //
     /////////////////////////////////////////////////
 
-    //TODO:
+    //TODO:須確定bram的時序及state走法
     wire load_weight_finish;
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -99,18 +106,12 @@ module MAC_array_control #(
         end
     end
 
-
-
-
-
-
     /////////////////////////////////////////////////
     //                                             //
     //                   instance                  //
     //                                             //
     /////////////////////////////////////////////////
 
-    //FIXME:address_reset不該有data_valid，給read_en應該要先讀完再加address 
     bram_control 
     #(
         .MAC_NUM            (MAC_NUM              ),
