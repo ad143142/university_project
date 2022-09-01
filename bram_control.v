@@ -76,4 +76,5 @@ module bram_control #(
         end
     end
 
+
 endmodule
