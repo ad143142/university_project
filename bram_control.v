@@ -8,6 +8,7 @@ module bram_control #(
     input wire rst_n,
 
     //data
+    //TODO:從AXI寫BRAM的部分還沒有實作
         // input wire [31:0] axi_in,
 
     input wire [5*MAC_NUM-1:0] weight_from_bram_A,
@@ -31,17 +32,16 @@ module bram_control #(
     output wire data_valid
 
 );
-    localparam IDLE=2'd0,S0=2'd1,S1=2'd2,S2=2'd3;
-    localparam A=1'd0,B=1'd1;
+
+    localparam S0=2'd0,S1=2'd1,VALID_A=2'd2,VALID_B=2'd3;
     
-    reg [1:0] read_state;
-    reg out_state;
+    reg [1:0] state;
 
     assign bram_A_en=1;
     assign bram_B_en=1;
 
-    assign data_valid=(read_state==S2);
-    assign weight_out = (out_state==A) ? weight_from_bram_A:weight_from_bram_B;
+    assign data_valid=(state==VALID_A || state==VALID_B);
+    assign weight_out = (state==VALID_B) ? weight_from_bram_B:weight_from_bram_A;
 
     assign bram_address_B = bram_address_A+1;
     always @(posedge clk or negedge rst_n) begin
@@ -49,35 +49,29 @@ module bram_control #(
             bram_address_A<=0;
         end
         else begin
-            if(read_en & read_state==IDLE) begin
-                bram_address_A<=address_reset ? 0:(read_len ? bram_address_A+2:bram_address_A+1);
+            if(address_reset) begin
+                bram_address_A<=0;
+            end
+            else if(state==VALID_A && ~read_len && read_en) begin
+                bram_address_A<=bram_address_A+1;
+            end
+            else if(state==VALID_B && read_en) begin
+                bram_address_A<=bram_address_A+2;
             end
         end
     end
     
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            read_state<=IDLE;
+            state<=S0;
         end
         else begin
-            case (read_state)
-                IDLE:read_state<=(read_en || address_reset) ? S0:IDLE;
-                S0:read_state<=S1;
-                S1:read_state<=S2;
-                S2:read_state<=IDLE;
-                default:read_state<=IDLE;         
-            endcase
-        end
-    end
-    
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            out_state<=A;
-        end
-        else begin
-            case(out_state)
-                A:out_state<=data_valid ? (read_len ? B:A):A;
-                B:out_state<=A;
+            case (state)
+                S0:state<=S1;
+                S1:state<=VALID_A;
+                VALID_A:state<=read_en ? (read_len ? VALID_B:S0):VALID_A;
+                VALID_B:state<=read_en ? S0:VALID_B;
+                default:state<=S0;         
             endcase
         end
     end
