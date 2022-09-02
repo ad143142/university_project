@@ -27,6 +27,7 @@ module MAC_ifmaps_FIFO #
     output wire fifo_full,
     output wire fifo_empty
 );
+//2022/08/31已測試
 
     function integer clogb2 (input integer bit_depth);
 	  begin

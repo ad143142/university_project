@@ -28,6 +28,7 @@ module MAC #
     input wire [4:0] kernel_size
 
 );
+//2022/08/31已測試
     reg load_ifmaps_buf_1t;
 
     wire ifmaps_fifo_row0_out,ifmaps_fifo_row1_out,ifmaps_fifo_row2_out,ifmaps_fifo_row3_out,ifmaps_fifo_row4_out;

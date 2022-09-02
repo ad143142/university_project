@@ -13,19 +13,18 @@ module MAC_array_control #(
     //data
     input wire [5*MAC_NUM-1:0] ifmaps_from_fifo,
 
-    input wire [5*MAC_NUM-1:0] weight_from_bram_A,
-    input wire [5*MAC_NUM-1:0] weight_from_bram_B,
-    output wire [BRAM_ADDRESS_WIDTH-1:0] bram_address_A,
-    output wire [BRAM_ADDRESS_WIDTH-1:0] bram_address_B,
+    input wire [5*MAC_NUM-1:0] weight_from_bram,
 
     output wire [5*MAC_NUM-1:0] psum_out,
     //control
     // input wire operation,
     // input wire [4:0] kernel_size,
+    input wire ifmaps_fifo_empty,
+
     input [31:0] axi_control_0,//主要的控制訊號(loadweight、compute....)
     input [31:0] axi_control_1,//附加控制訊號(kernel size、operation...)
     input [31:0] axi_control_2,//附加控制訊號(kernel size、operation...)
-    output[31:0] axi_control_3//回復訊號(compute over...)
+    output[31:0] axi_control_3//回復訊號(compute over、FIFO_full、read_ofmaps...)
 
 );
     //TODO:選做:可以做data gating MAC如果在別的模式下(load weight)時用個enable把它關掉，其他的部分也是
@@ -34,7 +33,6 @@ module MAC_array_control #(
         目前bram_control已修好，其他的control_path皆有問題。
         bram_control再準備好值之後等待read_en將值讀走，FSM會再根據讀取長度(只讀portA還是讀A和B)，決定是否要更新address並且讀取下筆資料。
     */
-    //TODO:還沒有實作AXI input的control path因此load_weight_FSM_start，或是要load weight給bram的data path、control path都還沒辦法實作
 
     //FIXME:需先將bram_control修好，state會少一半 20220902有修一版，還沒測
     //K=>kernelsize
@@ -46,7 +44,7 @@ module MAC_array_control #(
     wire data_valid;
 
     //TODO: 雙斜線的是指還沒實作
-    wire ifmaps_input_valid;//
+    wire ifmaps_input_valid;
 
     wire load_ifmaps;//
     wire load_weight;
@@ -60,6 +58,8 @@ module MAC_array_control #(
     assign load_ifmaps_FSM_start=(axi_control_0==`INST_LOADIFMAPS);
     assign operation=(axi_control_1[0]);
     assign kernel_size=(axi_control_2[4:0]);
+
+    assign ifmaps_input_valid=~ifmaps_fifo_empty;
 
     assign address_reset=(load_weight_state==RESET_ADDR);
     assign read_en=(load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K3_0 || load_weight_state==K3_1 || load_weight_state==K4_0 || 
@@ -127,31 +127,10 @@ module MAC_array_control #(
     //                                             //
     /////////////////////////////////////////////////
 
-    bram_control 
-    #(
-        .MAC_NUM            (MAC_NUM              ),
-        .BRAM_ADDRESS_WIDTH (BRAM_ADDRESS_WIDTH   )
-    )
-    u_bram_control(
-    	.clk                (clk                  ),
-        .rst_n              (rst_n                ),
-        .weight_from_bram_A (weight_from_bram_A   ),
-        .weight_from_bram_B (weight_from_bram_B   ),
-        .weight_out         (weight_out           ),
-        .bram_address_A     (bram_address_A       ),
-        .bram_address_B     (bram_address_B       ),
-        .bram_A_en          (bram_A_en            ),
-        .bram_B_en          (bram_B_en            ),
-        .address_reset      (address_reset        ),
-        .read_en            (read_en              ),
-        .read_len           (read_len             ),
-        .data_valid         (data_valid           ) 
-    );
-
     weight_preload u_weight_preload(
     	.clk                 (clk                 ),
         .rst_n               (rst_n               ),
-        .weight_from_bram    (weight_out          ),
+        .weight_from_bram    (weight_from_bram    ),
         .weight_from_preload (weight_from_preload ),
         .input_valid         (data_valid          ) 
     );    

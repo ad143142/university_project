@@ -21,6 +21,8 @@ module MAC_array #(
     input wire load_ifmaps,
     input wire load_weight
 );
+//2022/09/1已測試
+
     //產生MAC_NUM(板子上的LUT應該只能放256個MAC，其LUT用量已經45%不包括其他外設及control_unit)
     genvar idx;
     generate

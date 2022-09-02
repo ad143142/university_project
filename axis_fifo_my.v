@@ -47,7 +47,7 @@
 	endfunction
 	
 	// Total number of input data.
-	localparam FIFO_SIZE  = 4;
+	localparam FIFO_SIZE  = 16;
 	// bit_num gives the minimum number of bits needed to address 'FIFO_SIZE' size of FIFO.
 	localparam bit_num  = clogb2(FIFO_SIZE-1);
 	// Define the states of state machine
@@ -70,7 +70,8 @@
 
 	assign S_AXIS_TREADY=~fifo_full;
 
-	assign write_en=S_AXIS_TVALID & S_AXIS_TREADY ;	
+	// assign write_en=S_AXIS_TVALID & S_AXIS_TREADY ;	
+	assign write_en=S_AXIS_TVALID & ((~fifo_full) | read_want);
 	assign read_en=read_want & ~fifo_empty;
 
 	always @(posedge S_AXIS_ACLK or negedge S_AXIS_ARESETN) begin
