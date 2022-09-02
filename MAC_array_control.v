@@ -35,6 +35,8 @@ module MAC_array_control #(
                K1_LOAD_WEIGHT=5'd17,K2_LOAD_WEIGHT=5'd18,K3_LOAD_WEIGHT=5'd19,K4_LOAD_WEIGHT=5'd20,K5_LOAD_WEIGHT=5'd21;
     reg  [4:0] load_weight_state;
 
+    wire data_valid;
+
     //TODO: 雙斜線的是指還沒實作
     wire ifmaps_input_valid;//
 
@@ -43,12 +45,12 @@ module MAC_array_control #(
 
     wire address_reset;
     wire read_en;
-    wire read_len;//
+    wire read_len;
     wire load_weight_FSM_start;//
 
-    assign address_rest=(load_weight_state==RESET_ADDR);
-    assign read_en=(load_weight_state!=LOAD_WEIGHT_IDLE && load_weight_state!=K1_LOAD_WEIGHT && load_weight_state!=K2_LOAD_WEIGHT &&
-                    load_weight_state!=K3_LOAD_WEIGHT && load_weight_state!=K4_LOAD_WEIGHT && load_weight_state!=K5_LOAD_WEIGHT); //除了IDLE和要load外都是1
+    assign address_reset=(load_weight_state==RESET_ADDR);
+    assign read_en=(load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K3_0 || load_weight_state==K3_1 || load_weight_state==K4_0 || 
+                    load_weight_state==K4_1 || load_weight_state==K5_0 || load_weight_state==K5_1 || load_weight_state==K5_3);
     assign load_weight=(load_weight_state==K1_LOAD_WEIGHT && load_weight_state==K2_LOAD_WEIGHT &&
                         load_weight_state==K3_LOAD_WEIGHT && load_weight_state==K4_LOAD_WEIGHT && load_weight_state!=K5_LOAD_WEIGHT);
     
@@ -63,7 +65,7 @@ module MAC_array_control #(
     /////////////////////////////////////////////////
 
     //TODO:須確定bram的時序及state走法
-    wire load_weight_finish;
+    wire load_weight_finish;//所有weight都跑完
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             load_weight_state<=LOAD_WEIGHT_IDLE;
@@ -80,24 +82,24 @@ module MAC_array_control #(
                 K1_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K1_0;
 
                 K2_0:load_weight_state<=data_valid ? K2_1:K2_0;
-                K2_1:load_weight_state<=data_valid ? K2_LOAD_WEIGHT:K2_1;
+                K2_1:load_weight_state<=K2_LOAD_WEIGHT;
                 K2_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K2_0;
 
                 K3_0:load_weight_state<=data_valid ? K3_1:K3_0;
-                K3_1:load_weight_state<=data_valid ? K3_2:K3_1;
+                K3_1:load_weight_state<=K3_2;
                 K3_2:load_weight_state<=data_valid ? K3_LOAD_WEIGHT:K3_2;
                 K3_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K3_0;
 
                 K4_0:load_weight_state<=data_valid ? K4_1:K4_0;
-                K4_1:load_weight_state<=data_valid ? K4_2:K4_1;
+                K4_1:load_weight_state<=K4_2;
                 K4_2:load_weight_state<=data_valid ? K4_3:K4_2;
-                K4_3:load_weight_state<=data_valid ? K4_LOAD_WEIGHT:K4_3;
+                K4_3:load_weight_state<=K4_LOAD_WEIGHT;
                 K4_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K4_0;
 
                 K5_0:load_weight_state<=data_valid ? K5_1:K5_0;
-                K5_1:load_weight_state<=data_valid ? K5_2:K5_1;
+                K5_1:load_weight_state<=K5_2;
                 K5_2:load_weight_state<=data_valid ? K5_3:K5_2;
-                K5_3:load_weight_state<=data_valid ? K5_4:K5_3;
+                K5_3:load_weight_state<=K5_4;
                 K5_4:load_weight_state<=data_valid ? K5_LOAD_WEIGHT:K5_4;
                 K5_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K5_0;
 
@@ -127,9 +129,9 @@ module MAC_array_control #(
         .bram_address_B     (bram_address_B       ),
         .bram_A_en          (bram_A_en            ),
         .bram_B_en          (bram_B_en            ),
-        .address_reset      (address_reset        ),//
-        .read_en            (read_en              ),//
-        .read_len           (read_len             ),//
+        .address_reset      (address_reset        ),
+        .read_en            (read_en              ),
+        .read_len           (read_len             ),
         .data_valid         (data_valid           ) 
     );
 

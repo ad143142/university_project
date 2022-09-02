@@ -70,10 +70,10 @@ module bram_control #(
         end
         else begin
             case (state)
-                S0:state<=S1;
-                S1:state<=VALID_A;
-                VALID_A:state<=read_en ? (read_len ? VALID_B:S0):VALID_A;
-                VALID_B:state<=read_en ? S0:VALID_B;
+                S0:state<=address_reset ? S0:S1;
+                S1:state<=address_reset ? S0:VALID_A;
+                VALID_A:state<=address_reset ? S0:(read_en ? (read_len ? VALID_B:S0):VALID_A);
+                VALID_B:state<=address_reset ? S0:(read_en ? S0:VALID_B);
                 default:state<=S0;         
             endcase
         end
