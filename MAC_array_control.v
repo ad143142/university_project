@@ -1,3 +1,6 @@
+`define INST_COMPUTE 32'd87 
+`define INST_LOADIFMAPS 32'd88 
+
 module MAC_array_control #(
     parameter integer MAC_NUM = 256,
     parameter integer BRAM_ADDRESS_WIDTH = 12
@@ -17,10 +20,15 @@ module MAC_array_control #(
 
     output wire [5*MAC_NUM-1:0] psum_out,
     //control
-    input wire operation,
-    input wire [4:0] kernel_size
+    // input wire operation,
+    // input wire [4:0] kernel_size,
+    input [31:0] axi_control_0,//主要的控制訊號(loadweight、compute....)
+    input [31:0] axi_control_1,//附加控制訊號(kernel size、operation...)
+    input [31:0] axi_control_2,//附加控制訊號(kernel size、operation...)
+    output[31:0] axi_control_3//回復訊號(compute over...)
 
 );
+    //TODO:選做:可以做data gating MAC如果在別的模式下(load weight)時用個enable把它關掉，其他的部分也是
     /*
         0901
         目前bram_control已修好，其他的control_path皆有問題。
@@ -28,7 +36,7 @@ module MAC_array_control #(
     */
     //TODO:還沒有實作AXI input的control path因此load_weight_FSM_start，或是要load weight給bram的data path、control path都還沒辦法實作
 
-    //FIXME:需先將bram_control修好，state會少一半
+    //FIXME:需先將bram_control修好，state會少一半 20220902有修一版，還沒測
     //K=>kernelsize
     localparam LOAD_WEIGHT_IDLE=5'd0,RESET_ADDR=5'd1,K1_0=5'd2,K2_0=5'd3,K2_1=5'd4,K3_0=5'd5,K3_1=5'd6,K3_2=5'd7,
                K4_0=5'd8,K4_1=5'd9,K4_2=5'd10,K4_3=5'd11,K5_0=5'd12,K5_1=5'd13,K5_2=5'd14,K5_3=5'd15,K5_4=5'd16,
@@ -46,7 +54,12 @@ module MAC_array_control #(
     wire address_reset;
     wire read_en;
     wire read_len;
-    wire load_weight_FSM_start;//
+    wire load_weight_FSM_start;
+
+    assign load_weight_FSM_start=(axi_control_0==`INST_COMPUTE);
+    assign load_ifmaps_FSM_start=(axi_control_0==`INST_LOADIFMAPS);
+    assign operation=(axi_control_1[0]);
+    assign kernel_size=(axi_control_2[4:0]);
 
     assign address_reset=(load_weight_state==RESET_ADDR);
     assign read_en=(load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K3_0 || load_weight_state==K3_1 || load_weight_state==K4_0 || 
@@ -157,7 +170,7 @@ module MAC_array_control #(
         .kernel_size         (kernel_size         ),
         .ifmaps_input_valid  (ifmaps_input_valid  ),//
         .load_ifmaps         (load_ifmaps         ),//
-        .load_weight         (load_weight         ) //
+        .load_weight         (load_weight         ) 
     );
 
 
