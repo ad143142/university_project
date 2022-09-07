@@ -26,9 +26,10 @@ module bram_control #(
     output wire bram_B_en,
 
     //control
+        //input wire write_en,
     input wire address_reset,
     input wire read_en,
-    input wire read_len,
+    input wire read_length,
     output wire data_valid
 
 );
@@ -56,7 +57,7 @@ module bram_control #(
             if(address_reset) begin
                 bram_address_A<=0;
             end
-            else if(state==VALID_A && ~read_len && read_en) begin
+            else if(state==VALID_A && ~read_length && read_en) begin
                 bram_address_A<=bram_address_A+1;
             end
             else if(state==VALID_B && read_en) begin
@@ -73,7 +74,7 @@ module bram_control #(
             case (state)
                 S0:state<=address_reset ? S0:S1;
                 S1:state<=address_reset ? S0:VALID_A;
-                VALID_A:state<=address_reset ? S0:(read_en ? (read_len ? VALID_B:S0):VALID_A);
+                VALID_A:state<=address_reset ? S0:(read_en ? (read_length ? VALID_B:S0):VALID_A);
                 VALID_B:state<=address_reset ? S0:(read_en ? S0:VALID_B);
                 default:state<=S0;         
             endcase

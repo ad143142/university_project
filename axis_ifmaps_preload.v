@@ -44,6 +44,8 @@ module axis_ifmaps_preload #(
     wire write_en;
     wire read_en;
 
+    assign axi_fifo_read=MAC_read;
+
     assign fifo_empty=(fifo_cnt==0);
     assign fifo_full=(fifo_cnt==FIFO_DEPTH);
 

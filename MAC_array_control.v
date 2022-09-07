@@ -19,8 +19,12 @@ module MAC_array_control #(
     //control
     // input wire operation,
     // input wire [4:0] kernel_size,
-    input wire ifmaps_fifo_empty,
+    //TODO:read_weight,read_ifmaps
+    output wire read_weight,
+    output wire read_ifmaps,
 
+    input wire ifmaps_fifo_empty,
+    input wire data_valid,
     input [31:0] axi_control_0,//主要的控制訊號(loadweight、compute....)
     input [31:0] axi_control_1,//附加控制訊號(kernel size、operation...)
     input [31:0] axi_control_2,//附加控制訊號(kernel size、operation...)
@@ -41,7 +45,7 @@ module MAC_array_control #(
                K1_LOAD_WEIGHT=5'd17,K2_LOAD_WEIGHT=5'd18,K3_LOAD_WEIGHT=5'd19,K4_LOAD_WEIGHT=5'd20,K5_LOAD_WEIGHT=5'd21;
     reg  [4:0] load_weight_state;
 
-    wire data_valid;
+    
 
     //TODO: 雙斜線的是指還沒實作
     wire ifmaps_input_valid;

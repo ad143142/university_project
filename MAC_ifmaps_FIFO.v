@@ -5,16 +5,16 @@ module MAC_ifmaps_FIFO #
     parameter integer DATA_WIDTH = 1
 )
 (
+    //global
     input wire clk,
     input wire rst_n,
 
+    //data
     input wire [DATA_WIDTH-1:0] ifmaps_fifo_row0_in,
     input wire [DATA_WIDTH-1:0] ifmaps_fifo_row1_in,
     input wire [DATA_WIDTH-1:0] ifmaps_fifo_row2_in,
     input wire [DATA_WIDTH-1:0] ifmaps_fifo_row3_in,
     input wire [DATA_WIDTH-1:0] ifmaps_fifo_row4_in,
-
-    input ifmaps_input_valid,
 
     output reg [DATA_WIDTH-1:0] ifmaps_fifo_row0_out,
     output reg [DATA_WIDTH-1:0] ifmaps_fifo_row1_out,
@@ -22,6 +22,8 @@ module MAC_ifmaps_FIFO #
     output reg [DATA_WIDTH-1:0] ifmaps_fifo_row3_out,
     output reg [DATA_WIDTH-1:0] ifmaps_fifo_row4_out,
 
+    //control
+    input ifmaps_input_valid,
     input wire fifo_read,
 
     output wire fifo_full,
