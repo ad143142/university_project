@@ -96,7 +96,7 @@ u_MAC_ifmaps_FIFO(
 
 initial begin
     $fsdbDumpfile("tb_wave_2.fsdb");
-	$fsdbDumpvars(0);  
+	$fsdbDumpvars();  
 end
 
 task fifo_write(input [0:0] data0,input [0:0] data1,input [0:0] data2,input [0:0] data3,input [0:0] data4);begin    

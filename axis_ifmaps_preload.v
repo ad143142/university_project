@@ -13,13 +13,16 @@ module axis_ifmaps_preload #(
     output reg [5*MAC_NUM-1:0] ifmaps_out,
 
     //control
-    input  wire axi_fifo_empty,
-    output wire axi_fifo_read,
+    // input  wire axi_fifo_empty,
+    // output wire axi_fifo_read,
+    input wire [8:0] input_channel,
+    input wire load_ifmaps_preload,
     input  wire MAC_read,
     output wire fifo_empty,
     output wire fifo_full
 );
     //TODO:尚未測試
+    //FIXME:現在只能是以256channel為input所以要改成可調整的
 
     //由axis進入的32bit將他擺放成MAC要使用的5*MAC_NUM寬度
     function integer clogb2 (input integer bit_depth);
@@ -30,6 +33,7 @@ module axis_ifmaps_preload #(
 	endfunction
     
     integer idx;
+    integer idx1;
 
     localparam bit_num  = clogb2(FIFO_DEPTH-1);
 
@@ -43,13 +47,29 @@ module axis_ifmaps_preload #(
 
     wire write_en;
     wire read_en;
+    wire write_ptr_add;
 
-    assign axi_fifo_read=MAC_read;
+    assign write_ptr_add=(fifo_write_cnt==(input_channel-1));
+
+    always @(*) begin
+        for(idx1=0;idx1<256;idx=idx+1) begin
+            if(idx1<input_channel) begin
+                ifmaps_out[idx*5+4 -:5]=preload_fifo[fifo_read_ptr][idx*5+4 -: 5];
+            end
+            else begin
+                ifmaps_out[idx*5+4 -:5]=5'd0;
+            end
+        end
+    end
+
+    // assign axi_fifo_read=MAC_read;
+    // assign axi_fifo_read=((~axi_fifo_empty) & fifo_empty);
 
     assign fifo_empty=(fifo_cnt==0);
     assign fifo_full=(fifo_cnt==FIFO_DEPTH);
 
-    assign write_en=(~axi_fifo_empty) & ((~fifo_full) | MAC_read);
+    // assign write_en=(~axi_fifo_empty) & ((~fifo_full) | MAC_read);
+    assign write_en=~fifo_full & load_ifmaps_preload;
     assign read_en=~fifo_empty & MAC_read;
 
     always @(posedge clk or negedge rst_n) begin
@@ -70,7 +90,7 @@ module axis_ifmaps_preload #(
             fifo_write_ptr<=0;
         end
         else begin
-            if(write_en && fifo_write_cnt==39) begin
+            if(write_en && write_ptr_add) begin
                 fifo_write_ptr<=fifo_write_ptr+1;
             end
         end
@@ -82,7 +102,7 @@ module axis_ifmaps_preload #(
         end
         else begin
             if(write_en) begin
-                fifo_write_cnt<=(write_en==39) ? 0:fifo_write_cnt+1;
+                fifo_write_cnt<=write_ptr_add ? 0:fifo_write_cnt+1;
             end
         end
     end

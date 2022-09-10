@@ -10,7 +10,7 @@ module weight_preload
     output wire [25-1:0] weight_from_preload,
 
     //control
-    input wire input_valid
+    input wire load_weight_preload
 
 );
     
@@ -35,7 +35,7 @@ module weight_preload
             weight_reg_04<=0;
         end
         else begin
-            if(input_valid) begin
+            if(load_weight_preload) begin
                 weight_reg_00<=weight_from_bram[0];
                 weight_reg_01<=weight_reg_00;
                 weight_reg_02<=weight_reg_01;
@@ -54,7 +54,7 @@ module weight_preload
             weight_reg_14<=0;
         end
         else begin
-            if(input_valid) begin
+            if(load_weight_preload) begin
                 weight_reg_10<=weight_from_bram[1];
                 weight_reg_11<=weight_reg_10;
                 weight_reg_12<=weight_reg_11;
@@ -73,7 +73,7 @@ module weight_preload
             weight_reg_24<=0;
         end
         else begin
-            if(input_valid) begin
+            if(load_weight_preload) begin
                 weight_reg_20<=weight_from_bram[2];
                 weight_reg_21<=weight_reg_20;
                 weight_reg_22<=weight_reg_21;
@@ -92,7 +92,7 @@ module weight_preload
             weight_reg_34<=0;
         end
         else begin
-            if(input_valid) begin
+            if(load_weight_preload) begin
                 weight_reg_30<=weight_from_bram[3];
                 weight_reg_31<=weight_reg_30;
                 weight_reg_32<=weight_reg_31;
@@ -111,7 +111,7 @@ module weight_preload
             weight_reg_44<=0;
         end
         else begin
-            if(input_valid) begin
+            if(load_weight_preload) begin
                 weight_reg_40<=weight_from_bram[4];
                 weight_reg_41<=weight_reg_40;
                 weight_reg_42<=weight_reg_41;

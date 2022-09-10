@@ -28,9 +28,10 @@ module bram_control #(
     //control
         //input wire write_en,
     input wire address_reset,
-    input wire read_en,
-    input wire read_length,
-    output wire data_valid
+    input wire bram_control_add1,
+    input wire bram_control_add2,
+    input wire port_sel,
+    output wire weight_from_bram_valid
 
 );
 //TODO:未測試
@@ -38,15 +39,15 @@ module bram_control #(
         bram_control再準備好值之後等待read_en將值讀走，FSM會再根據讀取長度(只讀portA還是讀A和B)，決定是否要
         更新address並且讀取下筆資料。
     */
-    localparam S0=2'd0,S1=2'd1,VALID_A=2'd2,VALID_B=2'd3;
+    localparam S0=2'd0,S1=2'd1,VALID=2'd2;
     
     reg [1:0] state;
 
     assign bram_A_en=1;
     assign bram_B_en=1;
 
-    assign data_valid=(state==VALID_A || state==VALID_B);
-    assign weight_out = (state==VALID_B) ? weight_from_bram_B:weight_from_bram_A;
+    assign weight_from_bram_valid=(state==VALID || state==S0);
+    assign weight_out=(port_sel) ? weight_from_bram_B:weight_from_bram_A;
 
     assign bram_address_B = bram_address_A+1;
     always @(posedge clk or negedge rst_n) begin
@@ -57,10 +58,10 @@ module bram_control #(
             if(address_reset) begin
                 bram_address_A<=0;
             end
-            else if(state==VALID_A && ~read_length && read_en) begin
+            else if(bram_control_add1) begin
                 bram_address_A<=bram_address_A+1;
             end
-            else if(state==VALID_B && read_en) begin
+            else if(bram_control_add2) begin
                 bram_address_A<=bram_address_A+2;
             end
         end
@@ -73,9 +74,8 @@ module bram_control #(
         else begin
             case (state)
                 S0:state<=address_reset ? S0:S1;
-                S1:state<=address_reset ? S0:VALID_A;
-                VALID_A:state<=address_reset ? S0:(read_en ? (read_length ? VALID_B:S0):VALID_A);
-                VALID_B:state<=address_reset ? S0:(read_en ? S0:VALID_B);
+                S1:state<=address_reset ? S0:VALID;
+                VALID:state<=(bram_control_add1 || bram_control_add2)?S0:VALID;
                 default:state<=S0;         
             endcase
         end

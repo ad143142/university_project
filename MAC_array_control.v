@@ -17,18 +17,18 @@ module MAC_array_control #(
 
     output wire [5*MAC_NUM-1:0] psum_out,
     //control
-    // input wire operation,
-    // input wire [4:0] kernel_size,
-    //TODO:read_weight,read_ifmaps
-    output wire read_weight,
-    output wire read_ifmaps,
+    input wire operation,
+    input wire [4:0] kernel_size,
+    
+    input wire load_weight_preload,
+    input wire load_MAC_weight,
+    input wire load_ifmaps,
+    // output wire read_weight,
+    // output wire read_ifmaps,
+    output reg psum_valid,
 
     input wire ifmaps_fifo_empty,
-    input wire data_valid,
-    input [31:0] axi_control_0,//主要的控制訊號(loadweight、compute....)
-    input [31:0] axi_control_1,//附加控制訊號(kernel size、operation...)
-    input [31:0] axi_control_2,//附加控制訊號(kernel size、operation...)
-    output[31:0] axi_control_3//回復訊號(compute over、FIFO_full、read_ofmaps...)
+    output[31:0] axi_control_3 //回復訊號(compute over、FIFO_full、read_ofmaps...)
 
 );
     //TODO:選做:可以做data gating MAC如果在別的模式下(load weight)時用個enable把它關掉，其他的部分也是
@@ -40,88 +40,31 @@ module MAC_array_control #(
 
     //FIXME:需先將bram_control修好，state會少一半 20220902有修一版，還沒測
     //K=>kernelsize
-    localparam LOAD_WEIGHT_IDLE=5'd0,RESET_ADDR=5'd1,K1_0=5'd2,K2_0=5'd3,K2_1=5'd4,K3_0=5'd5,K3_1=5'd6,K3_2=5'd7,
-               K4_0=5'd8,K4_1=5'd9,K4_2=5'd10,K4_3=5'd11,K5_0=5'd12,K5_1=5'd13,K5_2=5'd14,K5_3=5'd15,K5_4=5'd16,
-               K1_LOAD_WEIGHT=5'd17,K2_LOAD_WEIGHT=5'd18,K3_LOAD_WEIGHT=5'd19,K4_LOAD_WEIGHT=5'd20,K5_LOAD_WEIGHT=5'd21;
-    reg  [4:0] load_weight_state;
-
-    
+    // localparam LOAD_WEIGHT_IDLE=5'd0,RESET_ADDR=5'd1,K1_0=5'd2,K2_0=5'd3,K2_1=5'd4,K3_0=5'd5,K3_1=5'd6,K3_2=5'd7,
+    //            K4_0=5'd8,K4_1=5'd9,K4_2=5'd10,K4_3=5'd11,K5_0=5'd12,K5_1=5'd13,K5_2=5'd14,K5_3=5'd15,K5_4=5'd16,
+    //            K1_LOAD_WEIGHT=5'd17,K2_LOAD_WEIGHT=5'd18,K3_LOAD_WEIGHT=5'd19,K4_LOAD_WEIGHT=5'd20,K5_LOAD_WEIGHT=5'd21;
+    // reg  [4:0] load_weight_state;   
 
     //TODO: 雙斜線的是指還沒實作
+    assign axi_control_3=0;//
     wire ifmaps_input_valid;
-
-    wire load_ifmaps;//
-    wire load_weight;
+    // wire load_weight;
 
     wire address_reset;
     wire read_en;
     wire read_len;
     wire load_weight_FSM_start;
 
-    assign load_weight_FSM_start=(axi_control_0==`INST_COMPUTE);
-    assign load_ifmaps_FSM_start=(axi_control_0==`INST_LOADIFMAPS);
-    assign operation=(axi_control_1[0]);
-    assign kernel_size=(axi_control_2[4:0]);
+    wire [25-1:0] weight_from_preload;
 
     assign ifmaps_input_valid=~ifmaps_fifo_empty;
 
-    assign address_reset=(load_weight_state==RESET_ADDR);
-    assign read_en=(load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K3_0 || load_weight_state==K3_1 || load_weight_state==K4_0 || 
-                    load_weight_state==K4_1 || load_weight_state==K5_0 || load_weight_state==K5_1 || load_weight_state==K5_3);
-    assign load_weight=(load_weight_state==K1_LOAD_WEIGHT && load_weight_state==K2_LOAD_WEIGHT &&
-                        load_weight_state==K3_LOAD_WEIGHT && load_weight_state==K4_LOAD_WEIGHT && load_weight_state!=K5_LOAD_WEIGHT);
-    
-    //FIXME:len需要將bram_control修好
-    assign read_len=(load_weight_state==K2_0 || load_weight_state==K3_0 || load_weight_state==K4_0 || load_weight_state==K4_2 || load_weight_state==K5_0 || 
-                     load_weight_state==K5_2);
-
-    /////////////////////////////////////////////////
-    //                                             //
-    //                   FSM                       //
-    //                                             //
-    /////////////////////////////////////////////////
-
-    //TODO:須確定bram的時序及state走法
-    wire load_weight_finish;//所有weight都跑完
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            load_weight_state<=LOAD_WEIGHT_IDLE;
-        end 
+            psum_valid<=0;      
+        end
         else begin
-            case (load_weight_state)
-                LOAD_WEIGHT_IDLE:load_weight_state<= load_weight_FSM_start ? RESET_ADDR:LOAD_WEIGHT_IDLE;
-                RESET_ADDR:load_weight_state<=(kernel_size==5'b00001) ? K1_0:
-                                              (kernel_size==5'b00010) ? K2_0:
-                                              (kernel_size==5'b00100) ? K3_0:
-                                              (kernel_size==5'b01000) ? K4_0:
-                                              (kernel_size==5'b10000) ? K5_0:K1_0;//不應該要有else
-                K1_0:load_weight_state<=data_valid ? K1_LOAD_WEIGHT:K1_0;
-                K1_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K1_0;
-
-                K2_0:load_weight_state<=data_valid ? K2_1:K2_0;
-                K2_1:load_weight_state<=K2_LOAD_WEIGHT;
-                K2_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K2_0;
-
-                K3_0:load_weight_state<=data_valid ? K3_1:K3_0;
-                K3_1:load_weight_state<=K3_2;
-                K3_2:load_weight_state<=data_valid ? K3_LOAD_WEIGHT:K3_2;
-                K3_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K3_0;
-
-                K4_0:load_weight_state<=data_valid ? K4_1:K4_0;
-                K4_1:load_weight_state<=K4_2;
-                K4_2:load_weight_state<=data_valid ? K4_3:K4_2;
-                K4_3:load_weight_state<=K4_LOAD_WEIGHT;
-                K4_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K4_0;
-
-                K5_0:load_weight_state<=data_valid ? K5_1:K5_0;
-                K5_1:load_weight_state<=K5_2;
-                K5_2:load_weight_state<=data_valid ? K5_3:K5_2;
-                K5_3:load_weight_state<=K5_4;
-                K5_4:load_weight_state<=data_valid ? K5_LOAD_WEIGHT:K5_4;
-                K5_LOAD_WEIGHT:load_weight_state<=load_weight_finish ? LOAD_WEIGHT_IDLE:K5_0;
-
-                default: load_weight_state<=LOAD_WEIGHT_IDLE;
-            endcase
+            psum_valid<=load_MAC_weight; 
         end
     end
 
@@ -132,11 +75,11 @@ module MAC_array_control #(
     /////////////////////////////////////////////////
 
     weight_preload u_weight_preload(
-    	.clk                 (clk                 ),
-        .rst_n               (rst_n               ),
-        .weight_from_bram    (weight_from_bram    ),
-        .weight_from_preload (weight_from_preload ),
-        .input_valid         (data_valid          ) 
+    	.clk                 (clk                   ),
+        .rst_n               (rst_n                 ),
+        .weight_from_bram    (weight_from_bram      ),
+        .weight_from_preload (weight_from_preload   ),
+        .load_weight_preload (load_weight_preload   ) 
     );    
 
     MAC_array 
@@ -153,7 +96,7 @@ module MAC_array_control #(
         .kernel_size         (kernel_size         ),
         .ifmaps_input_valid  (ifmaps_input_valid  ),//
         .load_ifmaps         (load_ifmaps         ),//
-        .load_weight         (load_weight         ) 
+        .load_weight         (load_MAC_weight     ) 
     );
 
 
