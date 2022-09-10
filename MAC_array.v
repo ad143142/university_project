@@ -13,7 +13,8 @@ module MAC_array #(
     output wire [5*MAC_NUM-1:0] psum_out,
 
     //control
-    input wire operation,
+    input wire [MAC_NUM-1:0] enable,
+    input wire [1:0] operation,
     input wire [4:0] kernel_size,
 
     input wire ifmaps_input_valid,
@@ -43,6 +44,7 @@ module MAC_array #(
                 .ifmaps_input_valid  (ifmaps_input_valid                      ),
                 .weight_in           (weight_from_preload[(idx*25+24) -: 25]  ),
                 .MAC_out             (psum_out[(idx*5+4) -: 5]                ),
+                .enable              (enable[idx]                             ),
                 .load_ifmaps         (load_ifmaps                             ),
                 .load_weight         (load_weight                             ),
                 .operation           (operation                               ),

@@ -14,11 +14,12 @@ module ALU (
 
     output wire [4:0] MAC_out,
 
-    //control
+    //control in
+    input wire enable,
     input wire load_ifmaps,
     input wire load_weight,
 
-    input wire operation,
+    input wire [1:0] operation,
     input wire [4:0] kernel_size //one hot vector
 
 );
@@ -41,6 +42,17 @@ module ALU (
     wire [24:0] xnor_op;
     reg [4:0] bitcount;
 
+    wire enable_n;//for weight reg to or it if enable is 1 then or 0 ,enable is 0 then or 1 
+    assign enable_n=~enable;
+
+    //operation decode
+    wire op_convolution;
+    wire op_pooling;
+    wire op_linear;
+    assign op_convolution=(operation==0);
+    assign op_pooling=(operation==1);
+    assign op_linear=(operation==2);
+
     wire pooling;
     assign pooling= ifmaps_reg_00|ifmaps_reg_01|ifmaps_reg_02|ifmaps_reg_03|ifmaps_reg_04|
                     ifmaps_reg_10|ifmaps_reg_11|ifmaps_reg_12|ifmaps_reg_13|ifmaps_reg_14|
@@ -49,7 +61,8 @@ module ALU (
                     ifmaps_reg_40|ifmaps_reg_41|ifmaps_reg_42|ifmaps_reg_43|ifmaps_reg_44;
 
     //operation  ->  1: Do Pooling  0: Do MUL
-    assign MAC_out = operation ? {4'd0,pooling}:bitcount; 
+    assign MAC_out = op_pooling ? {4'd0,pooling}:
+                     op_convolution ? bitcount:5'd0; 
     
     //kernel後的數字代表設定的kernel_size是否有比他大
     wire kenel_2,kenel_3,kenel_4,kenel_5;
@@ -110,7 +123,7 @@ module ALU (
                 ifmaps_reg_01<=kenel_4 & ifmaps_reg_02;
                 ifmaps_reg_02<=kenel_3 & ifmaps_reg_03;
                 ifmaps_reg_03<=kenel_2 & ifmaps_reg_04;
-                ifmaps_reg_04<=ifmaps_row0_in;
+                ifmaps_reg_04<=ifmaps_row0_in & enable;
             end
         end
     end
@@ -129,7 +142,7 @@ module ALU (
                 ifmaps_reg_11<=kenel_4 & ifmaps_reg_12;
                 ifmaps_reg_12<=kenel_3 & ifmaps_reg_13;
                 ifmaps_reg_13<=kenel_2 & ifmaps_reg_14;
-                ifmaps_reg_14<=kenel_2 & ifmaps_row1_in;
+                ifmaps_reg_14<=kenel_2 & enable & ifmaps_row1_in;
             end
         end
     end
@@ -148,7 +161,7 @@ module ALU (
                 ifmaps_reg_21<=kenel_4 & ifmaps_reg_22;
                 ifmaps_reg_22<=kenel_3 & ifmaps_reg_23;
                 ifmaps_reg_23<=kenel_3 & ifmaps_reg_24;
-                ifmaps_reg_24<=kenel_3 & ifmaps_row2_in;
+                ifmaps_reg_24<=kenel_3 & enable & ifmaps_row2_in;
             end
         end
     end
@@ -167,7 +180,7 @@ module ALU (
                 ifmaps_reg_31<=kenel_4 & ifmaps_reg_32;
                 ifmaps_reg_32<=kenel_4 & ifmaps_reg_33;
                 ifmaps_reg_33<=kenel_4 & ifmaps_reg_34;
-                ifmaps_reg_34<=kenel_4 & ifmaps_row3_in;
+                ifmaps_reg_34<=kenel_4 & enable & ifmaps_row3_in;
             end
         end
     end
@@ -186,7 +199,7 @@ module ALU (
                 ifmaps_reg_41<=kenel_5 & ifmaps_reg_42;
                 ifmaps_reg_42<=kenel_5 & ifmaps_reg_43;
                 ifmaps_reg_43<=kenel_5 & ifmaps_reg_44;
-                ifmaps_reg_44<=kenel_5 & ifmaps_row4_in;
+                ifmaps_reg_44<=kenel_5 & enable & ifmaps_row4_in;
             end
         end
     end
@@ -227,7 +240,7 @@ module ALU (
                         weight_reg_01 <= 1;
                         weight_reg_02 <= 1;
                         weight_reg_03 <= 1;
-                        weight_reg_04 <= weight_in[0];
+                        weight_reg_04 <= weight_in[0] | enable_n;
 
                         weight_reg_10 <= 1;
                         weight_reg_11 <= 1;
@@ -257,14 +270,14 @@ module ALU (
                         weight_reg_00 <= 1;
                         weight_reg_01 <= 1;
                         weight_reg_02 <= 1;
-                        weight_reg_03 <= weight_in[0];
-                        weight_reg_04 <= weight_in[1];
+                        weight_reg_03 <= weight_in[0] | enable_n;
+                        weight_reg_04 <= weight_in[1] | enable_n;
 
                         weight_reg_10 <= 1;
                         weight_reg_11 <= 1;
                         weight_reg_12 <= 1;
-                        weight_reg_13 <= weight_in[2];
-                        weight_reg_14 <= weight_in[3];
+                        weight_reg_13 <= weight_in[2] | enable_n;
+                        weight_reg_14 <= weight_in[3] | enable_n;
 
                         weight_reg_20 <= 1;
                         weight_reg_21 <= 1;
@@ -287,21 +300,21 @@ module ALU (
                     5'b??1??:begin
                         weight_reg_00 <= 1;
                         weight_reg_01 <= 1;
-                        weight_reg_02 <= weight_in[0];
-                        weight_reg_03 <= weight_in[1];
-                        weight_reg_04 <= weight_in[2];
+                        weight_reg_02 <= weight_in[0] | enable_n;
+                        weight_reg_03 <= weight_in[1] | enable_n;
+                        weight_reg_04 <= weight_in[2] | enable_n;
 
                         weight_reg_10 <= 1;
                         weight_reg_11 <= 1;
-                        weight_reg_12 <= weight_in[3];
-                        weight_reg_13 <= weight_in[4];
-                        weight_reg_14 <= weight_in[5];
+                        weight_reg_12 <= weight_in[3] | enable_n;
+                        weight_reg_13 <= weight_in[4] | enable_n;
+                        weight_reg_14 <= weight_in[5] | enable_n;
 
                         weight_reg_20 <= 1;
                         weight_reg_21 <= 1;
-                        weight_reg_22 <= weight_in[6];
-                        weight_reg_23 <= weight_in[7];
-                        weight_reg_24 <= weight_in[8];
+                        weight_reg_22 <= weight_in[6] | enable_n;
+                        weight_reg_23 <= weight_in[7] | enable_n;
+                        weight_reg_24 <= weight_in[8] | enable_n;
 
                         weight_reg_30 <= 1;
                         weight_reg_31 <= 1;
@@ -317,28 +330,28 @@ module ALU (
                     end
                     5'b?1???:begin
                         weight_reg_00 <= 1;
-                        weight_reg_01 <= weight_in[0];
-                        weight_reg_02 <= weight_in[1];
-                        weight_reg_03 <= weight_in[2];
-                        weight_reg_04 <= weight_in[3];
+                        weight_reg_01 <= weight_in[0] | enable_n;
+                        weight_reg_02 <= weight_in[1] | enable_n;
+                        weight_reg_03 <= weight_in[2] | enable_n;
+                        weight_reg_04 <= weight_in[3] | enable_n;
 
                         weight_reg_10 <= 1;
-                        weight_reg_11 <= weight_in[4];
-                        weight_reg_12 <= weight_in[5];
-                        weight_reg_13 <= weight_in[6];
-                        weight_reg_14 <= weight_in[7];
+                        weight_reg_11 <= weight_in[4] | enable_n;
+                        weight_reg_12 <= weight_in[5] | enable_n;
+                        weight_reg_13 <= weight_in[6] | enable_n;
+                        weight_reg_14 <= weight_in[7] | enable_n;
 
                         weight_reg_20 <= 1;
-                        weight_reg_21 <= weight_in[8];
-                        weight_reg_22 <= weight_in[9];
-                        weight_reg_23 <= weight_in[10];
-                        weight_reg_24 <= weight_in[11];
+                        weight_reg_21 <= weight_in[8]  | enable_n;
+                        weight_reg_22 <= weight_in[9]  | enable_n;
+                        weight_reg_23 <= weight_in[10] | enable_n;
+                        weight_reg_24 <= weight_in[11] | enable_n;
 
                         weight_reg_30 <= 1;
-                        weight_reg_31 <= weight_in[12];
-                        weight_reg_32 <= weight_in[13];
-                        weight_reg_33 <= weight_in[14];
-                        weight_reg_34 <= weight_in[15];
+                        weight_reg_31 <= weight_in[12] | enable_n;
+                        weight_reg_32 <= weight_in[13] | enable_n;
+                        weight_reg_33 <= weight_in[14] | enable_n;
+                        weight_reg_34 <= weight_in[15] | enable_n;
 
                         weight_reg_40 <= 1;
                         weight_reg_41 <= 1;
@@ -347,35 +360,35 @@ module ALU (
                         weight_reg_44 <= 1;
                     end
                     5'b1????:begin
-                        weight_reg_00 <= weight_in[0];
-                        weight_reg_01 <= weight_in[1];
-                        weight_reg_02 <= weight_in[2];
-                        weight_reg_03 <= weight_in[3];
-                        weight_reg_04 <= weight_in[4];
+                        weight_reg_00 <= weight_in[0] | enable_n;
+                        weight_reg_01 <= weight_in[1] | enable_n;
+                        weight_reg_02 <= weight_in[2] | enable_n;
+                        weight_reg_03 <= weight_in[3] | enable_n;
+                        weight_reg_04 <= weight_in[4] | enable_n;
 
-                        weight_reg_10 <= weight_in[5];
-                        weight_reg_11 <= weight_in[6];
-                        weight_reg_12 <= weight_in[7];
-                        weight_reg_13 <= weight_in[8];
-                        weight_reg_14 <= weight_in[9];
+                        weight_reg_10 <= weight_in[5] | enable_n;
+                        weight_reg_11 <= weight_in[6] | enable_n;
+                        weight_reg_12 <= weight_in[7] | enable_n;
+                        weight_reg_13 <= weight_in[8] | enable_n;
+                        weight_reg_14 <= weight_in[9] | enable_n;
 
-                        weight_reg_20 <= weight_in[10];
-                        weight_reg_21 <= weight_in[11];
-                        weight_reg_22 <= weight_in[12];
-                        weight_reg_23 <= weight_in[13];
-                        weight_reg_24 <= weight_in[14];
+                        weight_reg_20 <= weight_in[10] | enable_n;
+                        weight_reg_21 <= weight_in[11] | enable_n;
+                        weight_reg_22 <= weight_in[12] | enable_n;
+                        weight_reg_23 <= weight_in[13] | enable_n;
+                        weight_reg_24 <= weight_in[14] | enable_n;
 
-                        weight_reg_30 <= weight_in[15];
-                        weight_reg_31 <= weight_in[16];
-                        weight_reg_32 <= weight_in[17];
-                        weight_reg_33 <= weight_in[18];
-                        weight_reg_34 <= weight_in[19];
+                        weight_reg_30 <= weight_in[15] | enable_n;
+                        weight_reg_31 <= weight_in[16] | enable_n;
+                        weight_reg_32 <= weight_in[17] | enable_n;
+                        weight_reg_33 <= weight_in[18] | enable_n;
+                        weight_reg_34 <= weight_in[19] | enable_n;
 
-                        weight_reg_40 <= weight_in[20];
-                        weight_reg_41 <= weight_in[21];
-                        weight_reg_42 <= weight_in[22];
-                        weight_reg_43 <= weight_in[23];
-                        weight_reg_44 <= weight_in[24];
+                        weight_reg_40 <= weight_in[20] | enable_n;
+                        weight_reg_41 <= weight_in[21] | enable_n;
+                        weight_reg_42 <= weight_in[22] | enable_n;
+                        weight_reg_43 <= weight_in[23] | enable_n;
+                        weight_reg_44 <= weight_in[24] | enable_n;
                     end
                     default: begin
                         weight_reg_00 <= weight_reg_00;

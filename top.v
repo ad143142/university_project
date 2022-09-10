@@ -22,9 +22,13 @@ module top #(
     input wire [C_S_AXIS_TDATA_WIDTH-1 : 0] axi_control_2
 
 );
+    //TODO:padding、full-connect、if input channel bigger than 256(MAC_NUM)control unit要增加紀錄現在到哪個channel的reg、load weight 、AXI_S input、
+
+    wire [MAC_NUM-1:0] MAC_enable;
     wire weight_from_bram_valid;
-    wire operation;
+    wire [1:0] operation;
     wire [4:0] kernel_size;
+    wire [11:0]input_channel_size;
     wire load_weight_preload;
     wire load_weight;
     wire bram_port_sel;
@@ -51,7 +55,9 @@ module top #(
         .weight_from_bram_valid     (weight_from_bram_valid     ),
         .ifmaps_fifo_empty          (ifmaps_fifo_empty          ),
         //control out          
+        .MAC_enable                 (MAC_enable                 ),
         .operation                  (operation                  ),
+        .input_channel_size         (input_channel_size         ),
         .kernel_size                (kernel_size                ),
         .load_weight_preload        (load_weight_preload        ),
         .load_weight                (load_weight                ),
@@ -81,7 +87,9 @@ module top #(
         .S_AXIS_TVALID              (S_AXIS_TVALID              ),
         .psum_out                   (psum_out                   ),
         //contol in              
+        .MAC_enable                 (MAC_enable                 ),
         .psum_valid                 (psum_valid                 ),
+        .input_channel_size         (input_channel_size         ),
         .operation                  (operation                  ),
         .kernel_size                (kernel_size                ),
         .address_reset              (address_reset              ),

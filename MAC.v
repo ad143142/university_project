@@ -19,12 +19,13 @@ module MAC #
     output wire [4:0] MAC_out,
 
     //control
-    input ifmaps_input_valid,
+    input wire enable,
+    input wire ifmaps_input_valid,
 
     input wire load_ifmaps,
     input wire load_weight,
 
-    input wire operation,
+    input wire [1:0] operation,
     input wire [4:0] kernel_size
 
 );
@@ -77,6 +78,7 @@ module MAC #
         .ifmaps_row4_in (ifmaps_fifo_row4_out ),
         .weight_in      (weight_in            ),
         .MAC_out        (MAC_out              ),
+        .enable         (enable               ),
         .load_ifmaps    (load_ifmaps_buf_1t   ),
         .load_weight    (load_weight          ),
         .operation      (operation            ),

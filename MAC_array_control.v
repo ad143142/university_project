@@ -17,7 +17,8 @@ module MAC_array_control #(
 
     output wire [5*MAC_NUM-1:0] psum_out,
     //control
-    input wire operation,
+    input wire [MAC_NUM-1:0] enable,
+    input wire [1:0] operation,
     input wire [4:0] kernel_size,
     
     input wire load_weight_preload,
@@ -55,7 +56,7 @@ module MAC_array_control #(
     wire read_len;
     wire load_weight_FSM_start;
 
-    wire [25-1:0] weight_from_preload;
+    wire [25*MAC_NUM-1:0] weight_from_preload;
 
     assign ifmaps_input_valid=~ifmaps_fifo_empty;
 
@@ -74,13 +75,20 @@ module MAC_array_control #(
     //                                             //
     /////////////////////////////////////////////////
 
-    weight_preload u_weight_preload(
-    	.clk                 (clk                   ),
-        .rst_n               (rst_n                 ),
-        .weight_from_bram    (weight_from_bram      ),
-        .weight_from_preload (weight_from_preload   ),
-        .load_weight_preload (load_weight_preload   ) 
-    );    
+    genvar idx;
+    generate
+        for(idx=0;idx<MAC_NUM;idx=idx+1) begin
+            weight_preload u_weight_preload(
+                .clk                 (clk                                    ),
+                .rst_n               (rst_n                                  ),
+                .weight_from_bram    (weight_from_bram[idx*5+4 -:5]          ),
+                .weight_from_preload (weight_from_preload[idx*25+24 -:25]    ),
+                .load_weight_preload (load_weight_preload                    ) 
+            ); 
+        end
+    endgenerate
+
+       
 
     MAC_array 
     #(
@@ -92,6 +100,7 @@ module MAC_array_control #(
         .weight_from_preload (weight_from_preload ),
         .ifmaps_from_fifo    (ifmaps_from_fifo    ),
         .psum_out            (psum_out            ),
+        .enable              (enable              ),
         .operation           (operation           ),
         .kernel_size         (kernel_size         ),
         .ifmaps_input_valid  (ifmaps_input_valid  ),//

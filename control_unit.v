@@ -10,7 +10,7 @@ module control_unit #(
     input wire rst_n,
 
     //control output  
-    output wire operation,
+    output wire [1:0]operation,
     output wire [4:0]kernel_size,
     output wire load_weight_preload,
     output wire load_weight,
@@ -20,6 +20,9 @@ module control_unit #(
     output wire address_reset,
 
     output wire load_ifmaps,
+    output wire [11:0] input_channel_size,
+
+    output reg [MAC_NUM-1:0] MAC_enable,
     //control input 
     input wire weight_from_bram_valid,
     input wire ifmaps_fifo_empty,
@@ -30,6 +33,7 @@ module control_unit #(
     output wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_3 //回復訊號(compute over、FIFO_full、read_ofmaps...)
     
 );
+    //FIXME:MAC_enable等增加round之後要更改input
     localparam LOAD_WEIGHT_IDLE=5'd0,RESET_ADDR=5'd1,K1_0=5'd2,K2_0=5'd3,K2_1=5'd4,K3_0=5'd5,K3_1=5'd6,K3_2=5'd7,
                K4_0=5'd8,K4_1=5'd9,K4_2=5'd10,K4_3=5'd11,K5_0=5'd12,K5_1=5'd13,K5_2=5'd14,K5_3=5'd15,K5_4=5'd16,
                K1_LOAD_WEIGHT=5'd17,K2_LOAD_WEIGHT=5'd18,K3_LOAD_WEIGHT=5'd19,K4_LOAD_WEIGHT=5'd20,K5_LOAD_WEIGHT=5'd21;
@@ -46,12 +50,16 @@ module control_unit #(
 
     wire load_weight_FSM_start,load_ifmaps_FSM_start;
     wire [8:0] ofmaps_weight;
+    wire [7:0] MAC_enable_in;
     
-    assign ofmaps_weight=(axi_control_1[9:1]);   
-    assign operation=(axi_control_1[0]);
-    assign kernel_size=(axi_control_2[4:0]);
+    //decode
     assign load_ifmaps_FSM_start=(axi_control_0[7:0]==`INST_COMPUTE);
-    assign channel_size=(axi_control_0[19:8]);
+    assign input_channel_size=(axi_control_0[19:8]);
+
+    assign ofmaps_weight=(axi_control_1[10:2]);   
+    assign operation=(axi_control_1[1:0]);
+
+    assign kernel_size=(axi_control_2[4:0]);
 
     assign axi_control_3=0;
 
@@ -59,7 +67,7 @@ module control_unit #(
     //                   ifmaps_FSM                //
     /////////////////////////////////////////////////
     wire all_weight_compute_finish,all_finish,ifmaps_flush;
-    assign all_weight_compute_finish=(filter_cnt==channel_size);
+    assign all_weight_compute_finish=(filter_cnt==input_channel_size);
     assign all_finish=(ofmaps_width_cnt==ofmaps_weight && ofmaps_hegiht_cnt==ofmaps_weight);
     assign ifmaps_flush=(ofmaps_width_cnt==0);
 
@@ -231,6 +239,25 @@ module control_unit #(
             end
         end
     end
+
+    /////////////////////////////////////////////////
+    //                   MAC_enable                //
+    /////////////////////////////////////////////////
+    
+    //FIXME:
+    assign MAC_enable_in=input_channel_size[7:0];
+
+    integer idx;
+    always @(*) begin
+        for(idx=0;idx<MAC_NUM;idx=idx+1) begin
+            MAC_enable[idx]=(idx<MAC_enable_in) ? 1:0;
+        end
+    end
+    
+
+    /////////////////////////////////////////////////
+    //                   MAC_enable                //
+    /////////////////////////////////////////////////
 
 
 endmodule

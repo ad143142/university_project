@@ -38,18 +38,20 @@ module tb_top;
     begin
         #(PERIOD*2) rst_n  =  1;
         set_CONV();
+        set_input_channel(1);
         set_kernel_size(5);
-        compute_finish(0);
+        set_ofmaps_width(3);
+        // compute_finish(0);
         #20;
-        axis_in(123);
-        axis_in(124);
-        axis_in(125);
-        axis_in(126);
-        axis_in(127);
-        axis_in(128);
-        axis_in(129);
+        axis_in(32'b11111);
+        axis_in(32'b10111);
+        axis_in(32'b11101);
+        axis_in(32'b11011);
+        axis_in(32'b10001);
+        // axis_in(32'b11111);
+        // axis_in(32'b11111);
         compute_start();
-        #1000;
+        #10000;
         $finish;
     end
 
@@ -108,6 +110,17 @@ module tb_top;
     end
     endtask
 
+    task set_ofmaps_width(input [8:0]data);begin
+        axi_control_1[10:2]=data;
+    end
+    endtask
+
+    task set_input_channel(input [8:0]data);begin
+        axi_control_0[19:8]=data;
+    end
+    endtask
+
+    //?ü∫?ú¨‰∏çÁî®
     task compute_finish(input [0:0]finish);begin
         axi_control_2[5]=finish;
     end

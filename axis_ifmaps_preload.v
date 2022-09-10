@@ -10,12 +10,12 @@ module axis_ifmaps_preload #(
 
     //data
     input wire [C_S_AXIS_TDATA_WIDTH-1:0] ifmaps_from_axis,
-    output reg [5*MAC_NUM-1:0] ifmaps_out,
+    output wire [5*MAC_NUM-1:0] ifmaps_out,
 
     //control
     // input  wire axi_fifo_empty,
     // output wire axi_fifo_read,
-    input wire [8:0] input_channel,
+    input wire [11:0] input_channel_size,
     input wire load_ifmaps_preload,
     input  wire MAC_read,
     output wire fifo_empty,
@@ -33,14 +33,13 @@ module axis_ifmaps_preload #(
 	endfunction
     
     integer idx;
-    integer idx1;
 
     localparam bit_num  = clogb2(FIFO_DEPTH-1);
 
     reg [5*MAC_NUM-1:0] preload_fifo [0:bit_num-1];
 
     reg [bit_num-1:0] fifo_write_ptr;
-    reg [5:0] fifo_write_cnt;
+    reg [8:0] fifo_write_cnt;
     reg [bit_num-1:0] fifo_read_ptr;
 
     reg [bit_num-1:0] fifo_cnt;
@@ -49,18 +48,9 @@ module axis_ifmaps_preload #(
     wire read_en;
     wire write_ptr_add;
 
-    assign write_ptr_add=(fifo_write_cnt==(input_channel-1));
+    assign write_ptr_add=(fifo_write_cnt+6<input_channel_size);
 
-    always @(*) begin
-        for(idx1=0;idx1<256;idx=idx+1) begin
-            if(idx1<input_channel) begin
-                ifmaps_out[idx*5+4 -:5]=preload_fifo[fifo_read_ptr][idx*5+4 -: 5];
-            end
-            else begin
-                ifmaps_out[idx*5+4 -:5]=5'd0;
-            end
-        end
-    end
+    assign ifmaps_out=preload_fifo[fifo_read_ptr];
 
     // assign axi_fifo_read=MAC_read;
     // assign axi_fifo_read=((~axi_fifo_empty) & fifo_empty);
@@ -80,7 +70,7 @@ module axis_ifmaps_preload #(
         end
         else begin
             if(write_en) begin
-                preload_fifo[fifo_write_ptr][fifo_write_cnt]<=ifmaps_from_axis;
+                preload_fifo[fifo_write_ptr][fifo_write_cnt+29 -:30]<=ifmaps_from_axis[29:0];
             end
         end
     end
@@ -102,7 +92,7 @@ module axis_ifmaps_preload #(
         end
         else begin
             if(write_en) begin
-                fifo_write_cnt<=write_ptr_add ? 0:fifo_write_cnt+1;
+                fifo_write_cnt<=write_ptr_add? fifo_write_cnt+6:0;
             end
         end
     end

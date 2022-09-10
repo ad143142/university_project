@@ -25,7 +25,9 @@ module data_path #(
     output wire [5*MAC_NUM-1:0] psum_out,
     output wire psum_valid,
     //control
-    input wire operation,
+    input wire [MAC_NUM-1:0] MAC_enable,
+    input wire [1:0] operation,
+    input wire [11:0] input_channel_size,
     input wire [4:0] kernel_size,
     input wire address_reset,
     input wire bram_control_add1,
@@ -58,7 +60,7 @@ module data_path #(
     wire axi_fifo_empty,axi_fifo_full;
     wire axi_fifo_read;
     wire [5*MAC_NUM-1:0] ifmaps_from_fifo;
-    wire bram_address_A,bram_address_B;
+    wire [11:0] bram_address_A,bram_address_B;
     wire [5*MAC_NUM-1:0] weight_from_bram;
     wire read_weight,read_ifmaps;
 
@@ -103,8 +105,9 @@ module data_path #(
         .ifmaps_from_axis     (ifmaps_from_axis     ),
         .ifmaps_out           (ifmaps_from_fifo     ),
         //control in        
-        .MAC_read             (load_ifmaps          ),//TODO:
+        .MAC_read             (load_ifmaps          ),
         .load_ifmaps_preload  (load_ifmaps_preload  ),
+        .input_channel_size   (input_channel_size   ),
         //control out    
             // .axi_fifo_empty       (axi_fifo_empty       ),//
             // .axi_fifo_read        (axi_fifo_read        ),//
@@ -127,6 +130,7 @@ module data_path #(
         .weight_from_bram    (weight_from_bram    ),
         .psum_out            (psum_out            ),
         //control in
+        .enable              (MAC_enable          ),
         .operation           (operation           ),
         .kernel_size         (kernel_size         ),
         .load_weight_preload (load_weight_preload ),
@@ -139,7 +143,7 @@ module data_path #(
     );
     
     
-    wire weight_from_bram_A,weight_from_bram_B;
+    wire [1279:0] weight_from_bram_A,weight_from_bram_B;
     wire bram_A_en,bram_B_en;
 
     bram_control 
@@ -184,8 +188,8 @@ module data_path #(
         .BRAM_PORTB_0_addr       (bram_address_B     ),
         .BRAM_PORTA_0_en         (bram_A_en          ),
         .BRAM_PORTB_0_en         (bram_B_en          ),
-        .BRAM_PORTA_0_we         (0                  ),
-        .BRAM_PORTB_0_we         (0                  )
+        .BRAM_PORTA_0_we         (1'd0               ),
+        .BRAM_PORTB_0_we         (1'd0               )
     );
     
 endmodule
