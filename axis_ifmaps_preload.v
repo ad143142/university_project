@@ -36,7 +36,7 @@ module axis_ifmaps_preload #(
 
     localparam bit_num  = clogb2(FIFO_DEPTH-1);
 
-    reg [5*MAC_NUM-1:0] preload_fifo [0:bit_num-1];
+    reg [5*MAC_NUM-1:0] preload_fifo [0:FIFO_DEPTH-1];
 
     reg [bit_num-1:0] fifo_write_ptr;
     reg [8:0] fifo_write_cnt;
@@ -48,7 +48,7 @@ module axis_ifmaps_preload #(
     wire read_en;
     wire write_ptr_add;
 
-    assign write_ptr_add=(fifo_write_cnt+6<input_channel_size);
+    assign write_ptr_add=(fifo_write_cnt+6>input_channel_size);
 
     assign ifmaps_out=preload_fifo[fifo_read_ptr];
 
@@ -56,7 +56,7 @@ module axis_ifmaps_preload #(
     // assign axi_fifo_read=((~axi_fifo_empty) & fifo_empty);
 
     assign fifo_empty=(fifo_cnt==0);
-    assign fifo_full=(fifo_cnt==FIFO_DEPTH);
+    assign fifo_full=(fifo_cnt==FIFO_DEPTH-1);
 
     // assign write_en=(~axi_fifo_empty) & ((~fifo_full) | MAC_read);
     assign write_en=~fifo_full & load_ifmaps_preload;
@@ -64,7 +64,7 @@ module axis_ifmaps_preload #(
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            for(idx=0;idx<bit_num;idx=idx+1) begin
+            for(idx=0;idx<FIFO_DEPTH;idx=idx+1) begin
                 preload_fifo[idx]<=0;
             end
         end
@@ -92,7 +92,7 @@ module axis_ifmaps_preload #(
         end
         else begin
             if(write_en) begin
-                fifo_write_cnt<=write_ptr_add? fifo_write_cnt+6:0;
+                fifo_write_cnt<=write_ptr_add? 0:fifo_write_cnt+6;
             end
         end
     end

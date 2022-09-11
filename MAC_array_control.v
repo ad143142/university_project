@@ -77,7 +77,7 @@ module MAC_array_control #(
 
     genvar idx;
     generate
-        for(idx=0;idx<MAC_NUM;idx=idx+1) begin
+        for(idx=0;idx<MAC_NUM;idx=idx+1) begin:weight_preload_arr
             weight_preload u_weight_preload(
                 .clk                 (clk                                    ),
                 .rst_n               (rst_n                                  ),

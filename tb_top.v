@@ -36,6 +36,11 @@ module tb_top;
 
     initial
     begin
+        $fsdbDumpfile("top_tb.fsdb");
+        $fsdbDumpvars(0);
+    end
+    initial
+    begin
         #(PERIOD*2) rst_n  =  1;
         set_CONV();
         set_input_channel(1);
@@ -106,7 +111,7 @@ module tb_top;
     endtask
 
     task compute_start();begin
-        axi_control_0=`INST_COMPUTE;
+        axi_control_0[7:0]=`INST_COMPUTE;
     end
     endtask
 
@@ -120,7 +125,7 @@ module tb_top;
     end
     endtask
 
-    //?ü∫?ú¨‰∏çÁî®
+    //?ÔøΩÔøΩ?ÔøΩÔøΩ‰∏çÁî®
     task compute_finish(input [0:0]finish);begin
         axi_control_2[5]=finish;
     end
@@ -132,6 +137,7 @@ module tb_top;
         S_AXIS_TSTRB=0;
         S_AXIS_TLAST=0;
         #(PERIOD);
+        S_AXIS_TVALID=0;
     end
     endtask
 

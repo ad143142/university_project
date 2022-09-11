@@ -95,7 +95,7 @@ module top #(
         .address_reset              (address_reset              ),
         .bram_control_add1          (bram_control_add1          ),
         .bram_control_add2          (bram_control_add2          ),
-        .port_sel                   (port_sel                   ),
+        .port_sel                   (bram_port_sel              ),
         .load_weight_preload        (load_weight_preload        ),
         .load_weight                (load_weight                ),
         .load_ifmaps                (load_ifmaps                ),

@@ -107,7 +107,7 @@ module control_unit #(
 
     
 
-    // assign address_reset=(load_weight_state==RESET_ADDR);
+    assign address_reset=(load_weight_state==RESET_ADDR);
 
     assign load_weight_preload=(weight_from_bram_valid) & 
                                (load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K2_1 || load_weight_state==K3_0 || load_weight_state==K3_1 || 

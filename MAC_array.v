@@ -27,13 +27,12 @@ module MAC_array #(
     //產生MAC_NUM(板子上的LUT應該只能放256個MAC，其LUT用量已經45%不包括其他外設及control_unit)
     genvar idx;
     generate
-        for(idx=0;idx<MAC_NUM;idx=idx+1)
-        begin
+        for(idx=0;idx<MAC_NUM;idx=idx+1) begin:MAC_arr
             MAC 
             #(
                 .DATA_WIDTH (1)
             )
-            u_MAC(
+            u_MAC (
             	.clk                 (clk                                     ),
                 .rst_n               (rst_n                                   ),
                 .ifmaps_fifo_row0_in (ifmaps_from_fifo[(idx*5)+0]             ),
