@@ -46,12 +46,12 @@ module control_unit #(
     reg [11:0] filter_cnt;
     reg [8:0] ofmaps_width_cnt;
     reg [8:0] ofmaps_hegiht_cnt;
-    reg all_weight_compute_finish_delay;
 
     wire load_weight_FSM_start,load_ifmaps_FSM_start;
     wire [8:0] ofmaps_width;
     wire [11:0] ofmaps_channel;
     wire [7:0] MAC_enable_in;
+    wire all_weight_compute_finish;
     
     //decode
     assign load_ifmaps_FSM_start=(axi_control_0[7:0]==`INST_COMPUTE);
@@ -68,15 +68,19 @@ module control_unit #(
     /////////////////////////////////////////////////
     //                   ifmaps_FSM                //
     /////////////////////////////////////////////////
-    wire all_weight_compute_finish,all_finish,ifmaps_flush;
+    wire last_weight,all_finish,ifmaps_flush;
     wire [11:0] next_filter_cnt ;
     assign next_filter_cnt=filter_cnt+1;
-    assign all_weight_compute_finish=(next_filter_cnt==ofmaps_channel);
-    assign all_finish=(ofmaps_width_cnt==ofmaps_width && ofmaps_hegiht_cnt==ofmaps_width-1);
-    assign ifmaps_flush=(ofmaps_width_cnt==0);
+    assign last_weight=(next_filter_cnt==ofmaps_channel);
+    assign all_finish=(ofmaps_width_cnt==(ofmaps_width-1) && ofmaps_hegiht_cnt==ofmaps_width-1);
+    assign ifmaps_flush=(ofmaps_width_cnt==(ofmaps_width-1));
 
     assign load_ifmaps=(load_ifmaps_state==LOAD || load_ifmaps_state==LOAD1 || load_ifmaps_state==LOAD2 || load_ifmaps_state==LOAD3 || 
                         load_ifmaps_state==LOAD4 || load_ifmaps_state==LOAD5);
+
+    assign all_weight_compute_finish=last_weight & 
+                                    (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
+                                     load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -95,7 +99,7 @@ module control_unit #(
                 LOAD4             :load_ifmaps_state<=(kernel_size==5'b01000) ? COMPUTE:WAIT_FIFO5;
                 WAIT_FIFO5        :load_ifmaps_state<=ifmaps_fifo_empty ? WAIT_FIFO5:LOAD5;
                 LOAD5             :load_ifmaps_state<=COMPUTE;         
-                COMPUTE           :load_ifmaps_state<=all_weight_compute_finish_delay ? (all_finish ? LOAD_WEIGHT_IDLE:(ifmaps_flush ? WAIT_FIFO1:WAIT_FIFO6)):COMPUTE;
+                COMPUTE           :load_ifmaps_state<=all_weight_compute_finish ? (all_finish ? LOAD_WEIGHT_IDLE:(ifmaps_flush ? WAIT_FIFO1:WAIT_FIFO6)):COMPUTE;
                 WAIT_FIFO6        :load_ifmaps_state<=ifmaps_fifo_empty ? WAIT_FIFO6:LOAD;
                 LOAD              :load_ifmaps_state<=COMPUTE;
             endcase
@@ -147,29 +151,29 @@ module control_unit #(
                                               (kernel_size==5'b01000) ? K4_0:
                                               (kernel_size==5'b10000) ? K5_0:K1_0;//不應該有else
                 K1_0:load_weight_state<=weight_from_bram_valid ? K1_LOAD_WEIGHT:K1_0;
-                K1_LOAD_WEIGHT:load_weight_state<=all_weight_compute_finish ? LOAD_WEIGHT_IDLE:K1_0;
+                K1_LOAD_WEIGHT:load_weight_state<=last_weight ? LOAD_WEIGHT_IDLE:K1_0;
 
                 K2_0:load_weight_state<=weight_from_bram_valid ? K2_1:K2_0;
                 K2_1:load_weight_state<=K2_LOAD_WEIGHT;
-                K2_LOAD_WEIGHT:load_weight_state<=all_weight_compute_finish ? LOAD_WEIGHT_IDLE:K2_0;
+                K2_LOAD_WEIGHT:load_weight_state<=last_weight ? LOAD_WEIGHT_IDLE:K2_0;
 
                 K3_0:load_weight_state<=weight_from_bram_valid ? K3_1:K3_0;
                 K3_1:load_weight_state<=K3_2;
                 K3_2:load_weight_state<=weight_from_bram_valid ? K3_LOAD_WEIGHT:K3_2;
-                K3_LOAD_WEIGHT:load_weight_state<=all_weight_compute_finish ? LOAD_WEIGHT_IDLE:K3_0;
+                K3_LOAD_WEIGHT:load_weight_state<=last_weight ? LOAD_WEIGHT_IDLE:K3_0;
 
                 K4_0:load_weight_state<=weight_from_bram_valid ? K4_1:K4_0;
                 K4_1:load_weight_state<=K4_2;
                 K4_2:load_weight_state<=weight_from_bram_valid ? K4_3:K4_2;
                 K4_3:load_weight_state<=K4_LOAD_WEIGHT;
-                K4_LOAD_WEIGHT:load_weight_state<=all_weight_compute_finish ? LOAD_WEIGHT_IDLE:K4_0;
+                K4_LOAD_WEIGHT:load_weight_state<=last_weight ? LOAD_WEIGHT_IDLE:K4_0;
 
                 K5_0:load_weight_state<=weight_from_bram_valid ? K5_1:K5_0;
                 K5_1:load_weight_state<=K5_2;
                 K5_2:load_weight_state<=weight_from_bram_valid ? K5_3:K5_2;
                 K5_3:load_weight_state<=K5_4;
                 K5_4:load_weight_state<=weight_from_bram_valid ? K5_LOAD_WEIGHT:K5_4;
-                K5_LOAD_WEIGHT:load_weight_state<=all_weight_compute_finish ? LOAD_WEIGHT_IDLE:K5_0;
+                K5_LOAD_WEIGHT:load_weight_state<=last_weight ? LOAD_WEIGHT_IDLE:K5_0;
 
                 default: load_weight_state<=LOAD_WEIGHT_IDLE;
             endcase
@@ -195,16 +199,16 @@ module control_unit #(
         end
     end
 
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            all_weight_compute_finish_delay<=0;
-        end
-        else begin
-            all_weight_compute_finish_delay<=all_weight_compute_finish & 
-                                            (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
-                                             load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
-        end
-    end
+    // always @(posedge clk or negedge rst_n) begin
+    //     if(!rst_n) begin
+    //         all_weight_compute_finish<=0;
+    //     end
+    //     else begin
+    //         all_weight_compute_finish<=last_weight & 
+    //                                         (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
+    //                                          load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
+    //     end
+    // end
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -216,7 +220,7 @@ module control_unit #(
             end
             else begin
                 if(ofmaps_width_cnt != ofmaps_width) begin
-                    ofmaps_width_cnt<=(all_weight_compute_finish & 
+                    ofmaps_width_cnt<=(last_weight & 
                                   (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
                                    load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT)) ? ofmaps_width_cnt+1:ofmaps_width_cnt;
                 end
