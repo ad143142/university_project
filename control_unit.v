@@ -43,21 +43,23 @@ module control_unit #(
     
     reg [4:0] load_weight_state; 
     reg [4:0] load_ifmaps_state;
-    reg [9:0] filter_cnt;
+    reg [11:0] filter_cnt;
     reg [8:0] ofmaps_width_cnt;
     reg [8:0] ofmaps_hegiht_cnt;
     reg all_weight_compute_finish_delay;
 
     wire load_weight_FSM_start,load_ifmaps_FSM_start;
-    wire [8:0] ofmaps_weight;
+    wire [8:0] ofmaps_width;
+    wire [11:0] ofmaps_channel;
     wire [7:0] MAC_enable_in;
     
     //decode
     assign load_ifmaps_FSM_start=(axi_control_0[7:0]==`INST_COMPUTE);
     assign input_channel_size=(axi_control_0[19:8]);
+    assign ofmaps_channel=(axi_control_0[31:20]);
 
-    assign ofmaps_weight=(axi_control_1[10:2]);   
     assign operation=(axi_control_1[1:0]);
+    assign ofmaps_width=(axi_control_1[10:2]);   
 
     assign kernel_size=(axi_control_2[4:0]);
 
@@ -67,8 +69,10 @@ module control_unit #(
     //                   ifmaps_FSM                //
     /////////////////////////////////////////////////
     wire all_weight_compute_finish,all_finish,ifmaps_flush;
-    assign all_weight_compute_finish=(filter_cnt==input_channel_size);
-    assign all_finish=(ofmaps_width_cnt==ofmaps_weight && ofmaps_hegiht_cnt==ofmaps_weight);
+    wire [11:0] next_filter_cnt ;
+    assign next_filter_cnt=filter_cnt+1;
+    assign all_weight_compute_finish=(next_filter_cnt==ofmaps_channel);
+    assign all_finish=(ofmaps_width_cnt==ofmaps_width && ofmaps_hegiht_cnt==ofmaps_width-1);
     assign ifmaps_flush=(ofmaps_width_cnt==0);
 
     assign load_ifmaps=(load_ifmaps_state==LOAD || load_ifmaps_state==LOAD1 || load_ifmaps_state==LOAD2 || load_ifmaps_state==LOAD3 || 
@@ -128,9 +132,6 @@ module control_unit #(
     assign bram_port_sel=(load_weight_state==K2_1 || load_weight_state==K3_1 || load_weight_state==K4_1 || load_weight_state==K4_3 || load_weight_state==K5_1 ||
                           load_weight_state==K5_3);
 
-    wire compute_finish;//所有weight都跑完
-    assign compute_finish=axi_control_2[5];//TODO:先借用axi_control_2[5]實際上要由control unit來給
-
     assign load_weight_FSM_start=(load_ifmaps_state==COMPUTE);
 
     always @(posedge clk or negedge rst_n) begin
@@ -188,7 +189,8 @@ module control_unit #(
                 filter_cnt<=0;
             end
             else begin
-                filter_cnt<=(K1_LOAD_WEIGHT || K2_LOAD_WEIGHT || K3_LOAD_WEIGHT || K4_LOAD_WEIGHT || K5_LOAD_WEIGHT) ? filter_cnt+1:filter_cnt;
+                filter_cnt<=(load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
+                             load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT) ? next_filter_cnt:filter_cnt;
             end
         end
     end
@@ -213,7 +215,7 @@ module control_unit #(
                 ofmaps_width_cnt<=0;
             end
             else begin
-                if(ofmaps_width_cnt != ofmaps_weight) begin
+                if(ofmaps_width_cnt != ofmaps_width) begin
                     ofmaps_width_cnt<=(all_weight_compute_finish & 
                                   (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
                                    load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT)) ? ofmaps_width_cnt+1:ofmaps_width_cnt;
@@ -235,7 +237,7 @@ module control_unit #(
                 ofmaps_hegiht_cnt<=0;
             end
             else begin
-                ofmaps_hegiht_cnt<=(ofmaps_width_cnt==ofmaps_weight) ? ofmaps_hegiht_cnt+1:ofmaps_hegiht_cnt;
+                ofmaps_hegiht_cnt<=(ofmaps_width_cnt==ofmaps_width) ? ofmaps_hegiht_cnt+1:ofmaps_hegiht_cnt;
             end
         end
     end

@@ -13,7 +13,7 @@
 	)
 	(
 		// Users to add ports here
-        output reg [C_S_AXIS_TDATA_WIDTH-1 : 0] data_out,
+        output wire [C_S_AXIS_TDATA_WIDTH-1 : 0] data_out,
         input wire read_want,
 		output reg out_valid,
 		
@@ -74,6 +74,8 @@
 	assign write_en=S_AXIS_TVALID & ((~fifo_full) | read_want);
 	assign read_en=read_want & ~fifo_empty;
 
+	assign data_out=fifo[fifo_read_ptr];
+
 	always @(posedge S_AXIS_ACLK or negedge S_AXIS_ARESETN) begin
 		if(!S_AXIS_ARESETN) begin
 			for(idx=0;idx<FIFO_SIZE;idx=idx+1)
@@ -130,19 +132,19 @@
 		end
 	end
 
-	always @(posedge S_AXIS_ACLK or negedge S_AXIS_ARESETN) begin
-		if(!S_AXIS_ARESETN) begin
-			data_out<=0;
-		end
-		else begin
-			if(read_en) begin
-				data_out<=fifo[fifo_read_ptr];
-			end
-			else begin
-				data_out<=data_out;
-			end
-		end
-	end
+	// always @(posedge S_AXIS_ACLK or negedge S_AXIS_ARESETN) begin
+	// 	if(!S_AXIS_ARESETN) begin
+	// 		data_out<=0;
+	// 	end
+	// 	else begin
+	// 		if(read_en) begin
+	// 			data_out<=fifo[fifo_read_ptr];
+	// 		end
+	// 		else begin
+	// 			data_out<=data_out;
+	// 		end
+	// 	end
+	// end
 
 	always @(posedge S_AXIS_ACLK or negedge S_AXIS_ARESETN) begin
 		if(!S_AXIS_ARESETN) begin

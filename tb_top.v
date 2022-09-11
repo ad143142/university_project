@@ -46,6 +46,7 @@ module tb_top;
         set_input_channel(1);
         set_kernel_size(5);
         set_ofmaps_width(3);
+        set_ofmaps_channel(1);
         // compute_finish(0);
         #20;
         axis_in(32'b11111);
@@ -56,7 +57,17 @@ module tb_top;
         // axis_in(32'b11111);
         // axis_in(32'b11111);
         compute_start();
-        #10000;
+        axis_in(32'b11111);
+        axis_in(32'b01111);
+        axis_in(32'b10111);
+        axis_in(32'b11011);
+        axis_in(32'b11101);
+        axis_in(32'b11110);
+        axis_in(32'b11101);
+        axis_in(32'b11011);
+        axis_in(32'b10111);
+        
+        #10000000;
         $finish;
     end
 
@@ -112,6 +123,11 @@ module tb_top;
 
     task compute_start();begin
         axi_control_0[7:0]=`INST_COMPUTE;
+    end
+    endtask
+
+    task set_ofmaps_channel(input [11:0] data);begin
+        axi_control_0[31:20]=data;
     end
     endtask
 

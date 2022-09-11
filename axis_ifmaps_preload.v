@@ -42,7 +42,7 @@ module axis_ifmaps_preload #(
     reg [8:0] fifo_write_cnt;
     reg [bit_num-1:0] fifo_read_ptr;
 
-    reg [bit_num-1:0] fifo_cnt;
+    reg [bit_num:0] fifo_cnt;
 
     wire write_en;
     wire read_en;
@@ -56,10 +56,10 @@ module axis_ifmaps_preload #(
     // assign axi_fifo_read=((~axi_fifo_empty) & fifo_empty);
 
     assign fifo_empty=(fifo_cnt==0);
-    assign fifo_full=(fifo_cnt==FIFO_DEPTH-1);
+    assign fifo_full=(fifo_cnt==FIFO_DEPTH);
 
     // assign write_en=(~axi_fifo_empty) & ((~fifo_full) | MAC_read);
-    assign write_en=~fifo_full & load_ifmaps_preload;
+	assign write_en=load_ifmaps_preload & ((~fifo_full) | read_en);
     assign read_en=~fifo_empty & MAC_read;
 
     always @(posedge clk or negedge rst_n) begin
