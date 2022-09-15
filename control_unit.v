@@ -10,23 +10,31 @@ module control_unit #(
     input wire rst_n,
 
     //control output  
+        //AXI_interface
+    output wire layer_finish,
+        //MAC
+    output reg [MAC_NUM-1:0] MAC_enable,
     output wire [1:0]operation,
     output wire [4:0]kernel_size,
     output wire load_weight_preload,
     output wire load_weight,
+
+        //ifmaps_preload
+    output wire load_ifmaps,
+    output wire [11:0] input_channel_size,
+
+        //BRAM_control
     output wire bram_port_sel,
     output wire bram_control_add1,
     output wire bram_control_add2,
     output wire address_reset,
-
-    output wire load_ifmaps,
-    output wire [11:0] input_channel_size,
-
-    output reg [MAC_NUM-1:0] MAC_enable,
+        
     //control input 
     input wire weight_from_bram_valid,
     input wire ifmaps_fifo_empty,
-    //global
+    input wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_3_in,
+
+    //AXI_reg
     input  wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_0,//主要的控制訊號(loadweight、compute....)
     input  wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_1,//附加控制訊號(kernel size、operation...)
     input  wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_2,//附加控制訊號(kernel size、operation...)
@@ -52,6 +60,8 @@ module control_unit #(
     wire [11:0] ofmaps_channel;
     wire [7:0] MAC_enable_in;
     wire all_weight_compute_finish;
+    wire last_weight,all_finish,ifmaps_flush;
+    wire [11:0] next_filter_cnt ;
     
     //decode
     assign load_ifmaps_FSM_start=(axi_control_0[7:0]==`INST_COMPUTE);
@@ -63,13 +73,13 @@ module control_unit #(
 
     assign kernel_size=(axi_control_2[4:0]);
 
-    assign axi_control_3=0;
+    assign axi_control_3=axi_control_3_in;
+
+    assign layer_finish=all_finish & all_weight_compute_finish;
 
     /////////////////////////////////////////////////
     //                   ifmaps_FSM                //
     /////////////////////////////////////////////////
-    wire last_weight,all_finish,ifmaps_flush;
-    wire [11:0] next_filter_cnt ;
     assign next_filter_cnt=filter_cnt+1;
     assign last_weight=(next_filter_cnt==ofmaps_channel);
     assign all_finish=(ofmaps_width_cnt==(ofmaps_width-1) && ofmaps_hegiht_cnt==ofmaps_width-1);
