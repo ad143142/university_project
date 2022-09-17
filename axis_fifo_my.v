@@ -9,7 +9,15 @@
 		// Do not modify the parameters beyond this line
 
 		// AXI4Stream sink: Data Width
-		parameter integer C_S_AXIS_TDATA_WIDTH	= 32
+		parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
+
+		// Total number of input data.
+		parameter FIFO_SIZE  = 16,
+		// bit_num gives the minimum number of bits needed to address 'FIFO_SIZE' size of FIFO.
+		parameter bit_num  = clogb2(FIFO_SIZE-1)
+		// Define the states of state machine
+		// The control state machine oversees the writing of input streaming data to the FIFO,
+		// and outputs the streaming data from the FIFO
 	)
 	(
 		// Users to add ports here
@@ -47,9 +55,9 @@
 	endfunction
 	
 	// Total number of input data.
-	localparam FIFO_SIZE  = 16;
+	// localparam FIFO_SIZE  = 16;
 	// bit_num gives the minimum number of bits needed to address 'FIFO_SIZE' size of FIFO.
-	localparam bit_num  = clogb2(FIFO_SIZE-1);
+	// localparam bit_num  = clogb2(FIFO_SIZE-1);
 	// Define the states of state machine
 	// The control state machine oversees the writing of input streaming data to the FIFO,
 	// and outputs the streaming data from the FIFO
@@ -58,10 +66,10 @@
 	
 	reg [C_S_AXIS_TDATA_WIDTH-1:0] fifo [0:FIFO_SIZE-1];
 
+	reg [bit_num:0] fifo_cnt;
 	reg [bit_num-1:0] fifo_write_ptr;
 	reg [bit_num-1:0] fifo_read_ptr;
-	reg [bit_num:0] fifo_cnt;
-
+	
 	wire write_en;
 	wire read_en;
 

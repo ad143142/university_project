@@ -47,6 +47,7 @@ module top #(
     wire [1:0] operation;
     wire [4:0] kernel_size;
     wire [11:0]input_channel_size;
+    wire [11:0]output_channel_size;
     wire load_weight_preload;
     wire load_weight;
     wire bram_port_sel;
@@ -56,13 +57,15 @@ module top #(
     wire ifmaps_fifo_empty;
     wire load_ifmaps;
     wire layer_finish;
+    wire bram_write_en;
+    wire write_weight_finish;
 
     wire [31:0]reg0_read_data;
     wire [31:0]reg1_read_data;
     wire [31:0]reg2_read_data;
     wire [31:0]reg3_write_data;
 
-    wire [31:0]axi_control_3_from_datapath;
+    // wire [31:0]axi_control_3_from_datapath;
 
     AXI_interface 
     #(
@@ -71,35 +74,35 @@ module top #(
     )
     u_AXI_interface(
         //golbal
-        .S_AXI_ACLK      (clk             ),
-        .S_AXI_ARESETN   (rst_n           ),
-        //data
-    	.reg0_read_data  (reg0_read_data  ),
-        .reg1_read_data  (reg1_read_data  ),
-        .reg2_read_data  (reg2_read_data  ),
-        .reg3_write_data (reg3_write_data ),
-        //control
-        .layer_finish    (layer_finish    ),
+        .S_AXI_ACLK           (clk                  ),
+        .S_AXI_ARESETN        (rst_n                ),
+        //data     
+    	.reg0_read_data       (reg0_read_data       ),
+        .reg1_read_data       (reg1_read_data       ),
+        .reg2_read_data       (reg2_read_data       ),
+        .reg3_write_data      (reg3_write_data      ),
+        //control     
+        .layer_finish         (layer_finish         ),
 
-        .S_AXI_AWADDR    (S_AXI_AWADDR    ),
-        .S_AXI_AWPROT    (S_AXI_AWPROT    ),
-        .S_AXI_AWVALID   (S_AXI_AWVALID   ),
-        .S_AXI_AWREADY   (S_AXI_AWREADY   ),
-        .S_AXI_WDATA     (S_AXI_WDATA     ),
-        .S_AXI_WSTRB     (S_AXI_WSTRB     ),
-        .S_AXI_WVALID    (S_AXI_WVALID    ),
-        .S_AXI_WREADY    (S_AXI_WREADY    ),
-        .S_AXI_BRESP     (S_AXI_BRESP     ),
-        .S_AXI_BVALID    (S_AXI_BVALID    ),
-        .S_AXI_BREADY    (S_AXI_BREADY    ),
-        .S_AXI_ARADDR    (S_AXI_ARADDR    ),
-        .S_AXI_ARPROT    (S_AXI_ARPROT    ),
-        .S_AXI_ARVALID   (S_AXI_ARVALID   ),
-        .S_AXI_ARREADY   (S_AXI_ARREADY   ),
-        .S_AXI_RDATA     (S_AXI_RDATA     ),
-        .S_AXI_RRESP     (S_AXI_RRESP     ),
-        .S_AXI_RVALID    (S_AXI_RVALID    ),
-        .S_AXI_RREADY    (S_AXI_RREADY    )
+        .S_AXI_AWADDR         (S_AXI_AWADDR         ),
+        .S_AXI_AWPROT         (S_AXI_AWPROT         ),
+        .S_AXI_AWVALID        (S_AXI_AWVALID        ),
+        .S_AXI_AWREADY        (S_AXI_AWREADY        ),
+        .S_AXI_WDATA          (S_AXI_WDATA          ),
+        .S_AXI_WSTRB          (S_AXI_WSTRB          ),
+        .S_AXI_WVALID         (S_AXI_WVALID         ),
+        .S_AXI_WREADY         (S_AXI_WREADY         ),
+        .S_AXI_BRESP          (S_AXI_BRESP          ),
+        .S_AXI_BVALID         (S_AXI_BVALID         ),
+        .S_AXI_BREADY         (S_AXI_BREADY         ),
+        .S_AXI_ARADDR         (S_AXI_ARADDR         ),
+        .S_AXI_ARPROT         (S_AXI_ARPROT         ),
+        .S_AXI_ARVALID        (S_AXI_ARVALID        ),
+        .S_AXI_ARREADY        (S_AXI_ARREADY        ),
+        .S_AXI_RDATA          (S_AXI_RDATA          ),
+        .S_AXI_RRESP          (S_AXI_RRESP          ),
+        .S_AXI_RVALID         (S_AXI_RVALID         ),
+        .S_AXI_RREADY         (S_AXI_RREADY         )
     );
     
 
@@ -119,19 +122,23 @@ module top #(
         .axi_control_2              (reg2_read_data             ),
         .weight_from_bram_valid     (weight_from_bram_valid     ),
         .ifmaps_fifo_empty          (ifmaps_fifo_empty          ),
-        .axi_control_3_in           (axi_control_3_from_datapath),
+        // .axi_control_3_in           (axi_control_3_from_datapath),
         //control out          
         .layer_finish               (layer_finish               ),
+        .write_weight_finish        (write_weight_finish        ),
+
         .MAC_enable                 (MAC_enable                 ),
         .operation                  (operation                  ),
         .input_channel_size         (input_channel_size         ),
+        .output_channel_size        (output_channel_size        ),
         .kernel_size                (kernel_size                ),
         .load_weight_preload        (load_weight_preload        ),
         .load_weight                (load_weight                ),
+        .bram_write_en              (bram_write_en              ),
         .bram_port_sel              (bram_port_sel              ),
         .bram_control_add1          (bram_control_add1          ),
         .bram_control_add2          (bram_control_add2          ),
-        .address_reset              (address_reset              ),
+        .bram_transfer_start        (bram_transfer_start        ),
         .load_ifmaps                (load_ifmaps                ),
         .axi_control_3              (reg3_write_data            )
     );
@@ -157,9 +164,11 @@ module top #(
         .MAC_enable                 (MAC_enable                 ),
         .psum_valid                 (psum_valid                 ),
         .input_channel_size         (input_channel_size         ),
+        .output_channel_size        (output_channel_size        ),
         .operation                  (operation                  ),
         .kernel_size                (kernel_size                ),
-        .address_reset              (address_reset              ),
+        .bram_write_en              (bram_write_en              ),
+        .bram_transfer_start        (bram_transfer_start        ),
         .bram_control_add1          (bram_control_add1          ),
         .bram_control_add2          (bram_control_add2          ),
         .port_sel                   (bram_port_sel              ),
@@ -169,7 +178,8 @@ module top #(
         //control out
         .ifmaps_fifo_empty          (ifmaps_fifo_empty          ),
         .weight_from_bram_valid     (weight_from_bram_valid     ),
-        .axi_control_3              (axi_control_3_from_datapath)
+        // .axi_control_3              (axi_control_3_from_datapath),
+        .write_weight_finish        (write_weight_finish        )
     );
     
 

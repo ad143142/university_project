@@ -28,8 +28,8 @@ module MAC_array_control #(
     // output wire read_ifmaps,
     output reg psum_valid,
 
-    input wire ifmaps_fifo_empty,
-    output[31:0] axi_control_3 //回復訊號(compute over、FIFO_full、read_ofmaps...)
+    input wire ifmaps_fifo_empty
+    // output[31:0] axi_control_3 //回復訊號(compute over、FIFO_full、read_ofmaps...)
 
 );
     //TODO:選做:可以做data gating MAC如果在別的模式下(load weight)時用個enable把它關掉，其他的部分也是
@@ -47,7 +47,7 @@ module MAC_array_control #(
     // reg  [4:0] load_weight_state;   
 
     //TODO: 雙斜線的是指還沒實作
-    assign axi_control_3=0;//
+    // assign axi_control_3=0;//
     wire ifmaps_input_valid;
     // wire load_weight;
 

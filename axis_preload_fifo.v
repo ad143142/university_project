@@ -1,7 +1,8 @@
-module axis_ifmaps_preload #(
+module axis_preload_fifo #(
     parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
     parameter integer MAC_NUM = 256,
-    parameter integer FIFO_DEPTH = 4
+    parameter integer AXIS_PRELOAD_FIFO_DEPTH = 4,
+    parameter integer bit_num  = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1)
 )
 (
     //global
@@ -12,12 +13,13 @@ module axis_ifmaps_preload #(
     input wire [C_S_AXIS_TDATA_WIDTH-1:0] ifmaps_from_axis,
     output wire [5*MAC_NUM-1:0] ifmaps_out,
 
-    //control
-    // input  wire axi_fifo_empty,
-    // output wire axi_fifo_read,
+    //control in
     input wire [11:0] input_channel_size,
     input wire load_ifmaps_preload,
-    input  wire MAC_read,
+    input  wire fifo_read,
+    
+    //control out
+    output reg [bit_num:0] fifo_cnt,
     output wire fifo_empty,
     output wire fifo_full
 );
@@ -34,15 +36,13 @@ module axis_ifmaps_preload #(
     
     integer idx;
 
-    localparam bit_num  = clogb2(FIFO_DEPTH-1);
-
-    reg [5*MAC_NUM-1:0] preload_fifo [0:FIFO_DEPTH-1];
+    reg [5*MAC_NUM-1:0] preload_fifo [0:AXIS_PRELOAD_FIFO_DEPTH-1];
 
     reg [bit_num-1:0] fifo_write_ptr;
     reg [8:0] fifo_write_cnt;
     reg [bit_num-1:0] fifo_read_ptr;
 
-    reg [bit_num:0] fifo_cnt;
+    
 
     wire write_en;
     wire read_en;
@@ -56,15 +56,15 @@ module axis_ifmaps_preload #(
     // assign axi_fifo_read=((~axi_fifo_empty) & fifo_empty);
 
     assign fifo_empty=(fifo_cnt==0);
-    assign fifo_full=(fifo_cnt==FIFO_DEPTH);
+    assign fifo_full=(fifo_cnt==AXIS_PRELOAD_FIFO_DEPTH);
 
     // assign write_en=(~axi_fifo_empty) & ((~fifo_full) | MAC_read);
 	assign write_en=load_ifmaps_preload & ((~fifo_full) | read_en);
-    assign read_en=~fifo_empty & MAC_read;
+    assign read_en=~fifo_empty & fifo_read;
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            for(idx=0;idx<FIFO_DEPTH;idx=idx+1) begin
+            for(idx=0;idx<AXIS_PRELOAD_FIFO_DEPTH;idx=idx+1) begin
                 preload_fifo[idx]<=0;
             end
         end

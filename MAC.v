@@ -45,41 +45,58 @@ module MAC #
         end
     end
 
-    MAC_ifmaps_FIFO 
-    #(
-        .DATA_WIDTH (DATA_WIDTH )
-    )
-    u_MAC_ifmaps_FIFO(
-    	.clk                  (clk                  ),
-        .rst_n                (rst_n                ),
-        .ifmaps_fifo_row0_in  (ifmaps_fifo_row0_in  ),
-        .ifmaps_fifo_row1_in  (ifmaps_fifo_row1_in  ),
-        .ifmaps_fifo_row2_in  (ifmaps_fifo_row2_in  ),
-        .ifmaps_fifo_row3_in  (ifmaps_fifo_row3_in  ),
-        .ifmaps_fifo_row4_in  (ifmaps_fifo_row4_in  ),
-        .ifmaps_input_valid   (ifmaps_input_valid   ),
-        .ifmaps_fifo_row0_out (ifmaps_fifo_row0_out ),
-        .ifmaps_fifo_row1_out (ifmaps_fifo_row1_out ),
-        .ifmaps_fifo_row2_out (ifmaps_fifo_row2_out ),
-        .ifmaps_fifo_row3_out (ifmaps_fifo_row3_out ),
-        .ifmaps_fifo_row4_out (ifmaps_fifo_row4_out ),
-        .fifo_read            (load_ifmaps          ),
-        .fifo_full            (fifo_full            ),
-        .fifo_empty           (fifo_empty           )
-    );
+    // MAC_ifmaps_FIFO 
+    // #(
+    //     .DATA_WIDTH (DATA_WIDTH )
+    // )
+    // u_MAC_ifmaps_FIFO(
+    // 	.clk                  (clk                  ),
+    //     .rst_n                (rst_n                ),
+    //     .ifmaps_fifo_row0_in  (ifmaps_fifo_row0_in  ),
+    //     .ifmaps_fifo_row1_in  (ifmaps_fifo_row1_in  ),
+    //     .ifmaps_fifo_row2_in  (ifmaps_fifo_row2_in  ),
+    //     .ifmaps_fifo_row3_in  (ifmaps_fifo_row3_in  ),
+    //     .ifmaps_fifo_row4_in  (ifmaps_fifo_row4_in  ),
+    //     .ifmaps_input_valid   (ifmaps_input_valid   ),
+    //     .ifmaps_fifo_row0_out (ifmaps_fifo_row0_out ),
+    //     .ifmaps_fifo_row1_out (ifmaps_fifo_row1_out ),
+    //     .ifmaps_fifo_row2_out (ifmaps_fifo_row2_out ),
+    //     .ifmaps_fifo_row3_out (ifmaps_fifo_row3_out ),
+    //     .ifmaps_fifo_row4_out (ifmaps_fifo_row4_out ),
+    //     .fifo_read            (load_ifmaps          ),
+    //     .fifo_full            (fifo_full            ),
+    //     .fifo_empty           (fifo_empty           )
+    // );
+    
+    // ALU u_ALU(
+    // 	.clk            (clk                  ),
+    //     .rst_n          (rst_n                ),
+    //     .ifmaps_row0_in (ifmaps_fifo_row0_out ),
+    //     .ifmaps_row1_in (ifmaps_fifo_row1_out ),
+    //     .ifmaps_row2_in (ifmaps_fifo_row2_out ),
+    //     .ifmaps_row3_in (ifmaps_fifo_row3_out ),
+    //     .ifmaps_row4_in (ifmaps_fifo_row4_out ),
+    //     .weight_in      (weight_in            ),
+    //     .MAC_out        (MAC_out              ),
+    //     .enable         (enable               ),
+    //     .load_ifmaps    (load_ifmaps_buf_1t   ),
+    //     .load_weight    (load_weight          ),
+    //     .operation      (operation            ),
+    //     .kernel_size    (kernel_size          )
+    // );
     
     ALU u_ALU(
     	.clk            (clk                  ),
         .rst_n          (rst_n                ),
-        .ifmaps_row0_in (ifmaps_fifo_row0_out ),
-        .ifmaps_row1_in (ifmaps_fifo_row1_out ),
-        .ifmaps_row2_in (ifmaps_fifo_row2_out ),
-        .ifmaps_row3_in (ifmaps_fifo_row3_out ),
-        .ifmaps_row4_in (ifmaps_fifo_row4_out ),
+        .ifmaps_row0_in (ifmaps_fifo_row0_in  ),
+        .ifmaps_row1_in (ifmaps_fifo_row1_in  ),
+        .ifmaps_row2_in (ifmaps_fifo_row2_in  ),
+        .ifmaps_row3_in (ifmaps_fifo_row3_in  ),
+        .ifmaps_row4_in (ifmaps_fifo_row4_in  ),
         .weight_in      (weight_in            ),
         .MAC_out        (MAC_out              ),
         .enable         (enable               ),
-        .load_ifmaps    (load_ifmaps_buf_1t   ),
+        .load_ifmaps    (load_ifmaps          ),
         .load_weight    (load_weight          ),
         .operation      (operation            ),
         .kernel_size    (kernel_size          )

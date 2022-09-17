@@ -16,11 +16,11 @@ module MAC_ifmaps_FIFO #
     input wire [DATA_WIDTH-1:0] ifmaps_fifo_row3_in,
     input wire [DATA_WIDTH-1:0] ifmaps_fifo_row4_in,
 
-    output reg [DATA_WIDTH-1:0] ifmaps_fifo_row0_out,
-    output reg [DATA_WIDTH-1:0] ifmaps_fifo_row1_out,
-    output reg [DATA_WIDTH-1:0] ifmaps_fifo_row2_out,
-    output reg [DATA_WIDTH-1:0] ifmaps_fifo_row3_out,
-    output reg [DATA_WIDTH-1:0] ifmaps_fifo_row4_out,
+    output wire [DATA_WIDTH-1:0] ifmaps_fifo_row0_out,
+    output wire [DATA_WIDTH-1:0] ifmaps_fifo_row1_out,
+    output wire [DATA_WIDTH-1:0] ifmaps_fifo_row2_out,
+    output wire [DATA_WIDTH-1:0] ifmaps_fifo_row3_out,
+    output wire [DATA_WIDTH-1:0] ifmaps_fifo_row4_out,
 
     //control
     input ifmaps_input_valid,
@@ -58,6 +58,12 @@ module MAC_ifmaps_FIFO #
     wire write_en;
     wire read_en;
     
+    assign ifmaps_fifo_row0_out=ifmaps_fifo_row0[fifo_read_ptr];
+    assign ifmaps_fifo_row1_out=ifmaps_fifo_row1[fifo_read_ptr];
+    assign ifmaps_fifo_row2_out=ifmaps_fifo_row2[fifo_read_ptr];
+    assign ifmaps_fifo_row3_out=ifmaps_fifo_row3[fifo_read_ptr];
+    assign ifmaps_fifo_row4_out=ifmaps_fifo_row4[fifo_read_ptr];
+
     assign fifo_full=(fifo_cnt==FIFO_SIZE);
 	assign fifo_empty=(fifo_cnt==0);
 
@@ -87,24 +93,24 @@ module MAC_ifmaps_FIFO #
 		end
 	end
 
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            ifmaps_fifo_row0_out<=0;
-            ifmaps_fifo_row1_out<=0;
-            ifmaps_fifo_row2_out<=0;
-            ifmaps_fifo_row3_out<=0;
-            ifmaps_fifo_row4_out<=0;
-        end
-        else begin
-            if(read_en) begin
-                ifmaps_fifo_row0_out<=ifmaps_fifo_row0[fifo_read_ptr];
-                ifmaps_fifo_row1_out<=ifmaps_fifo_row1[fifo_read_ptr];
-                ifmaps_fifo_row2_out<=ifmaps_fifo_row2[fifo_read_ptr];
-                ifmaps_fifo_row3_out<=ifmaps_fifo_row3[fifo_read_ptr];
-                ifmaps_fifo_row4_out<=ifmaps_fifo_row4[fifo_read_ptr];
-            end
-        end
-    end
+    // always @(posedge clk or negedge rst_n) begin
+    //     if(!rst_n) begin
+    //         ifmaps_fifo_row0_out<=0;
+    //         ifmaps_fifo_row1_out<=0;
+    //         ifmaps_fifo_row2_out<=0;
+    //         ifmaps_fifo_row3_out<=0;
+    //         ifmaps_fifo_row4_out<=0;
+    //     end
+    //     else begin
+    //         if(read_en) begin
+    //             ifmaps_fifo_row0_out<=ifmaps_fifo_row0[fifo_read_ptr];
+    //             ifmaps_fifo_row1_out<=ifmaps_fifo_row1[fifo_read_ptr];
+    //             ifmaps_fifo_row2_out<=ifmaps_fifo_row2[fifo_read_ptr];
+    //             ifmaps_fifo_row3_out<=ifmaps_fifo_row3[fifo_read_ptr];
+    //             ifmaps_fifo_row4_out<=ifmaps_fifo_row4[fifo_read_ptr];
+    //         end
+    //     end
+    // end
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin

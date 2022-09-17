@@ -193,6 +193,7 @@
 `timescale  1ns / 1ps
 `define INST_COMPUTE 32'd87 
 `define INST_LOADIFMAPS 32'd88 
+`define INST_WRITE_WEIGHT 32'd12 
 module tb_top;
 
     // top Parameters
@@ -221,10 +222,13 @@ module tb_top;
     reg   [2 : 0]  S_AXI_ARPROT                = 0 ;
     reg   S_AXI_ARVALID                        = 0 ;
     reg   S_AXI_RREADY                         = 0 ;
+    
     reg   watch_set_kernel_size=0;
     reg   watch_set_ofmaps_channel_and_input_channel=0;
     reg   watch_set_function_and_ofmaps_width=0;
     reg   watch_compute_start=0;
+    reg   watch_write_weight_start=0;
+    reg   watch_read_AXI_3=0;
     // top Outputs
     wire  S_AXIS_TREADY                        ;
     wire  [1279:0]  psum_out                   ;
@@ -251,36 +255,54 @@ module tb_top;
         set_ofmaps_channel_and_input_channel(2,1);
         set_function_and_ofmaps_width(0,3);
         // compute_finish(0);
-        #20;
-        axis_in(32'b11111);
-        axis_in(32'b10111);
-        axis_in(32'b11101);
-        axis_in(32'b11011);
+        wait(!clk);
+        axis_in(32'b00110);
         axis_in(32'b10001);
-        // axis_in(32'b11111);
-        // axis_in(32'b11111);
-        #10;
+        axis_in(32'b11001);
+        axis_in(32'b00111);
+        axis_in(32'b01001);
+        write_weight_start();
+        wait(!clk);
+        axis_in(32'b01000);
+        axis_in(32'b10001);
+        axis_in(32'b01010);
+        axis_in(32'b00101);
+        axis_in(32'b01110);
+        //以上是weight
+        while(S_AXI_RDATA!=32'd1)begin
+            read_AXI_3();
+        end
+        //以下是ifmaps
+        #(PERIOD*5);
         compute_start();
-        axis_in(32'b11111);
-        axis_in(32'b01111);
-        axis_in(32'b10111);
-        axis_in(32'b11011);
-        axis_in(32'b11101);
+        #20;
         axis_in(32'b11110);
-        axis_in(32'b11101);
-        axis_in(32'b11011);
-        axis_in(32'b10111);
+        axis_in(32'b01010);
+        axis_in(32'b01011);
         axis_in(32'b01111);
-        axis_in(32'b10111);
-        axis_in(32'b11011);
-        axis_in(32'b11101);
-        axis_in(32'b11110);
-        axis_in(32'b11101);
-        axis_in(32'b11011);
-        axis_in(32'b10111);
+        axis_in(32'b00001);
+        axis_in(32'b00101);
+        axis_in(32'b10011);
+        #1000;
+
         axis_in(32'b01111);
+        axis_in(32'b00101);
+        axis_in(32'b00101);
+        axis_in(32'b10111);
+        axis_in(32'b10000);
+        axis_in(32'b00010);
+        axis_in(32'b01001);
+
+        #1000;
+        axis_in(32'b00111);
+        axis_in(32'b00010);
+        axis_in(32'b10010);
+        axis_in(32'b01011);
+        axis_in(32'b01000);
+        axis_in(32'b00001);
+        axis_in(32'b10100);
         
-        #10000000;
+        #1000000;
         $finish;
     end
 
@@ -380,6 +402,61 @@ module tb_top;
     end
     endtask
 
+    task read_AXI_3();begin
+        watch_read_AXI_3=1;
+
+        S_AXI_ARADDR=4'b1100;
+        S_AXI_ARPROT=3'b000;
+        S_AXI_ARVALID=1'b1;
+        S_AXI_RREADY=1'd0;
+
+        wait(S_AXI_ARREADY==1'b1) begin
+            wait(S_AXI_RVALID) begin
+                    $monitor($time,,"AXI_3 read success");
+                if(S_AXI_RDATA==32'd1) begin
+                    $monitor($time,,"write_weight_finish");
+                end
+                else begin
+                    $monitor($time,,"write_weight_fail");
+                end
+                S_AXI_ARVALID=1'b0;
+                S_AXI_RREADY=1'b1;
+                watch_read_AXI_3=0;
+                #(PERIOD*2)
+                S_AXI_RREADY=1'b0;
+
+            end            
+        end
+    end
+    endtask
+
+    task write_weight_start();begin
+        watch_write_weight_start=1;
+
+        S_AXI_BREADY=1'b1;
+        S_AXI_AWADDR=4'b0000;
+        S_AXI_AWPROT=3'b000;
+        S_AXI_WSTRB=4'b0001;
+        S_AXI_WDATA=`INST_WRITE_WEIGHT;
+
+        S_AXI_AWVALID=1'b1;
+        S_AXI_WVALID=1'b1;
+
+        wait(S_AXI_AWREADY==1'b1 && S_AXI_WREADY==1'b1) begin
+            wait(S_AXI_BVALID) begin
+                S_AXI_AWVALID=1'b0;
+                S_AXI_WVALID=1'b0;
+            end
+            $monitor($time,,"write_weight_start success");
+            watch_write_weight_start=0;
+        end
+        // else begin
+        //     $monitor($time,,"compute_start WRITE ERROR : S_AXI_AWREADY= %b   S_AXI_WREADY= %b",S_AXI_AWREADY,S_AXI_WREADY);
+        // end
+        // axi_control_0[7:0]=`INST_COMPUTE;
+    end
+    endtask
+
     task compute_start();begin
         watch_compute_start=1;
 
@@ -405,9 +482,9 @@ module tb_top;
         // end
         // axi_control_0[7:0]=`INST_COMPUTE;
     end
-    endtask
+    endtask 
 
-    task set_ofmaps_channel_and_input_channel(input [11:0]input_channel,input [11:0] ofmaps_channel);begin
+    task set_ofmaps_channel_and_input_channel(input [11:0]ofmaps_channel,input [11:0] input_channel);begin
         watch_set_ofmaps_channel_and_input_channel=1;
 
         S_AXI_AWADDR=4'b0000;
