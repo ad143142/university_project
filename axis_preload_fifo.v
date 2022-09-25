@@ -15,17 +15,14 @@ module axis_preload_fifo #(
 
     //control in
     input wire [11:0] input_channel_size,
-    input wire load_ifmaps_preload,
-    input  wire fifo_read,
+    input wire load_axis_preload,
+    input wire fifo_read,
     
     //control out
     output reg [bit_num:0] fifo_cnt,
     output wire fifo_empty,
     output wire fifo_full
 );
-    //TODO:尚未測試
-    //FIXME:現在只能是以256channel為input所以要改成可調整的
-
     //由axis進入的32bit將他擺放成MAC要使用的5*MAC_NUM寬度
     function integer clogb2 (input integer bit_depth);
 	  begin
@@ -52,14 +49,10 @@ module axis_preload_fifo #(
 
     assign ifmaps_out=preload_fifo[fifo_read_ptr];
 
-    // assign axi_fifo_read=MAC_read;
-    // assign axi_fifo_read=((~axi_fifo_empty) & fifo_empty);
-
     assign fifo_empty=(fifo_cnt==0);
     assign fifo_full=(fifo_cnt==AXIS_PRELOAD_FIFO_DEPTH);
 
-    // assign write_en=(~axi_fifo_empty) & ((~fifo_full) | MAC_read);
-	assign write_en=load_ifmaps_preload & ((~fifo_full) | read_en);
+	assign write_en=load_axis_preload & ((~fifo_full) | read_en);
     assign read_en=~fifo_empty & fifo_read;
 
     always @(posedge clk or negedge rst_n) begin

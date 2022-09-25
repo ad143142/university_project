@@ -11,7 +11,7 @@ module MAC_array_control #(
     input wire rst_n,
 
     //data
-    input wire [5*MAC_NUM-1:0] ifmaps_from_fifo,
+    input wire [5*MAC_NUM-1:0] ifmaps_from_axis_preload,
 
     input wire [5*MAC_NUM-1:0] weight_from_bram,
 
@@ -95,17 +95,17 @@ module MAC_array_control #(
         .MAC_NUM (MAC_NUM )
     )
     u_MAC_array(
-        .clk                 (clk                 ),
-        .rst_n               (rst_n               ),
-        .weight_from_preload (weight_from_preload ),
-        .ifmaps_from_fifo    (ifmaps_from_fifo    ),
-        .psum_out            (psum_out            ),
-        .enable              (enable              ),
-        .operation           (operation           ),
-        .kernel_size         (kernel_size         ),
-        .ifmaps_input_valid  (ifmaps_input_valid  ),//
-        .load_ifmaps         (load_ifmaps         ),//
-        .load_weight         (load_MAC_weight     ) 
+        .clk                         (clk                       ),
+        .rst_n                       (rst_n                     ),
+        .weight_from_preload         (weight_from_preload       ),
+        .ifmaps_from_axis_preload    (ifmaps_from_axis_preload  ),
+        .psum_out                    (psum_out                  ),
+        .enable                      (enable                    ),
+        .operation                   (operation                 ),
+        .kernel_size                 (kernel_size               ),
+        .ifmaps_input_valid          (ifmaps_input_valid        ),//
+        .load_ifmaps                 (load_ifmaps               ),//
+        .load_weight                 (load_MAC_weight           ) 
     );
 
 

@@ -40,7 +40,7 @@ module top #(
     input wire  S_AXI_RREADY
 
 );
-    //TODO:padding、full-connect、if input channel bigger than 256(MAC_NUM)control unit要增加紀錄現在到哪個channel的reg、load weight 、AXI_S input、
+    //TODO:full-connect、if input channel bigger than 256(MAC_NUM)control unit要增加紀錄現在到哪個channel的reg、load weight
 
     wire [MAC_NUM-1:0] MAC_enable;
     wire weight_from_bram_valid;
@@ -160,22 +160,26 @@ module top #(
         .S_AXIS_TLAST               (S_AXIS_TLAST               ),
         .S_AXIS_TVALID              (S_AXIS_TVALID              ),
         .psum_out                   (psum_out                   ),
-        //contol in              
-        .MAC_enable                 (MAC_enable                 ),
-        .psum_valid                 (psum_valid                 ),
+        //contol in       
+            //golbal control       
         .input_channel_size         (input_channel_size         ),
         .output_channel_size        (output_channel_size        ),
         .operation                  (operation                  ),
         .kernel_size                (kernel_size                ),
+            //MAC_control
+        .MAC_enable                 (MAC_enable                 ),
+        .load_weight                (load_weight                ),
+        .load_ifmaps                (load_ifmaps                ),
+            //BRAM_control
         .bram_write_en              (bram_write_en              ),
         .bram_transfer_start        (bram_transfer_start        ),
         .bram_control_add1          (bram_control_add1          ),
         .bram_control_add2          (bram_control_add2          ),
         .port_sel                   (bram_port_sel              ),
+            //weight_preload
         .load_weight_preload        (load_weight_preload        ),
-        .load_weight                (load_weight                ),
-        .load_ifmaps                (load_ifmaps                ),
         //control out
+        .psum_valid                 (psum_valid                 ),
         .ifmaps_fifo_empty          (ifmaps_fifo_empty          ),
         .weight_from_bram_valid     (weight_from_bram_valid     ),
         // .axi_control_3              (axi_control_3_from_datapath),

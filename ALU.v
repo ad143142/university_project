@@ -42,7 +42,7 @@ module ALU (
     wire [24:0] xnor_op;
     reg [4:0] bitcount;
 
-    wire enable_n;//for weight reg to or it if enable is 1 then or 0 ,enable is 0 then or 1 
+    wire enable_n;//for weight reg to or it. If enable is 1 then or 0 ,enable is 0 then or 1 
     assign enable_n=~enable;
 
     //operation decode

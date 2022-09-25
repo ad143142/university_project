@@ -417,7 +417,7 @@ module tb_top;
                     $monitor($time,,"write_weight_finish");
                 end
                 else begin
-                    $monitor($time,,"write_weight_fail");
+                    $monitor($time,,"write_weight_not_finish");
                 end
                 S_AXI_ARVALID=1'b0;
                 S_AXI_RREADY=1'b1;

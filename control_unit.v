@@ -153,10 +153,6 @@ module control_unit #(
     assign load_weight=(load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT ||
                         load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
 
-    // assign bram_control_add1=(load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT || load_weight_state==K3_1 || load_weight_state==K5_3);      
-    // assign bram_control_add2=(load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_1 || 
-    //                           load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_1);
-
     assign bram_control_add1=weight_from_bram_valid && (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT || load_weight_state==K3_0 || load_weight_state==K5_4);   
     assign bram_control_add2=weight_from_bram_valid && (load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_0 || 
                                                         load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_0  || load_weight_state==K5_2);
@@ -254,17 +250,6 @@ module control_unit #(
         end
     end
 
-    // always @(posedge clk or negedge rst_n) begin
-    //     if(!rst_n) begin
-    //         all_weight_compute_finish<=0;
-    //     end
-    //     else begin
-    //         all_weight_compute_finish<=last_weight & 
-    //                                         (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
-    //                                          load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
-    //     end
-    // end
-
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             ofmaps_width_cnt<=0;
@@ -305,7 +290,7 @@ module control_unit #(
     //                   MAC_enable                //
     /////////////////////////////////////////////////
     
-    //FIXME:
+    //FIXME:MAC_enable等增加round之後要更改input
     assign MAC_enable_in=input_channel_size[7:0];
 
     integer idx;
@@ -319,32 +304,5 @@ module control_unit #(
     /////////////////////////////////////////////////
     //                   MAC_enable                //
     /////////////////////////////////////////////////
-
-    // /////////////////////////////////////////////////
-    // //                 write_bram_cnt              //
-    // /////////////////////////////////////////////////
-    // always @(*) begin
-    //     case(kernel_size)
-    //         5'b00001:write_bram_num=input_channel_size;
-    //         5'b00010:write_bram_num=input_channel_size*2;
-    //         5'b00100:write_bram_num=input_channel_size*3;
-    //         5'b01000:write_bram_num=input_channel_size*4;
-    //         5'b10000:write_bram_num=input_channel_size*5;
-    //         default :write_bram_num=input_channel_size;
-    //     endcase
-    // end
-
-    // always @(posedge clk or negedge rst_n) begin
-    //     if(!rst_n) begin
-    //         write_bram_cnt<=0;
-    //     end
-    //     else begin
-    //         // write_bram_cnt<=
-    //     end
-    // end
-
-    // /////////////////////////////////////////////////
-    // //                 write_bram_cnt              //
-    // /////////////////////////////////////////////////
-
+    
 endmodule
