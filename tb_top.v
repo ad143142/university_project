@@ -251,17 +251,59 @@ module tb_top;
     begin
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
-        set_kernel_size(5);
+        set_kernel_size(3'd5);
         set_ofmaps_channel_and_input_channel(2,1);
         set_function_and_ofmaps_width(0,3);
         // compute_finish(0);
+        write_weight_start();
+
+        /*
+            weight 1
+            0 1 1 1 1
+            1 0 0 1 0
+            1 0 0 1 0
+            0 0 1 0 1
+            0 1 1 0 0 
+
+            weight 2
+            0 1 0 1 0 
+            0 0 1 0 1 
+            0 0 0 1 1 
+            1 0 1 0 1 
+            0 1 0 0 0
+
+            ifmaps 1
+            0 0 1 1 1 1 1
+            1 1 1 1 0 0 1 
+            1 0 0 1 0 1 0
+            1 1 1 1 0 0 0 
+            1 0 0 0 0 0 1
+
+            ifmaps 2
+            1 1 1 1 0 0 1
+            1 0 0 1 0 1 0 
+            1 1 1 1 0 0 0 
+            1 0 0 0 0 0 1
+            0 0 0 1 1 0 0 
+
+            ifmaps 3
+            1 0 0 1 0 1 0 
+            1 1 1 1 0 0 0 
+            1 0 0 0 0 0 1
+            0 0 0 1 1 0 0 
+            0 0 1 0 0 0 1             
+
+            ofmaps 1 
+            
+        */
+
         wait(!clk);
         axis_in(32'b00110);
         axis_in(32'b10001);
         axis_in(32'b11001);
         axis_in(32'b00111);
         axis_in(32'b01001);
-        write_weight_start();
+        
         wait(!clk);
         axis_in(32'b01000);
         axis_in(32'b10001);
