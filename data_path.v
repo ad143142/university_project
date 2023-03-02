@@ -163,7 +163,36 @@ module data_path #(
         //control out
         .psum_valid                  (psum_valid                  )
     );
-    
+
+    wire psum_adder_o_data;
+    wire psum_adder_o_valid;
+    wire [11:0] psum_adder_o_addr;
+    //FIXME:OFMAPS_BRAM_ADDR_WIDTH還不確定是多少
+    psum_adder
+    #(
+        .PSUM_IN_WIDTH          (MAC_NUM*5                ),
+        .OFMAPS_BRAM_ADDR_WIDTH (12                       )
+    )
+    u_psum_adder(
+        //golbal
+    	.clk                    (clk                       ),
+        .rst_n                  (rst_n                     ),
+   
+        //control
+        .in_channel             (input_channel_size        ),
+        .kernel_size            (kernel_size               ),
+
+        //inputdata
+        .psum_in                (psum_out                  ),
+        //FIXME:
+        .address_in             (12'd0                     ),
+        .i_valid                (psum_valid                ),
+
+        //output data
+        .o_data                 (psum_adder_o_data         ),
+        .address_out            (psum_adder_o_addr         ),
+        .o_valid                (psum_adder_o_valid        )
+    ); 
     
     wire [1279:0] weight_from_bram_A,weight_from_bram_B,weight_to_bram_A,weight_to_bram_B;
     wire bram_A_en,bram_B_en;

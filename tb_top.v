@@ -251,101 +251,255 @@ module tb_top;
     begin
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
-        set_kernel_size(3'd5);
-        set_ofmaps_channel_and_input_channel(2,1);
-        set_function_and_ofmaps_width(0,3);
-        // compute_finish(0);
-        write_weight_start();
+        
+        
+        ///////////////////////////////////////////////////////
+        //                  Pattern 1                        //
+        ///////////////////////////////////////////////////////
+
+        // set_kernel_size(3'd5);
+        // set_ofmaps_channel_and_input_channel(2,1);
+        // set_function_and_ofmaps_width(0,3);
+        // // compute_finish(0);
+        // write_weight_start();
+
+        // /*
+        //     weight 1
+        //     0 1 1 1 1
+        //     1 0 0 1 0
+        //     1 0 0 1 0
+        //     0 0 1 0 1
+        //     0 1 1 0 0 
+
+        //     weight 2
+        //     0 1 0 1 0 
+        //     0 0 1 0 1 
+        //     0 0 0 1 1 
+        //     1 0 1 0 1 
+        //     0 1 0 0 0
+
+        //     ifmaps 1
+        //     0 0 1 1 1 1 1
+        //     1 1 1 1 0 0 1 
+        //     1 0 0 1 0 1 0
+        //     1 1 1 1 0 0 0 
+        //     1 0 0 0 0 0 1
+
+        //     ifmaps 2
+        //     1 1 1 1 0 0 1
+        //     1 0 0 1 0 1 0 
+        //     1 1 1 1 0 0 0 
+        //     1 0 0 0 0 0 1
+        //     0 0 0 1 1 0 0 
+
+        //     ifmaps 3
+        //     1 0 0 1 0 1 0 
+        //     1 1 1 1 0 0 0 
+        //     1 0 0 0 0 0 1
+        //     0 0 0 1 1 0 0 
+        //     0 0 1 0 0 0 1             
+            
+        // */
+
+        // wait(!clk);
+        // axis_in(32'b00110);
+        // axis_in(32'b10001);
+        // axis_in(32'b11001);
+        // axis_in(32'b00111);
+        // axis_in(32'b01001);
+        
+        // wait(!clk);
+        // axis_in(32'b01000);
+        // axis_in(32'b10001);
+        // axis_in(32'b01010);
+        // axis_in(32'b00101);
+        // axis_in(32'b01110);
+        // //以�?�是weight
+        // while(S_AXI_RDATA!=32'd1)begin
+        //     read_AXI_3();
+        // end
+        // //以�?�是ifmaps
+        // #(PERIOD*5);
+        // compute_start();
+        // #20;
+        // axis_in(32'b11110);
+        // axis_in(32'b01010);
+        // axis_in(32'b01011);
+        // axis_in(32'b01111);
+        // axis_in(32'b00001);
+        // axis_in(32'b00101);
+        // axis_in(32'b10011);
+        // #1000;
+
+        // axis_in(32'b01111);
+        // axis_in(32'b00101);
+        // axis_in(32'b00101);
+        // axis_in(32'b10111);
+        // axis_in(32'b10000);
+        // axis_in(32'b00010);
+        // axis_in(32'b01001);
+
+        // #1000;
+        // axis_in(32'b00111);
+        // axis_in(32'b00010);
+        // axis_in(32'b10010);
+        // axis_in(32'b01011);
+        // axis_in(32'b01000);
+        // axis_in(32'b00001);
+        // axis_in(32'b10100);
+
+        ///////////////////////////////////////////////////////
+        //                  Pattern 1                        //
+        ///////////////////////////////////////////////////////
 
         /*
             weight 1
+            ch0
             0 1 1 1 1
             1 0 0 1 0
             1 0 0 1 0
             0 0 1 0 1
             0 1 1 0 0 
+            ch1
+            1 1 0 1 0 
+            0 0 0 1 1 
+            1 0 1 0 1
+            1 1 1 1 0
+            0 0 0 1 0 
 
             weight 2
+            ch0
             0 1 0 1 0 
             0 0 1 0 1 
             0 0 0 1 1 
             1 0 1 0 1 
             0 1 0 0 0
+            ch1
+            1 1 1 1 0 
+            1 1 0 0 1 
+            1 0 0 1 0 
+            0 0 1 0 1 
+            0 1 0 1 0 
 
             ifmaps 1
+            ch0
             0 0 1 1 1 1 1
             1 1 1 1 0 0 1 
             1 0 0 1 0 1 0
             1 1 1 1 0 0 0 
             1 0 0 0 0 0 1
-
+            ch1
+            1 0 1 0 1 1 1 
+            0 0 0 1 1 1 0
+            0 1 0 1 0 0 0 
+            1 1 1 0 1 0 1 
+            1 1 0 0 0 1 0 
+            
             ifmaps 2
+            ch0
             1 1 1 1 0 0 1
             1 0 0 1 0 1 0 
             1 1 1 1 0 0 0 
             1 0 0 0 0 0 1
             0 0 0 1 1 0 0 
+            ch1
+            0 0 0 0 1 0 1
+            1 1 0 1 0 1 0
+            1 1 1 0 1 0 1
+            0 1 0 0 0 1 0 
+            1 1 1 0 0 0 1
 
             ifmaps 3
+            ch0
             1 0 0 1 0 1 0 
             1 1 1 1 0 0 0 
             1 0 0 0 0 0 1
             0 0 0 1 1 0 0 
-            0 0 1 0 0 0 1             
-
-            ofmaps 1 
-            
+            0 0 1 0 0 0 1 
+            ch1
+            0 1 0 1 0 1 0
+            1 1 1 1 0 1 0
+            0 0 1 0 1 0 0
+            0 0 1 0 1 1 1 
+            1 1 1 0 1 0 1
         */
 
+        set_kernel_size(3'd5);
+        set_ofmaps_channel_and_input_channel(2,2);
+        set_function_and_ofmaps_width(0,3);
+        // compute_finish(0);
+        write_weight_start();
+
         wait(!clk);
-        axis_in(32'b00110);
-        axis_in(32'b10001);
-        axis_in(32'b11001);
-        axis_in(32'b00111);
-        axis_in(32'b01001);
+        axis_in(32'b0110100110);
+        axis_in(32'b0100110001);
+        axis_in(32'b0110011001);
+        axis_in(32'b1101100111);
+        axis_in(32'b0011001001);
         
         wait(!clk);
-        axis_in(32'b01000);
-        axis_in(32'b10001);
-        axis_in(32'b01010);
-        axis_in(32'b00101);
-        axis_in(32'b01110);
-        //以上是weight
+        axis_in(32'b0011101000);
+        axis_in(32'b1001110001);
+        axis_in(32'b0100101010);
+        axis_in(32'b1010100101);
+        axis_in(32'b0101001110);
+        //以�?�是weight
         while(S_AXI_RDATA!=32'd1)begin
             read_AXI_3();
         end
-        //以下是ifmaps
+        //以�?�是ifmaps
         #(PERIOD*5);
         compute_start();
         #20;
-        axis_in(32'b11110);
-        axis_in(32'b01010);
-        axis_in(32'b01011);
-        axis_in(32'b01111);
-        axis_in(32'b00001);
-        axis_in(32'b00101);
-        axis_in(32'b10011);
-        #1000;
+        axis_in(32'b1100111110);
+        axis_in(32'b1110001010);
+        axis_in(32'b0100101011);
+        axis_in(32'b0011001111);
+        axis_in(32'b0101100001);
+        axis_in(32'b1001100101);
+        axis_in(32'b0100110011);
+        // #1000;
 
-        axis_in(32'b01111);
-        axis_in(32'b00101);
-        axis_in(32'b00101);
-        axis_in(32'b10111);
-        axis_in(32'b10000);
-        axis_in(32'b00010);
-        axis_in(32'b01001);
+        axis_in(32'b1011001111);
+        axis_in(32'b1111000101);
+        axis_in(32'b1010000101);
+        axis_in(32'b0001010111);
+        axis_in(32'b0010110000);
+        axis_in(32'b0101000010);
+        axis_in(32'b1010101001);
 
-        #1000;
-        axis_in(32'b00111);
-        axis_in(32'b00010);
-        axis_in(32'b10010);
-        axis_in(32'b01011);
-        axis_in(32'b01000);
-        axis_in(32'b00001);
-        axis_in(32'b10100);
-        
-        #1000000;
+        // #1000;
+        axis_in(32'b1001000111);
+        axis_in(32'b1001100010);
+        axis_in(32'b1111010010);
+        axis_in(32'b0001101011);
+        axis_in(32'b1110001000);
+        axis_in(32'b0101100001);
+        axis_in(32'b1100010100);
+
+
+
+
+        #10000;
         $finish;
+    end
+
+    //FIXME:紅�?�是�?常�??
+    integer i;
+    integer out=0;
+    always @(negedge clk ) begin
+        if(u_top.u_data_path.psum_valid) begin
+            out = 0;
+            for(i=0;i<256;i=i+1) begin
+                out = out + u_top.u_data_path.psum_out[i*5 +:5];
+            end
+            $display($time,"  valid = %d , o_data = %5d",u_top.u_data_path.psum_valid,out);
+        end
+    end
+    //FIXME:紅�?�是�?常�??
+    always @(negedge clk ) begin
+        if(u_top.u_data_path.u_psum_adder.o_valid)
+            $display($time,"  o_valid = %d , address_out = %h , o_data = %h",u_top.u_data_path.u_psum_adder.o_valid,u_top.u_data_path.u_psum_adder.address_out,u_top.u_data_path.u_psum_adder.o_data);
     end
 
     initial

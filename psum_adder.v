@@ -8,8 +8,8 @@ module psum_adder #(
     input wire rst_n,
 
     //control
-    input [7:0] in_channel,
-    input [2:0] kernel_size,
+    input [11:0] in_channel,
+    input [4:0] kernel_size,
 
     //input data
     input [PSUM_IN_WIDTH-1:0] psum_in,
@@ -63,7 +63,20 @@ module psum_adder #(
     wire [12:0] threshold_0;
     wire [12:0] threshold;
 
-    assign threshold_0 = kernel_size * kernel_size * in_channel;
+    reg [2:0] kernel_num;
+    always @(*) begin
+        case(kernel_size)
+            5'b10000 : kernel_num = 3'd5;
+            5'b01000 : kernel_num = 3'd4;
+            5'b00100 : kernel_num = 3'd3;
+            5'b00010 : kernel_num = 3'd2;
+            5'b00001 : kernel_num = 3'd1;
+
+            default  : kernel_num = 3'd1;
+        endcase
+    end
+
+    assign threshold_0 = kernel_num * kernel_num * in_channel;
     assign threshold = {1'd0,threshold_0[12:1]}; 
 
     assign o_data = r_pipe9_data;
