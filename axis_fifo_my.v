@@ -23,6 +23,8 @@
 		// Users to add ports here
         output wire [C_S_AXIS_TDATA_WIDTH-1 : 0] data_out,
         input wire read_want,
+		input wire axis_en,
+		input wire axis_clear,
 		output reg out_valid,
 		
 		output wire fifo_full,
@@ -79,7 +81,7 @@
 	assign S_AXIS_TREADY=~fifo_full;
 
 	// assign write_en=S_AXIS_TVALID & S_AXIS_TREADY ;	
-	assign write_en=S_AXIS_TVALID & ((~fifo_full) | read_want);
+	assign write_en=S_AXIS_TVALID & ((~fifo_full) | read_want) & axis_en;
 	assign read_en=read_want & ~fifo_empty;
 
 	assign data_out=fifo[fifo_read_ptr];
@@ -103,7 +105,10 @@
 			fifo_cnt<=0;
 		end
 		else begin
-			if(read_en & write_en) begin
+			if(axis_clear) begin
+				fifo_cnt<=0;
+			end
+			else if(read_en & write_en) begin
 				fifo_cnt<=fifo_cnt;
 			end
 			else if(write_en) begin
@@ -123,7 +128,10 @@
 			fifo_write_ptr<=0;
 		end
 		else begin
-			if(write_en) begin
+			if (axis_clear) begin
+				fifo_write_ptr<=0;
+			end
+			else if(write_en) begin
 				fifo_write_ptr<=fifo_write_ptr+1;
 			end
 		end
@@ -134,7 +142,10 @@
 			fifo_read_ptr<=0;
 		end
 		else begin
-			if(read_en) begin
+			if (axis_clear) begin
+				fifo_read_ptr<=0;
+			end
+			else if(read_en) begin
 				fifo_read_ptr<=fifo_read_ptr+1;
 			end
 		end

@@ -62,7 +62,7 @@ module bram_control #(
     reg [12:0] write_bram_cnt;
     reg [12:0] next_write_bram_cnt;
 
-    assign write_weight_finish=(next_write_bram_cnt==write_bram_num);
+    assign write_weight_finish=(next_write_bram_cnt>=write_bram_num);
 
     assign axis_fifo_read=(write_state==WS0 || write_state==WS1);
 
@@ -125,7 +125,8 @@ module bram_control #(
                 WS0:      write_state<=(!write_en) ? WIDLE:
                                        (axis_fifo_cnt==0) ? WS0:
                                        (axis_fifo_cnt==1) ? WVALID1:WS1;                                       
-                WS1:      write_state<=(!write_en) ? WIDLE:(WVALID2);
+                WS1:      write_state<=(!write_en) ? WIDLE: 
+                                       (next_write_bram_cnt + 13'd1 == write_bram_num) ? WVALID1 : WVALID2;
                 WVALID1:  write_state<=(!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WS0);
                 WVALID2:  write_state<=(!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WS0);
                 default:  write_state<=WIDLE;         

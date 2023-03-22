@@ -37,6 +37,8 @@ module data_path #(
     input wire [11:0] input_channel_size,
     input wire [11:0] output_channel_size,
     input wire [4:0] kernel_size,
+    input wire axis_en,
+    input wire axis_clear,
 
     input wire bram_write_en,
     input wire bram_transfer_start,
@@ -105,6 +107,8 @@ module data_path #(
         .S_AXIS_TLAST   (S_AXIS_TLAST        ),
         .S_AXIS_TVALID  (S_AXIS_TVALID       ),
         .read_want      (load_axis_preload   ),
+        .axis_en        (axis_en             ),
+        .axis_clear     (axis_clear          ),
         //control out 
         .out_valid      (out_valid           ),
         .fifo_full      (axi_fifo_full       ),
@@ -131,7 +135,7 @@ module data_path #(
         .fifo_read            (axis_preload_fifo_read   ),
         .load_axis_preload    (load_axis_preload        ),
         .input_channel_size   (input_channel_size       ),
-  
+        .axis_clear           (axis_clear               ),
         //control out      
         .fifo_cnt             (axis_preload_fifo_cnt    ),
         .fifo_empty           (ifmaps_fifo_empty        ),

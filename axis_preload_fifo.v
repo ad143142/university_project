@@ -17,7 +17,8 @@ module axis_preload_fifo #(
     input wire [11:0] input_channel_size,
     input wire load_axis_preload,
     input wire fifo_read,
-    
+    input wire axis_clear,
+
     //control out
     output reg [bit_num:0] fifo_cnt,
     output wire fifo_empty,
@@ -73,7 +74,10 @@ module axis_preload_fifo #(
             fifo_write_ptr<=0;
         end
         else begin
-            if(write_en && write_ptr_add) begin
+            if(axis_clear) begin
+                fifo_write_ptr<=0;
+            end
+            else if(write_en && write_ptr_add) begin
                 fifo_write_ptr<=fifo_write_ptr+1;
             end
         end
@@ -84,7 +88,10 @@ module axis_preload_fifo #(
             fifo_write_cnt<=0;
         end
         else begin
-            if(write_en) begin
+            if(axis_clear) begin
+                fifo_write_cnt<=0;
+            end
+            else if(write_en) begin
                 fifo_write_cnt<=write_ptr_add? 0:fifo_write_cnt+6;
             end
         end
@@ -95,7 +102,10 @@ module axis_preload_fifo #(
             fifo_read_ptr<=0;
         end
         else begin
-            if(read_en) begin
+            if(axis_clear) begin
+                fifo_read_ptr<=0;
+            end
+            else if(read_en) begin
                 fifo_read_ptr<=fifo_read_ptr+1;
             end
         end
@@ -106,7 +116,10 @@ module axis_preload_fifo #(
             fifo_cnt<=0;
         end
         else begin
-			if(read_en & write_en && fifo_write_cnt==0) begin
+            if(axis_clear) begin
+                fifo_cnt<=0;
+            end
+			else if(read_en & write_en && fifo_write_cnt==0) begin
 				fifo_cnt<=fifo_cnt;
 			end
 			else if(write_en && fifo_write_cnt==0) begin

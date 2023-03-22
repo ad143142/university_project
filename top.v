@@ -48,6 +48,8 @@ module top #(
     wire [4:0] kernel_size;
     wire [11:0]input_channel_size;
     wire [11:0]output_channel_size;
+    wire axis_en;
+    wire axis_clear;
     wire load_weight_preload;
     wire load_weight;
     wire bram_port_sel;
@@ -83,6 +85,7 @@ module top #(
         .reg3_write_data      (reg3_write_data      ),
         //control     
         .layer_finish         (layer_finish         ),
+        .write_weight_finish  (write_weight_finish  ),
 
         .S_AXI_AWADDR         (S_AXI_AWADDR         ),
         .S_AXI_AWPROT         (S_AXI_AWPROT         ),
@@ -131,6 +134,8 @@ module top #(
         .operation                  (operation                  ),
         .input_channel_size         (input_channel_size         ),
         .output_channel_size        (output_channel_size        ),
+        .axis_en                    (axis_en                    ),
+        .axis_clear                 (axis_clear                 ),
         .kernel_size                (kernel_size                ),
         .load_weight_preload        (load_weight_preload        ),
         .load_weight                (load_weight                ),
@@ -166,6 +171,8 @@ module top #(
         .output_channel_size        (output_channel_size        ),
         .operation                  (operation                  ),
         .kernel_size                (kernel_size                ),
+        .axis_en                    (axis_en                    ),
+        .axis_clear                 (axis_clear                 ),
             //MAC_control
         .MAC_enable                 (MAC_enable                 ),
         .load_weight                (load_weight                ),

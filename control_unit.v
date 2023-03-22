@@ -24,6 +24,8 @@ module control_unit #(
     output wire load_ifmaps,
     output wire [11:0] input_channel_size,
     output wire [11:0] output_channel_size,
+    output wire axis_en,
+    output wire  axis_clear,
 
         //BRAM_control
     output wire bram_write_en,
@@ -42,7 +44,7 @@ module control_unit #(
     input  wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_0,//主要的控制訊號(loadweight、compute....)
     input  wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_1,//附加控制訊號(kernel size、operation...)
     input  wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_2,//附加控制訊號(kernel size、operation...)
-    output wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_3 //回復訊號(compute over、FIFO_full、read_ofmaps...)
+    output reg [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_3 //回復訊號(compute over、FIFO_full、read_ofmaps...)
     
 );
     //FIXME:MAC_enable等增加round之後要更改input
@@ -66,6 +68,9 @@ module control_unit #(
     reg [8:0] ofmaps_width_cnt;
     reg [8:0] ofmaps_hegiht_cnt;
 
+    reg axis_en_buf;
+    reg axis_clear_buf;
+    
     wire load_weight_FSM_start,inst_compute;
     wire [8:0] ofmaps_width;
     wire [7:0] MAC_enable_in;
@@ -91,8 +96,11 @@ module control_unit #(
 
     assign bram_transfer_start=(load_weight_state==RESET_ADDR || write_weight_state==WW_START);
 
-    assign axi_control_3=(write_weight_state==WW_FINISH) ? 32'd1:0;
+    //assign axi_control_3=(write_weight_state==WW_FINISH) ? 32'd1:0;
 
+
+    assign axis_en = axis_en_buf | inst_write_weight | inst_compute;
+    assign axis_clear = axis_clear_buf;
     /////////////////////////////////////////////////
     //                   ifmaps_FSM                //
     /////////////////////////////////////////////////
@@ -303,6 +311,44 @@ module control_unit #(
 
     /////////////////////////////////////////////////
     //                   MAC_enable                //
+    /////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////
+    //                  axis_en_buf                //
+    /////////////////////////////////////////////////
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            axis_en_buf <= 1'd0;
+        end
+        else begin
+            axis_en_buf <= (layer_finish | write_weight_finish) ? 1'd0 :
+                           (inst_write_weight | inst_compute) ? 1'd1 : axis_en_buf;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            axis_clear_buf <= 1'd0;
+        end
+        else begin
+            axis_clear_buf <= write_weight_finish;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            axi_control_3 <= 32'd0;
+        end
+        else begin
+            axi_control_3 <= write_weight_finish ? 1'd1 :
+                             inst_compute ? 1'd0 : axi_control_3;
+        end
+    end
+
+
+    /////////////////////////////////////////////////
+    //                   axis_en_buf               //
     /////////////////////////////////////////////////
     
 endmodule

@@ -23,7 +23,7 @@
 		input wire [C_S_AXI_DATA_WIDTH-1:0] reg3_write_data,
 			//control
 		input wire layer_finish,
-
+		input wire write_weight_finish,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -282,7 +282,7 @@
 			// slv_reg3<=reg3_write_data;
 	      end
 		  slv_reg0[7:0] <= ((slv_reg_wren) && (axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==2'h0) && (S_AXI_WSTRB[0] == 1)) ? S_AXI_WDATA[7:0]:
-							(layer_finish) ? 8'd0:slv_reg0[7:0];
+							(layer_finish | write_weight_finish) ? 8'd0:slv_reg0[7:0];//
 		  //write reg3
 		   for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 ) begin
 		   		slv_reg3[(byte_index*8) +: 8] <= reg3_write_data[(byte_index*8) +: 8];
