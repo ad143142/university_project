@@ -1,6 +1,6 @@
 `timescale  1ns / 1ps
 
-module tb_axis_out_data_package;   
+module tb_axis_out;   
 
 // axis_out_data_package Parameters
 parameter PERIOD                = 10;

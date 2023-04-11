@@ -63,8 +63,8 @@ module control_unit #(
     reg [2:0] write_weight_state;
 
     reg [11:0] filter_cnt;
-    reg [12:0] write_bram_num;
-    reg [12:0] write_bram_cnt;
+    // reg [12:0] write_bram_num;
+    // reg [12:0] write_bram_cnt;
     reg [8:0] ofmaps_width_cnt;
     reg [8:0] ofmaps_hegiht_cnt;
 
@@ -73,11 +73,17 @@ module control_unit #(
     
     wire load_weight_FSM_start,inst_compute;
     wire [8:0] ofmaps_width;
+    wire [2:0] stride;
     wire [7:0] MAC_enable_in;
     wire all_weight_compute_finish;
     wire last_weight,all_finish,ifmaps_flush;
     wire [11:0] next_filter_cnt ;
-    wire [12:0] next_write_bram_cnt;
+
+    wire load_ifmaps_state_enable;
+    wire load_weight_state_enable;
+    wire write_weight_state_enable;
+
+    // wire [12:0] next_write_bram_cnt;
     
     //decode
     assign inst_compute=(axi_control_0[7:0]==`INST_COMPUTE);
@@ -88,6 +94,7 @@ module control_unit #(
 
     assign operation=(axi_control_1[1:0]);
     assign ofmaps_width=(axi_control_1[10:2]);   
+    assign stride=(axi_control_1[13:11]);   
 
     assign kernel_size=(axi_control_2[4:0]);
 
@@ -116,30 +123,36 @@ module control_unit #(
                                     (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
                                      load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
 
+    //FIXME:現在這個狀態機是以convolution為主，並且沒有考慮stride=1以外的情況。
+    assign load_ifmaps_state_enable = (!inst_compute);
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             load_ifmaps_state<=5'd0;
         end
         else begin
+            if(load_ifmaps_state_enable) begin
+                load_ifmaps_state <= LOAD_IFMAPS_IDLE;
+            end
+            else begin
+                case(load_ifmaps_state)
+                    LOAD_IFMAPS_IDLE  :load_ifmaps_state<=(WAIT_FIFO1);
+                    WAIT_FIFO1        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO1:LOAD1);
+                    LOAD1             :load_ifmaps_state<=((kernel_size==5'b00001) ? COMPUTE:WAIT_FIFO2);
+                    WAIT_FIFO2        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO2:LOAD2);
+                    LOAD2             :load_ifmaps_state<=((kernel_size==5'b00010) ? COMPUTE:WAIT_FIFO3);
+                    WAIT_FIFO3        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO3:LOAD3);
+                    LOAD3             :load_ifmaps_state<=((kernel_size==5'b00100) ? COMPUTE:WAIT_FIFO4);
+                    WAIT_FIFO4        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO4:LOAD4);
+                    LOAD4             :load_ifmaps_state<=((kernel_size==5'b01000) ? COMPUTE:WAIT_FIFO5);
+                    WAIT_FIFO5        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO5:LOAD5);
+                    LOAD5             :load_ifmaps_state<=(COMPUTE);         
+                    COMPUTE           :load_ifmaps_state<=(all_weight_compute_finish ? (all_finish ? LOAD_WEIGHT_IDLE:(ifmaps_flush ? WAIT_FIFO1:WAIT_FIFO6)):COMPUTE);
+                    WAIT_FIFO6        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO6:LOAD);
+                    LOAD              :load_ifmaps_state<=(COMPUTE);
+                    default           :load_ifmaps_state<=LOAD_IFMAPS_IDLE;          
+                endcase
+            end
             
-            case(load_ifmaps_state)
-                LOAD_IFMAPS_IDLE  :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (WAIT_FIFO1);
-                WAIT_FIFO1        :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (ifmaps_fifo_empty ? WAIT_FIFO1:LOAD1);
-                LOAD1             :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: ((kernel_size==5'b00001) ? COMPUTE:WAIT_FIFO2);
-                WAIT_FIFO2        :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (ifmaps_fifo_empty ? WAIT_FIFO2:LOAD2);
-                LOAD2             :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: ((kernel_size==5'b00010) ? COMPUTE:WAIT_FIFO3);
-                WAIT_FIFO3        :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (ifmaps_fifo_empty ? WAIT_FIFO3:LOAD3);
-                LOAD3             :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: ((kernel_size==5'b00100) ? COMPUTE:WAIT_FIFO4);
-                WAIT_FIFO4        :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (ifmaps_fifo_empty ? WAIT_FIFO4:LOAD4);
-                LOAD4             :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: ((kernel_size==5'b01000) ? COMPUTE:WAIT_FIFO5);
-                WAIT_FIFO5        :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (ifmaps_fifo_empty ? WAIT_FIFO5:LOAD5);
-                LOAD5             :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (COMPUTE);         
-                COMPUTE           :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: 
-                                                      (all_weight_compute_finish ? (all_finish ? LOAD_WEIGHT_IDLE:(ifmaps_flush ? WAIT_FIFO1:WAIT_FIFO6)):COMPUTE);
-                WAIT_FIFO6        :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (ifmaps_fifo_empty ? WAIT_FIFO6:LOAD);
-                LOAD              :load_ifmaps_state<=(!inst_compute) ? LOAD_IFMAPS_IDLE: (COMPUTE);
-                default           :load_ifmaps_state<=LOAD_IFMAPS_IDLE;          
-            endcase
         end
     end
     /////////////////////////////////////////////////
@@ -170,46 +183,52 @@ module control_unit #(
 
     assign load_weight_FSM_start=(load_ifmaps_state==COMPUTE);
 
+    assign load_weight_state_enable = (!inst_compute);
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             load_weight_state<=LOAD_WEIGHT_IDLE;
         end 
         else begin
-            case (load_weight_state)
-                LOAD_WEIGHT_IDLE:load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (load_weight_FSM_start ? RESET_ADDR:LOAD_WEIGHT_IDLE);
-                RESET_ADDR      :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE:
-                                                    ((kernel_size==5'b00001) ? K1_0:
-                                                    (kernel_size==5'b00010) ? K2_0:
-                                                    (kernel_size==5'b00100) ? K3_0:
-                                                    (kernel_size==5'b01000) ? K4_0:
-                                                    (kernel_size==5'b10000) ? K5_0:K1_0);//不應該有else
-                K1_0            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K1_LOAD_WEIGHT:K1_0);
-                K1_LOAD_WEIGHT  :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (last_weight ? LOAD_WEIGHT_IDLE:K1_0);
+            if(load_weight_state_enable) begin
+                load_weight_state<=LOAD_WEIGHT_IDLE;
+            end
+            else begin
+                case (load_weight_state)
+                    LOAD_WEIGHT_IDLE:load_weight_state<=(load_weight_FSM_start ? RESET_ADDR:LOAD_WEIGHT_IDLE);
+                    RESET_ADDR      :load_weight_state<=((kernel_size==5'b00001) ? K1_0:
+                                                        (kernel_size==5'b00010) ? K2_0:
+                                                        (kernel_size==5'b00100) ? K3_0:
+                                                        (kernel_size==5'b01000) ? K4_0:
+                                                        (kernel_size==5'b10000) ? K5_0:K1_0);//不應該有else
+                    K1_0            :load_weight_state<=(weight_from_bram_valid ? K1_LOAD_WEIGHT:K1_0);
+                    K1_LOAD_WEIGHT  :load_weight_state<=(last_weight ? LOAD_WEIGHT_IDLE:K1_0);
 
-                K2_0            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K2_1:K2_0);
-                K2_1            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (K2_LOAD_WEIGHT);
-                K2_LOAD_WEIGHT  :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (last_weight ? LOAD_WEIGHT_IDLE:K2_0);
+                    K2_0            :load_weight_state<=(weight_from_bram_valid ? K2_1:K2_0);
+                    K2_1            :load_weight_state<=(K2_LOAD_WEIGHT);
+                    K2_LOAD_WEIGHT  :load_weight_state<=(last_weight ? LOAD_WEIGHT_IDLE:K2_0);
 
-                K3_0            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K3_1:K3_0);
-                K3_1            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (K3_2);
-                K3_2            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K3_LOAD_WEIGHT:K3_2);
-                K3_LOAD_WEIGHT  :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (last_weight ? LOAD_WEIGHT_IDLE:K3_0);
+                    K3_0            :load_weight_state<=(weight_from_bram_valid ? K3_1:K3_0);
+                    K3_1            :load_weight_state<=(K3_2);
+                    K3_2            :load_weight_state<=(weight_from_bram_valid ? K3_LOAD_WEIGHT:K3_2);
+                    K3_LOAD_WEIGHT  :load_weight_state<=(last_weight ? LOAD_WEIGHT_IDLE:K3_0);
 
-                K4_0            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K4_1:K4_0);
-                K4_1            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (K4_2);
-                K4_2            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K4_3:K4_2);
-                K4_3            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (K4_LOAD_WEIGHT);
-                K4_LOAD_WEIGHT  :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (last_weight ? LOAD_WEIGHT_IDLE:K4_0);
+                    K4_0            :load_weight_state<=(weight_from_bram_valid ? K4_1:K4_0);
+                    K4_1            :load_weight_state<=(K4_2);
+                    K4_2            :load_weight_state<=(weight_from_bram_valid ? K4_3:K4_2);
+                    K4_3            :load_weight_state<=(K4_LOAD_WEIGHT);
+                    K4_LOAD_WEIGHT  :load_weight_state<=(last_weight ? LOAD_WEIGHT_IDLE:K4_0);
 
-                K5_0            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K5_1:K5_0);
-                K5_1            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (K5_2);
-                K5_2            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K5_3:K5_2);
-                K5_3            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (K5_4);
-                K5_4            :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (weight_from_bram_valid ? K5_LOAD_WEIGHT:K5_4);
-                K5_LOAD_WEIGHT  :load_weight_state<=(!inst_compute) ? LOAD_WEIGHT_IDLE: (last_weight ? LOAD_WEIGHT_IDLE:K5_0);
+                    K5_0            :load_weight_state<=(weight_from_bram_valid ? K5_1:K5_0);
+                    K5_1            :load_weight_state<=(K5_2);
+                    K5_2            :load_weight_state<=(weight_from_bram_valid ? K5_3:K5_2);
+                    K5_3            :load_weight_state<=(K5_4);
+                    K5_4            :load_weight_state<=(weight_from_bram_valid ? K5_LOAD_WEIGHT:K5_4);
+                    K5_LOAD_WEIGHT  :load_weight_state<=(last_weight ? LOAD_WEIGHT_IDLE:K5_0);
 
-                default: load_weight_state<=LOAD_WEIGHT_IDLE;
-            endcase
+                    default: load_weight_state<=LOAD_WEIGHT_IDLE;
+                endcase
+            end
+            
         end
     end
     
@@ -221,20 +240,28 @@ module control_unit #(
     //                write_weight_FSM             //
     /////////////////////////////////////////////////
 
-    assign next_write_bram_cnt=write_bram_cnt+1;
+    // assign next_write_bram_cnt=write_bram_cnt+1;
     assign bram_write_en=(write_weight_state!=WW_IDLE);
+
+    assign write_weight_state_enable = (!inst_write_weight);
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             write_weight_state<=WW_IDLE;
         end
         else begin
-            case(write_weight_state)
-                WW_IDLE  :write_weight_state<=(!inst_write_weight) ? WW_IDLE:WW_START;
-                WW_START :write_weight_state<=(!inst_write_weight) ? WW_IDLE:WW_WAIT;
-                WW_WAIT  :write_weight_state<=(!inst_write_weight) ? WW_IDLE:((write_weight_finish) ? WW_FINISH:WW_WAIT);
-                WW_FINISH:write_weight_state<=(!inst_write_weight) ? WW_IDLE:WW_FINISH;
-                default  :write_weight_state<=WW_IDLE;                 
-            endcase
+            if(write_weight_state_enable) begin
+                write_weight_state<=WW_IDLE;
+            end
+            else begin
+                case(write_weight_state)
+                    WW_IDLE  :write_weight_state<=WW_START;
+                    WW_START :write_weight_state<=WW_WAIT;
+                    WW_WAIT  :write_weight_state<=((write_weight_finish) ? WW_FINISH:WW_WAIT);
+                    WW_FINISH:write_weight_state<=WW_FINISH;
+                    default  :write_weight_state<=WW_IDLE;                 
+                endcase
+            end
+            
         end
     end
 
