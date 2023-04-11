@@ -8,3 +8,5 @@
 //FIXME:  
 這兩個tag在vscode 中可以下載TODO highlight的插件使這兩個tag變得顯眼  
 
+![image](https://github.com/ad143142/university_project/blob/master/20230411%E9%9D%A2%E7%A9%8D%E5%88%86%E5%B8%83%E5%9C%96/20230411%E9%9D%A2%E7%A9%8D%E5%88%86%E5%B8%83%E5%9C%96.png)
+這是目前的面積，其中weight_from_preload這組線佔了6000近2成的面積.txt
