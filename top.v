@@ -3,7 +3,9 @@ module top #(
     parameter BRAM_ADDRESS_WIDTH=12,
     parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
     parameter integer C_S_AXI_DATA_WIDTH	= 32,
-    parameter integer C_S_AXI_ADDR_WIDTH	= 4
+    parameter integer C_S_AXI_ADDR_WIDTH	= 4,
+    parameter C_M_AXIS_TDATA_WIDTH = 32,
+    parameter M_AXIS_FIFO_DEPTH = 4
     
 ) 
 (
@@ -11,14 +13,14 @@ module top #(
     input wire clk,
     input wire rst_n,
     //data path
+    //S_AXIS
     output wire  S_AXIS_TREADY,
     input wire [C_S_AXIS_TDATA_WIDTH-1 : 0] S_AXIS_TDATA,
     input wire [(C_S_AXIS_TDATA_WIDTH/8)-1 : 0] S_AXIS_TSTRB,
     input wire  S_AXIS_TLAST,
     input wire  S_AXIS_TVALID,
 
-    output wire [1279:0]psum_out,
-
+    //S_AXI
     input wire [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_AWADDR,
     input wire [2 : 0] S_AXI_AWPROT,
     input wire  S_AXI_AWVALID,
@@ -37,8 +39,15 @@ module top #(
     output wire [C_S_AXI_DATA_WIDTH-1 : 0] S_AXI_RDATA,
     output wire [1 : 0] S_AXI_RRESP,
     output wire  S_AXI_RVALID,
-    input wire  S_AXI_RREADY
+    input wire  S_AXI_RREADY,
 
+    //M_AXIS
+    input wire  								 M_AXIS_TREADY,
+
+    output wire	[C_M_AXIS_TDATA_WIDTH-1:0]       M_AXIS_TDATA,
+    output wire                                  M_AXIS_TVALID,
+    output wire 						         M_AXIS_TLAST,
+    output wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] M_AXIS_TSTRB  
 );
     //TODO:full-connect、if input channel bigger than 256(MAC_NUM)control unit要增加紀錄現在到哪個channel的reg、load weight
 
@@ -66,6 +75,10 @@ module top #(
     wire [31:0]reg1_read_data;
     wire [31:0]reg2_read_data;
     wire [31:0]reg3_write_data;
+
+    wire axis_out_data_package_o_valid;
+    wire [C_M_AXIS_TDATA_WIDTH-1:0] axis_out_data_package_o_data;
+    wire axis_out_data_package_o_last;
 
     // wire [31:0]axi_control_3_from_datapath;
 
@@ -156,43 +169,62 @@ module top #(
     )
     u_data_path(
         //golbal
-    	.clk                        (clk                        ),
-        .rst_n                      (rst_n                      ),
-        //data path              
-        .S_AXIS_TREADY              (S_AXIS_TREADY              ),
-        .S_AXIS_TDATA               (S_AXIS_TDATA               ),
-        .S_AXIS_TSTRB               (S_AXIS_TSTRB               ),
-        .S_AXIS_TLAST               (S_AXIS_TLAST               ),
-        .S_AXIS_TVALID              (S_AXIS_TVALID              ),
-        .psum_out                   (psum_out                   ),
+    	.clk                           (clk                            ),
+        .rst_n                         (rst_n                          ),
+        //data path in            
+        .S_AXIS_TREADY                 (S_AXIS_TREADY                  ),
+        .S_AXIS_TDATA                  (S_AXIS_TDATA                   ),
+        .S_AXIS_TSTRB                  (S_AXIS_TSTRB                   ),
+        .S_AXIS_TLAST                  (S_AXIS_TLAST                   ),
+        .S_AXIS_TVALID                 (S_AXIS_TVALID                  ),
+        //data path out
+        .axis_out_data_package_o_valid (axis_out_data_package_o_valid  ),
+        .axis_out_data_package_o_data  (axis_out_data_package_o_data   ),
+        .axis_out_data_package_o_last  (axis_out_data_package_o_last   ),
         //contol in       
             //golbal control       
-        .input_channel_size         (input_channel_size         ),
-        .output_channel_size        (output_channel_size        ),
-        .operation                  (operation                  ),
-        .kernel_size                (kernel_size                ),
-        .axis_en                    (axis_en                    ),
-        .axis_clear                 (axis_clear                 ),
+        .input_channel_size            (input_channel_size             ),
+        .output_channel_size           (output_channel_size            ),
+        .operation                     (operation                      ),
+        .kernel_size                   (kernel_size                    ),
+        .axis_en                       (axis_en                        ),
+        .axis_clear                    (axis_clear                     ),
+        .layer_finish                  (layer_finish                   ),
             //MAC_control
-        .MAC_enable                 (MAC_enable                 ),
-        .load_weight                (load_weight                ),
-        .load_ifmaps                (load_ifmaps                ),
+        .MAC_enable                    (MAC_enable                     ),
+        .load_weight                   (load_weight                    ),
+        .load_ifmaps                   (load_ifmaps                    ),
             //BRAM_control
-        .bram_write_en              (bram_write_en              ),
-        .bram_transfer_start        (bram_transfer_start        ),
-        .bram_control_add1          (bram_control_add1          ),
-        .bram_control_add2          (bram_control_add2          ),
-        .port_sel                   (bram_port_sel              ),
+        .bram_write_en                 (bram_write_en                  ),
+        .bram_transfer_start           (bram_transfer_start           ),
+        .bram_control_add1             (bram_control_add1              ),
+        .bram_control_add2             (bram_control_add2              ),
+        .port_sel                      (bram_port_sel                  ),
             //weight_preload
-        .load_weight_preload        (load_weight_preload        ),
+        .load_weight_preload           (load_weight_preload            ),
         //control out
-        .psum_valid                 (psum_valid                 ),
-        .ifmaps_fifo_empty          (ifmaps_fifo_empty          ),
-        .weight_from_bram_valid     (weight_from_bram_valid     ),
+        .ifmaps_fifo_empty             (ifmaps_fifo_empty              ),
+        .weight_from_bram_valid        (weight_from_bram_valid         ),
         // .axi_control_3              (axi_control_3_from_datapath),
-        .write_weight_finish        (write_weight_finish        )
+        .write_weight_finish           (write_weight_finish            )
     );
-    
 
+
+    axis_master #(
+        .FIFO_DEPTH           ( M_AXIS_FIFO_DEPTH           ),
+        .C_M_AXIS_TDATA_WIDTH ( C_M_AXIS_TDATA_WIDTH ))
+    u_axis_master (
+        .M_AXIS_ACLK             ( clk                                              ),
+        .M_AXIS_ARESETN          ( rst_n                                            ),
+        .TDATA_in                ( axis_out_data_package_o_data                     ),
+        .TVALID_in               ( axis_out_data_package_o_valid                    ),
+        .TLAST_in                ( axis_out_data_package_o_last                     ),
+        .M_AXIS_TREADY           ( M_AXIS_TREADY                                    ),
+
+        .M_AXIS_TDATA            ( M_AXIS_TDATA    [C_M_AXIS_TDATA_WIDTH-1:0]       ),
+        .M_AXIS_TVALID           ( M_AXIS_TVALID                                    ),
+        .M_AXIS_TLAST            ( M_AXIS_TLAST                                     ),
+        .M_AXIS_TSTRB            ( M_AXIS_TSTRB    [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] )
+    );
 
 endmodule

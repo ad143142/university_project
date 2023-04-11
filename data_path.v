@@ -7,6 +7,7 @@ module data_path #(
     parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
     parameter AXIS_PRELOAD_FIFO_DEPTH = 4,
     parameter AXIS_FIFO_SIZE  = 16,
+    parameter C_M_AXIS_TDATA_WIDTH = 32,
 
     parameter AXIS_PRELOAD_BIT_NUM=clogb2(AXIS_PRELOAD_FIFO_DEPTH-1),
     parameter AXIS_BIT_NUM  = clogb2(AXIS_FIFO_SIZE-1)
@@ -28,8 +29,10 @@ module data_path #(
     //TODO:還沒完成AXI_S_out
 
     //temp_out
-    output wire [5*MAC_NUM-1:0] psum_out,
-    output wire psum_valid,
+    
+    output wire axis_out_data_package_o_valid,
+    output wire [C_M_AXIS_TDATA_WIDTH-1:0] axis_out_data_package_o_data,
+    output wire axis_out_data_package_o_last,
 
     //control in 
     input wire [MAC_NUM-1:0] MAC_enable,
@@ -50,6 +53,7 @@ module data_path #(
     input wire load_weight,
     input wire load_ifmaps,
     
+    input wire layer_finish,
     //control out
     output wire ifmaps_fifo_empty,
     output wire weight_from_bram_valid,
@@ -84,6 +88,9 @@ module data_path #(
     wire [AXIS_PRELOAD_BIT_NUM:0] axis_preload_fifo_cnt;
     wire axis_fifo_read;
     wire ifmaps_fifo_full;
+
+    wire [5*MAC_NUM-1:0] psum_out;
+    wire psum_valid;
 
     wire load_axis_preload;
     assign load_axis_preload=(~axi_fifo_empty) & (~ifmaps_fifo_full);
@@ -171,6 +178,7 @@ module data_path #(
     wire psum_adder_o_data;
     wire psum_adder_o_valid;
     wire [11:0] psum_adder_o_addr;
+    wire psum_adder_o_last;
     //FIXME:OFMAPS_BRAM_ADDR_WIDTH還不確定是多少
     psum_adder
     #(
@@ -185,7 +193,7 @@ module data_path #(
         //control
         .in_channel             (input_channel_size        ),
         .kernel_size            (kernel_size               ),
-
+        .layer_finish           (layer_finish             ),
         //inputdata
         .psum_in                (psum_out                  ),
         //FIXME:
@@ -195,8 +203,23 @@ module data_path #(
         //output data
         .o_data                 (psum_adder_o_data         ),
         .address_out            (psum_adder_o_addr         ),
-        .o_valid                (psum_adder_o_valid        )
+        .o_valid                (psum_adder_o_valid        ),
+        .o_last                 (psum_adder_o_last         )
     ); 
+
+    axis_out_data_package #(
+        .C_M_AXIS_TDATA_WIDTH ( C_M_AXIS_TDATA_WIDTH ))
+    u_axis_out_data_package (
+        .clk                     ( clk                                      ),
+        .rst_n                   ( rst_n                                    ),
+        .layer_finish            ( psum_adder_o_last                        ),
+        .in_valid                ( psum_adder_o_valid                       ),
+        .in_data                 ( psum_adder_o_data                        ),
+
+        .out_valid               ( axis_out_data_package_o_valid            ),
+        .out_data                ( axis_out_data_package_o_data             ),
+        .out_last                ( axis_out_data_package_o_last             )
+    );
     
     wire [1279:0] weight_from_bram_A,weight_from_bram_B,weight_to_bram_A,weight_to_bram_B;
     wire bram_A_en,bram_B_en;

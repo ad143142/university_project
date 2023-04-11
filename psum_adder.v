@@ -6,10 +6,10 @@ module psum_adder #(
     //golbal
     input wire clk,
     input wire rst_n,
-
     //control
     input [11:0] in_channel,
     input [4:0] kernel_size,
+    input wire layer_finish,
 
     //input data
     input [PSUM_IN_WIDTH-1:0] psum_in,
@@ -17,6 +17,7 @@ module psum_adder #(
     input i_valid,
 
     //output data
+    output o_last,
     output o_data,
     output [OFMAPS_BRAM_ADDR_WIDTH-1:0 ] address_out,
     output o_valid
@@ -59,6 +60,18 @@ module psum_adder #(
     //cmp
     reg r_pipe9_valid;
 
+    reg r_pipe0_last;
+    reg r_pipe1_last;
+    reg r_pipe2_last;
+    reg r_pipe3_last;
+    reg r_pipe4_last;
+    reg r_pipe5_last;
+    reg r_pipe6_last;
+    reg r_pipe7_last;
+    reg r_pipe8_last;
+    reg r_pipe9_last;
+    reg r_pipe10_last;
+
 //////////////////////wire//////////////////////////
     wire [12:0] threshold_0;
     wire [12:0] threshold;
@@ -82,6 +95,7 @@ module psum_adder #(
     assign o_data = r_pipe9_data;
     assign address_out = r_pipe9_addr;
     assign o_valid = r_pipe9_valid;
+    assign o_last = r_pipe10_last;
 //////////////////////data_pipeline//////////////////////////
     integer i_0 ;
     always @(posedge clk or negedge rst_n) begin
@@ -384,6 +398,106 @@ module psum_adder #(
             r_pipe9_valid <= r_pipe8_valid;
         end
     end
+    
+//////////////////////last_pipeline//////////////////////////
 
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe0_last <= 1'd0;
+        end
+        else begin
+            r_pipe0_last <= layer_finish;
+        end
+    end
+    
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe1_last <= 1'd0;
+        end
+        else begin
+            r_pipe1_last <= r_pipe0_last;
+        end
+    end
+    
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe2_last <= 1'd0;
+        end
+        else begin
+            r_pipe2_last <= r_pipe1_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe3_last <= 1'd0;
+        end
+        else begin
+            r_pipe3_last <= r_pipe2_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe4_last <= 1'd0;
+        end
+        else begin
+            r_pipe4_last <= r_pipe3_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe5_last <= 1'd0;
+        end
+        else begin
+            r_pipe5_last <= r_pipe4_last;
+        end
+    end
+    
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe6_last <= 1'd0;
+        end
+        else begin
+            r_pipe6_last <= r_pipe5_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe7_last <= 1'd0;
+        end
+        else begin
+            r_pipe7_last <= r_pipe6_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe8_last <= 1'd0;
+        end
+        else begin
+            r_pipe8_last <= r_pipe7_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe9_last <= 1'd0;
+        end
+        else begin
+            r_pipe9_last <= r_pipe8_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe10_last <= 1'd0;
+        end
+        else begin
+            r_pipe10_last <= r_pipe9_last;
+        end
+    end
 
 endmodule

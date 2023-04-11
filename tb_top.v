@@ -203,6 +203,7 @@ module tb_top;
     parameter C_S_AXIS_TDATA_WIDTH  = 32 ;
     parameter C_S_AXI_DATA_WIDTH    = 32 ;
     parameter C_S_AXI_ADDR_WIDTH    = 4  ;
+    parameter C_M_AXIS_TDATA_WIDTH  = 32 ;
 
     // top Inputs
     reg   clk                                  = 0 ;
@@ -241,6 +242,12 @@ module tb_top;
     wire  [1 : 0]  S_AXI_RRESP                 ;
     wire  S_AXI_RVALID                         ;
 
+    reg M_AXIS_TREADY = 1 ;
+
+    wire [C_M_AXIS_TDATA_WIDTH-1:0]       M_AXIS_TDATA;
+    wire                                  M_AXIS_TVALID;
+    wire						          M_AXIS_TLAST;
+    wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] M_AXIS_TSTRB ; 
 
     initial
     begin
@@ -442,7 +449,7 @@ module tb_top;
             0 0 1
             0 1 0
             0 1 1
-
+            10_1101_0110_0110_0101=2D665
         */
 
         set_kernel_size(3'd5);
@@ -600,7 +607,12 @@ module tb_top;
         .S_AXI_RVALID      ( S_AXI_RVALID                                    ),
 
         //tmp_out
-        .psum_out          ( psum_out       [1279:0]                         )
+        .M_AXIS_TREADY     ( M_AXIS_TREADY                                   ),
+
+        .M_AXIS_TDATA      ( M_AXIS_TDATA    [C_M_AXIS_TDATA_WIDTH-1:0]      ),
+        .M_AXIS_TVALID     ( M_AXIS_TVALID                                   ),
+        .M_AXIS_TLAST      ( M_AXIS_TLAST                                    ),
+        .M_AXIS_TSTRB      ( M_AXIS_TSTRB    [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0])
     );
 
 
