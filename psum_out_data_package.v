@@ -1,7 +1,7 @@
 
 `timescale 1 ns / 1 ps
 
-	module axis_out_data_package #
+	module psum_out_data_package #
 	(
 		parameter integer C_M_AXIS_TDATA_WIDTH	= 32
 
@@ -9,7 +9,7 @@
 	(
 		input wire clk,
     	input wire rst_n,
-
+        input wire [1:0] operation,
 		input wire layer_finish,
         input wire in_valid,
         input wire in_data,
@@ -61,7 +61,7 @@
             out_valid <= 1'd0;
         end
         else begin
-            out_valid <= (write_ptr == 5'd31 || layer_finish);
+            out_valid <= (write_ptr == 5'd31 || (layer_finish && (operation == 2'd0)));
         end
     end
 

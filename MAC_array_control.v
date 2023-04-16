@@ -15,7 +15,7 @@ module MAC_array_control #(
 
     input wire [5*MAC_NUM-1:0] weight_from_bram,
 
-    output wire [5*MAC_NUM-1:0] psum_out,
+    output wire [5*MAC_NUM-1:0] MAC_out,
     //control
     input wire [MAC_NUM-1:0] enable,
     input wire [1:0] operation,
@@ -24,9 +24,10 @@ module MAC_array_control #(
     input wire load_weight_preload,
     input wire load_MAC_weight,
     input wire load_ifmaps,
+    input wire pooling_compute,
     // output wire read_weight,
     // output wire read_ifmaps,
-    output reg psum_valid,
+    output reg MAC_o_valid,
 
     input wire ifmaps_fifo_empty
     // output[31:0] axi_control_3 //回復訊號(compute over、FIFO_full、read_ofmaps...)
@@ -62,10 +63,10 @@ module MAC_array_control #(
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            psum_valid<=0;      
+            MAC_o_valid<=0;      
         end
         else begin
-            psum_valid<=load_MAC_weight; 
+            MAC_o_valid<=(load_MAC_weight|pooling_compute); 
         end
     end
 
@@ -99,7 +100,7 @@ module MAC_array_control #(
         .rst_n                       (rst_n                     ),
         .weight_from_preload         (weight_from_preload       ),
         .ifmaps_from_axis_preload    (ifmaps_from_axis_preload  ),
-        .psum_out                    (psum_out                  ),
+        .psum_out                    (MAC_out                   ),
         .enable                      (enable                    ),
         .operation                   (operation                 ),
         .kernel_size                 (kernel_size               ),

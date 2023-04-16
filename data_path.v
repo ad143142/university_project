@@ -30,9 +30,9 @@ module data_path #(
 
     //temp_out
     
-    output wire axis_out_data_package_o_valid,
-    output wire [C_M_AXIS_TDATA_WIDTH-1:0] axis_out_data_package_o_data,
-    output wire axis_out_data_package_o_last,
+    output wire M_AXIS_o_valid,
+    output wire [C_M_AXIS_TDATA_WIDTH-1:0] M_AXIS_o_data,
+    output wire M_AXIS_o_last,
 
     //control in 
     input wire [MAC_NUM-1:0] MAC_enable,
@@ -40,6 +40,7 @@ module data_path #(
     input wire [11:0] input_channel_size,
     input wire [11:0] output_channel_size,
     input wire [4:0] kernel_size,
+    input wire [2:0] stride,
     input wire axis_en,
     input wire axis_clear,
 
@@ -52,12 +53,14 @@ module data_path #(
     input wire load_weight_preload,
     input wire load_weight,
     input wire load_ifmaps,
+    input wire pooling_compute,
     
     input wire layer_finish,
     //control out
     output wire ifmaps_fifo_empty,
     output wire weight_from_bram_valid,
 
+    output wire pooling_finish,
     output wire write_weight_finish
 );
 
@@ -89,8 +92,23 @@ module data_path #(
     wire axis_fifo_read;
     wire ifmaps_fifo_full;
 
-    wire [5*MAC_NUM-1:0] psum_out;
-    wire psum_valid;
+    wire [5*MAC_NUM-1:0] MAC_out;
+    wire MAC_o_valid;
+
+    wire psum_out_data_package_o_valid;
+    wire psum_out_data_package_o_last;
+    wire [31:0] psum_out_data_package_o_data;
+
+    reg [255:0] pool_data_package_data_in;
+    wire pool_data_package_i_valid;
+    wire pool_data_package_layer_finish;
+    wire pool_data_package_o_valid;
+    wire pool_data_package_o_last;
+    wire [31:0] pool_data_package_o_data;
+
+    assign M_AXIS_o_valid = (operation==2'd0) ? psum_out_data_package_o_valid : pool_data_package_o_valid;
+    assign M_AXIS_o_data  = (operation==2'd0) ? psum_out_data_package_o_data : pool_data_package_o_data;
+    assign M_AXIS_o_last  = (operation==2'd0) ? psum_out_data_package_o_last : pool_data_package_o_last;
 
     wire load_axis_preload;
     assign load_axis_preload=(~axi_fifo_empty) & (~ifmaps_fifo_full);
@@ -162,7 +180,7 @@ module data_path #(
         //data
         .ifmaps_from_axis_preload    (ifmaps_from_axis_preload    ),
         .weight_from_bram            (weight_from_bram            ),
-        .psum_out                    (psum_out                    ),
+        .MAC_out                     (MAC_out                     ),
         //control in
         .enable                      (MAC_enable                  ),
         .operation                   (operation                   ),
@@ -170,9 +188,10 @@ module data_path #(
         .load_weight_preload         (load_weight_preload         ),
         .load_MAC_weight             (load_weight                 ),
         .load_ifmaps                 (load_ifmaps                 ),
+        .pooling_compute             (pooling_compute             ),
         .ifmaps_fifo_empty           (ifmaps_fifo_empty           ),
         //control out
-        .psum_valid                  (psum_valid                  )
+        .MAC_o_valid                 (MAC_o_valid                 )
     );
 
     wire psum_adder_o_data;
@@ -180,6 +199,9 @@ module data_path #(
     wire [11:0] psum_adder_o_addr;
     wire psum_adder_o_last;
     //FIXME:OFMAPS_BRAM_ADDR_WIDTH還不確定是多少
+    wire psum_adder_i_valid;
+
+    assign psum_adder_i_valid = (MAC_o_valid && (operation==2'd0));
     psum_adder
     #(
         .PSUM_IN_WIDTH          (MAC_NUM*5                ),
@@ -193,12 +215,12 @@ module data_path #(
         //control
         .in_channel             (input_channel_size        ),
         .kernel_size            (kernel_size               ),
-        .layer_finish           (layer_finish             ),
+        .layer_finish           (layer_finish              ),
         //inputdata
-        .psum_in                (psum_out                  ),
+        .psum_in                (MAC_out                   ),
         //FIXME:
         .address_in             (12'd0                     ),
-        .i_valid                (psum_valid                ),
+        .i_valid                (psum_adder_i_valid        ),
 
         //output data
         .o_data                 (psum_adder_o_data         ),
@@ -207,20 +229,54 @@ module data_path #(
         .o_last                 (psum_adder_o_last         )
     ); 
 
-    axis_out_data_package #(
+    wire psum_out_data_package_i_valid;
+    assign psum_out_data_package_i_valid = (psum_adder_o_valid && (operation == 2'd0));
+    psum_out_data_package #(
         .C_M_AXIS_TDATA_WIDTH ( C_M_AXIS_TDATA_WIDTH ))
-    u_axis_out_data_package (
+    u_psum_out_data_package (
         .clk                     ( clk                                      ),
         .rst_n                   ( rst_n                                    ),
         .layer_finish            ( psum_adder_o_last                        ),
-        .in_valid                ( psum_adder_o_valid                       ),
+        .in_valid                ( psum_out_data_package_i_valid            ),
         .in_data                 ( psum_adder_o_data                        ),
+        .operation               ( operation                                ),
 
-        .out_valid               ( axis_out_data_package_o_valid            ),
-        .out_data                ( axis_out_data_package_o_data             ),
-        .out_last                ( axis_out_data_package_o_last             )
+        .out_valid               ( psum_out_data_package_o_valid            ),
+        .out_data                ( psum_out_data_package_o_data             ),
+        .out_last                ( psum_out_data_package_o_last             )
+    );
+
+    
+    assign pool_data_package_i_valid = (MAC_o_valid && (operation==2'd1));
+    assign pool_data_package_layer_finish = (layer_finish && (operation==2'd1));
+    integer i;
+    always @(*) begin
+        for(i=0;i<256;i=i+1) begin
+            pool_data_package_data_in[i]=MAC_out[i*5];
+        end
+    end
+    pool_out_data_package#(
+        .C_M_AXIS_TDATA_WIDTH (C_M_AXIS_TDATA_WIDTH )
+    )
+    u_pool_out_data_package(
+    	.clk                     (clk                            ),
+        .rst_n                   (rst_n                          ),
+        .layer_finish            (pool_data_package_layer_finish ),
+        .MAC_o_valid             (pool_data_package_i_valid      ),
+        .MAC_out                 (pool_data_package_data_in      ),
+        .output_channel_size     (output_channel_size            ),
+        .stride                  (stride                         ),
+        .pooling_finish          (pooling_finish                 ),
+        .out_valid               (pool_data_package_o_valid      ),
+        .out_last                (pool_data_package_o_last       ),
+        .out_data                (pool_data_package_o_data       )
     );
     
+
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    //                                     BRAM                                        //
+    /////////////////////////////////////////////////////////////////////////////////////
     wire [1279:0] weight_from_bram_A,weight_from_bram_B,weight_to_bram_A,weight_to_bram_B;
     wire bram_A_en,bram_B_en;
 

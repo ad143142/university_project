@@ -55,6 +55,7 @@ module top #(
     wire weight_from_bram_valid;
     wire [1:0] operation;
     wire [4:0] kernel_size;
+    wire [2:0] stride;
     wire [11:0]input_channel_size;
     wire [11:0]output_channel_size;
     wire axis_en;
@@ -70,18 +71,22 @@ module top #(
     wire layer_finish;
     wire bram_write_en;
     wire write_weight_finish;
-
+    wire pooling_compute;
+    wire pooling_finish;
+    
     wire [31:0]reg0_read_data;
     wire [31:0]reg1_read_data;
     wire [31:0]reg2_read_data;
     wire [31:0]reg3_write_data;
 
-    wire axis_out_data_package_o_valid;
-    wire [C_M_AXIS_TDATA_WIDTH-1:0] axis_out_data_package_o_data;
-    wire axis_out_data_package_o_last;
+    wire M_AXIS_o_valid;
+    wire [C_M_AXIS_TDATA_WIDTH-1:0] M_AXIS_o_data;
+    wire M_AXIS_o_last;
 
     // wire [31:0]axi_control_3_from_datapath;
 
+    wire M_AXIS_output_finsih;
+    assign M_AXIS_output_finsih = (M_AXIS_TVALID && M_AXIS_TLAST);
     AXI_interface 
     #(
         .C_S_AXI_DATA_WIDTH (C_S_AXI_DATA_WIDTH ),
@@ -89,36 +94,36 @@ module top #(
     )
     u_AXI_interface(
         //golbal
-        .S_AXI_ACLK           (clk                  ),
-        .S_AXI_ARESETN        (rst_n                ),
+        .S_AXI_ACLK           (clk                               ),
+        .S_AXI_ARESETN        (rst_n                             ),
         //data     
-    	.reg0_read_data       (reg0_read_data       ),
-        .reg1_read_data       (reg1_read_data       ),
-        .reg2_read_data       (reg2_read_data       ),
-        .reg3_write_data      (reg3_write_data      ),
+    	.reg0_read_data       (reg0_read_data                    ),
+        .reg1_read_data       (reg1_read_data                    ),
+        .reg2_read_data       (reg2_read_data                    ),
+        .reg3_write_data      (reg3_write_data                   ),
         //control     
-        .layer_finish         (layer_finish         ),
-        .write_weight_finish  (write_weight_finish  ),
+        .layer_finish         (M_AXIS_output_finsih              ),
+        .write_weight_finish  (write_weight_finish               ),
 
-        .S_AXI_AWADDR         (S_AXI_AWADDR         ),
-        .S_AXI_AWPROT         (S_AXI_AWPROT         ),
-        .S_AXI_AWVALID        (S_AXI_AWVALID        ),
-        .S_AXI_AWREADY        (S_AXI_AWREADY        ),
-        .S_AXI_WDATA          (S_AXI_WDATA          ),
-        .S_AXI_WSTRB          (S_AXI_WSTRB          ),
-        .S_AXI_WVALID         (S_AXI_WVALID         ),
-        .S_AXI_WREADY         (S_AXI_WREADY         ),
-        .S_AXI_BRESP          (S_AXI_BRESP          ),
-        .S_AXI_BVALID         (S_AXI_BVALID         ),
-        .S_AXI_BREADY         (S_AXI_BREADY         ),
-        .S_AXI_ARADDR         (S_AXI_ARADDR         ),
-        .S_AXI_ARPROT         (S_AXI_ARPROT         ),
-        .S_AXI_ARVALID        (S_AXI_ARVALID        ),
-        .S_AXI_ARREADY        (S_AXI_ARREADY        ),
-        .S_AXI_RDATA          (S_AXI_RDATA          ),
-        .S_AXI_RRESP          (S_AXI_RRESP          ),
-        .S_AXI_RVALID         (S_AXI_RVALID         ),
-        .S_AXI_RREADY         (S_AXI_RREADY         )
+        .S_AXI_AWADDR         (S_AXI_AWADDR                      ),
+        .S_AXI_AWPROT         (S_AXI_AWPROT                      ),
+        .S_AXI_AWVALID        (S_AXI_AWVALID                     ),
+        .S_AXI_AWREADY        (S_AXI_AWREADY                     ),
+        .S_AXI_WDATA          (S_AXI_WDATA                       ),
+        .S_AXI_WSTRB          (S_AXI_WSTRB                       ),
+        .S_AXI_WVALID         (S_AXI_WVALID                      ),
+        .S_AXI_WREADY         (S_AXI_WREADY                      ),
+        .S_AXI_BRESP          (S_AXI_BRESP                       ),
+        .S_AXI_BVALID         (S_AXI_BVALID                      ),
+        .S_AXI_BREADY         (S_AXI_BREADY                      ),
+        .S_AXI_ARADDR         (S_AXI_ARADDR                      ),
+        .S_AXI_ARPROT         (S_AXI_ARPROT                      ),
+        .S_AXI_ARVALID        (S_AXI_ARVALID                     ),
+        .S_AXI_ARREADY        (S_AXI_ARREADY                     ),
+        .S_AXI_RDATA          (S_AXI_RDATA                       ),
+        .S_AXI_RRESP          (S_AXI_RRESP                       ),
+        .S_AXI_RVALID         (S_AXI_RVALID                      ),
+        .S_AXI_RREADY         (S_AXI_RREADY                      )
     );
     
 
@@ -138,6 +143,8 @@ module top #(
         .axi_control_2              (reg2_read_data             ),
         .weight_from_bram_valid     (weight_from_bram_valid     ),
         .ifmaps_fifo_empty          (ifmaps_fifo_empty          ),
+        .pooling_finish             (pooling_finish             ),
+        .M_AXIS_output_finsih       (M_AXIS_output_finsih       ),
         // .axi_control_3_in           (axi_control_3_from_datapath),
         //control out          
         .layer_finish               (layer_finish               ),
@@ -150,8 +157,10 @@ module top #(
         .axis_en                    (axis_en                    ),
         .axis_clear                 (axis_clear                 ),
         .kernel_size                (kernel_size                ),
+        .stride                     (stride                     ),
         .load_weight_preload        (load_weight_preload        ),
         .load_weight                (load_weight                ),
+        .pooling_compute            (pooling_compute            ),
         .bram_write_en              (bram_write_en              ),
         .bram_port_sel              (bram_port_sel              ),
         .bram_control_add1          (bram_control_add1          ),
@@ -178,18 +187,20 @@ module top #(
         .S_AXIS_TLAST                  (S_AXIS_TLAST                   ),
         .S_AXIS_TVALID                 (S_AXIS_TVALID                  ),
         //data path out
-        .axis_out_data_package_o_valid (axis_out_data_package_o_valid  ),
-        .axis_out_data_package_o_data  (axis_out_data_package_o_data   ),
-        .axis_out_data_package_o_last  (axis_out_data_package_o_last   ),
+        .M_AXIS_o_data                 (M_AXIS_o_data                  ),
+        .M_AXIS_o_valid                (M_AXIS_o_valid                 ),
+        .M_AXIS_o_last                 (M_AXIS_o_last                  ),
         //contol in       
             //golbal control       
         .input_channel_size            (input_channel_size             ),
         .output_channel_size           (output_channel_size            ),
         .operation                     (operation                      ),
         .kernel_size                   (kernel_size                    ),
+        .stride                        (stride                         ),
         .axis_en                       (axis_en                        ),
         .axis_clear                    (axis_clear                     ),
         .layer_finish                  (layer_finish                   ),
+        .pooling_compute               (pooling_compute                ),
             //MAC_control
         .MAC_enable                    (MAC_enable                     ),
         .load_weight                   (load_weight                    ),
@@ -205,6 +216,7 @@ module top #(
         //control out
         .ifmaps_fifo_empty             (ifmaps_fifo_empty              ),
         .weight_from_bram_valid        (weight_from_bram_valid         ),
+        .pooling_finish                (pooling_finish                 ),
         // .axi_control_3              (axi_control_3_from_datapath),
         .write_weight_finish           (write_weight_finish            )
     );
@@ -216,9 +228,9 @@ module top #(
     u_axis_master (
         .M_AXIS_ACLK             ( clk                                              ),
         .M_AXIS_ARESETN          ( rst_n                                            ),
-        .TDATA_in                ( axis_out_data_package_o_data                     ),
-        .TVALID_in               ( axis_out_data_package_o_valid                    ),
-        .TLAST_in                ( axis_out_data_package_o_last                     ),
+        .TDATA_in                ( M_AXIS_o_data                                    ),
+        .TVALID_in               ( M_AXIS_o_valid                                   ),
+        .TLAST_in                ( M_AXIS_o_last                                    ),
         .M_AXIS_TREADY           ( M_AXIS_TREADY                                    ),
 
         .M_AXIS_TDATA            ( M_AXIS_TDATA    [C_M_AXIS_TDATA_WIDTH-1:0]       ),

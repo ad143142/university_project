@@ -32,7 +32,7 @@ module psum_adder #(
     reg [9 : 0] r_pipe5_data [0 : 8  -1];
     reg [10: 0] r_pipe6_data [0 : 4  -1];
     reg [11: 0] r_pipe7_data [0 : 2  -1];
-    reg [12: 0] r_pipe8_data [0 : 1  -1];
+    reg [12: 0] r_pipe8_data ;
     //cmp
     reg r_pipe9_data;
 
@@ -195,13 +195,11 @@ module psum_adder #(
 
     integer i_8 ;
     always @(posedge clk or negedge rst_n) begin
-        for(i_8=0;i_8<1;i_8=i_8+1) begin
-            if(!rst_n) begin
-                r_pipe8_data[i_8] <= 13'd0;
-            end
-            else begin
-                r_pipe8_data[i_8] <= r_pipe7_data[i_8 * 2] + r_pipe7_data[i_8 * 2 + 1];
-            end
+        if(!rst_n) begin
+            r_pipe8_data <= 13'd0;
+        end
+        else begin
+            r_pipe8_data <= r_pipe7_data[0] + r_pipe7_data[1];
         end
     end
 
@@ -211,7 +209,7 @@ module psum_adder #(
             r_pipe9_data <= 1'd0;
         end
         else begin
-            r_pipe9_data <= (r_pipe8_data[0] >= threshold);
+            r_pipe9_data <= (r_pipe8_data >= threshold);
         end
     end
 

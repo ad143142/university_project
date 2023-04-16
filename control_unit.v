@@ -19,13 +19,14 @@ module control_unit #(
     output wire [4:0]kernel_size,
     output wire load_weight_preload,
     output wire load_weight,
-
+    output wire pooling_compute,
+    output wire [2:0]stride,
         //ifmaps_preload
     output wire load_ifmaps,
     output wire [11:0] input_channel_size,
     output wire [11:0] output_channel_size,
     output wire axis_en,
-    output wire  axis_clear,
+    output wire axis_clear,
 
         //BRAM_control
     output wire bram_write_en,
@@ -37,8 +38,10 @@ module control_unit #(
     //control input 
     input wire weight_from_bram_valid,
     input wire ifmaps_fifo_empty,
+    input wire M_AXIS_output_finsih,
     // input wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_3_in,
     input wire write_weight_finish,
+    input wire pooling_finish,
 
     //AXI_reg
     input  wire [C_S_AXIS_TDATA_WIDTH-1:0] axi_control_0,//主要的控制訊號(loadweight、compute....)
@@ -67,21 +70,43 @@ module control_unit #(
     // reg [12:0] write_bram_cnt;
     reg [8:0] ofmaps_width_cnt;
     reg [8:0] ofmaps_hegiht_cnt;
+    reg [2:0] stride_cnt;
 
+    //buf
     reg axis_en_buf;
     reg axis_clear_buf;
     
-    wire load_weight_FSM_start,inst_compute;
-    wire [8:0] ofmaps_width;
-    wire [2:0] stride;
-    wire [7:0] MAC_enable_in;
-    wire all_weight_compute_finish;
-    wire last_weight,all_finish,ifmaps_flush;
-    wire [11:0] next_filter_cnt ;
+    reg pooling_compute_buf;
+    reg layer_finish_buf;
+    reg inst_compute_buf;
+    reg inst_write_weight_buf;
 
+    //inst
+    wire inst_compute;
+    wire inst_write_weight;
+    wire inst_compute_pos_edge;
+    wire inst_write_weight_pos_edge;
+
+    //setting
+    wire op_conv;
+    wire op_pool;
+    wire [8:0] ofmaps_width;
+
+    //FSM
+    wire load_weight_FSM_start;
     wire load_ifmaps_state_enable;
     wire load_weight_state_enable;
     wire write_weight_state_enable;
+
+    //control
+    wire [7:0] MAC_enable_in;
+    wire all_finish;
+    wire all_weight_compute_finish;
+    wire last_weight;
+    wire ifmaps_flush;
+    wire [11:0] next_filter_cnt;
+    wire layer_finish_wire;
+    wire axi_control_3_clear;
 
     // wire [12:0] next_write_bram_cnt;
     
@@ -98,16 +123,23 @@ module control_unit #(
 
     assign kernel_size=(axi_control_2[4:0]);
 
+    assign op_conv = (operation == 2'd0);
+    assign op_pool = (operation == 2'd1);
 
-    assign layer_finish=all_finish & all_weight_compute_finish;
+    assign layer_finish = (layer_finish_wire && (!layer_finish_buf));
+    assign layer_finish_wire=(all_finish & all_weight_compute_finish) || (all_finish & op_pool);
 
     assign bram_transfer_start=(load_weight_state==RESET_ADDR || write_weight_state==WW_START);
 
     //assign axi_control_3=(write_weight_state==WW_FINISH) ? 32'd1:0;
-
+    assign pooling_compute = (op_pool && (load_ifmaps_state == COMPUTE)) && (!pooling_compute_buf);
 
     assign axis_en = axis_en_buf | inst_write_weight | inst_compute;
-    assign axis_clear = axis_clear_buf;
+    assign axis_clear = axis_clear_buf | inst_compute_pos_edge;
+
+    assign inst_compute_pos_edge = inst_compute && (!inst_compute_buf);
+    assign inst_write_weight_pos_edge = inst_write_weight && (!inst_write_weight_buf);
+    assign axi_control_3_clear = (inst_compute_pos_edge | inst_write_weight_pos_edge);
     /////////////////////////////////////////////////
     //                   ifmaps_FSM                //
     /////////////////////////////////////////////////
@@ -146,9 +178,9 @@ module control_unit #(
                     LOAD4             :load_ifmaps_state<=((kernel_size==5'b01000) ? COMPUTE:WAIT_FIFO5);
                     WAIT_FIFO5        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO5:LOAD5);
                     LOAD5             :load_ifmaps_state<=(COMPUTE);         
-                    COMPUTE           :load_ifmaps_state<=(all_weight_compute_finish ? (all_finish ? LOAD_WEIGHT_IDLE:(ifmaps_flush ? WAIT_FIFO1:WAIT_FIFO6)):COMPUTE);
+                    COMPUTE           :load_ifmaps_state<=((all_weight_compute_finish || pooling_finish) ? (all_finish ? LOAD_IFMAPS_IDLE:(ifmaps_flush ? WAIT_FIFO1:WAIT_FIFO6)):COMPUTE);
                     WAIT_FIFO6        :load_ifmaps_state<=(ifmaps_fifo_empty ? WAIT_FIFO6:LOAD);
-                    LOAD              :load_ifmaps_state<=(COMPUTE);
+                    LOAD              :load_ifmaps_state<=(stride_cnt+3'd1 == stride) ? COMPUTE : WAIT_FIFO6;
                     default           :load_ifmaps_state<=LOAD_IFMAPS_IDLE;          
                 endcase
             end
@@ -183,7 +215,7 @@ module control_unit #(
 
     assign load_weight_FSM_start=(load_ifmaps_state==COMPUTE);
 
-    assign load_weight_state_enable = (!inst_compute);
+    assign load_weight_state_enable = ~(inst_compute && op_conv);
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             load_weight_state<=LOAD_WEIGHT_IDLE;
@@ -295,9 +327,9 @@ module control_unit #(
             end
             else begin
                 if(ofmaps_width_cnt != ofmaps_width) begin
-                    ofmaps_width_cnt<=(last_weight & 
+                    ofmaps_width_cnt<=((last_weight & 
                                   (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || 
-                                   load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT)) ? ofmaps_width_cnt+1:ofmaps_width_cnt;
+                                   load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT)) || (pooling_finish)) ? ofmaps_width_cnt+1:ofmaps_width_cnt;
                 end
                 else begin
                     ofmaps_width_cnt<=0;
@@ -341,7 +373,26 @@ module control_unit #(
     /////////////////////////////////////////////////
 
     /////////////////////////////////////////////////
-    //                  axis_en_buf                //
+    //                   stride                    //
+    /////////////////////////////////////////////////
+    
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            stride_cnt <= 3'd0;
+        end
+        else begin
+            stride_cnt <= (load_ifmaps_state == LOAD) ? stride_cnt+3'd1 : 
+                          (load_ifmaps_state == COMPUTE) ? 3'd0 : stride_cnt;
+        end
+    end
+    
+
+    /////////////////////////////////////////////////
+    //                   stride                    //
+    /////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////
+    //                     buf                     //
     /////////////////////////////////////////////////
 
     always @(posedge clk or negedge rst_n) begin
@@ -349,8 +400,8 @@ module control_unit #(
             axis_en_buf <= 1'd0;
         end
         else begin
-            axis_en_buf <= (layer_finish | write_weight_finish) ? 1'd0 :
-                           (inst_write_weight | inst_compute) ? 1'd1 : axis_en_buf;
+            axis_en_buf <= (layer_finish_wire | write_weight_finish) ? 1'd0 :
+                           (inst_write_weight_pos_edge | inst_compute_pos_edge) ? 1'd1 : axis_en_buf;
         end
     end
 
@@ -368,14 +419,53 @@ module control_unit #(
             axi_control_3 <= 32'd0;
         end
         else begin
-            axi_control_3 <= write_weight_finish ? 1'd1 :
-                             inst_compute ? 1'd0 : axi_control_3;
+            axi_control_3 <= write_weight_finish ? 32'd1 :
+                             (M_AXIS_output_finsih) ? 32'hFFFFFFFF : 
+                             (axi_control_3_clear) ? 32'd0 : axi_control_3;
         end
     end
 
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            pooling_compute_buf <= 1'd0;
+        end
+        else begin
+            pooling_compute_buf <= (op_pool && (load_ifmaps_state == COMPUTE));
+
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            layer_finish_buf <= 1'd0;
+        end
+        else begin
+            layer_finish_buf <= layer_finish_wire;
+
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            inst_compute_buf <= 1'd0;
+        end
+        else begin
+            inst_compute_buf <= inst_compute;
+
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            inst_write_weight_buf <= 1'd0;
+        end
+        else begin
+            inst_write_weight_buf <= inst_write_weight;
+        end
+    end
 
     /////////////////////////////////////////////////
-    //                   axis_en_buf               //
+    //                      buf                    //
     /////////////////////////////////////////////////
     
 endmodule

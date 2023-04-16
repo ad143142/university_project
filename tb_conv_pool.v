@@ -2,7 +2,7 @@
 `define INST_COMPUTE 32'd87 
 `define INST_LOADIFMAPS 32'd88 
 `define INST_WRITE_WEIGHT 32'd12 
-module tb_top_pooling;
+module tb_conv_pool;
 
     // top Parameters
     parameter PERIOD                = 20 ;
@@ -57,6 +57,8 @@ module tb_top_pooling;
     wire						          M_AXIS_TLAST;
     wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] M_AXIS_TSTRB ; 
 
+    integer valid_cnt=0;
+
     initial
     begin
         forever #(PERIOD/2)  clk=~clk;
@@ -66,9 +68,99 @@ module tb_top_pooling;
     begin
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
-        set_kernel_size(3'd2);
-        set_ofmaps_channel_and_input_channel(2,2);
-        set_stride_function_ofmaps_width(2,1,3);
+        
+        /*
+            weight 1
+            ch0
+            0 1 1 1 1
+            1 0 0 1 0
+            1 0 0 1 0
+            0 0 1 0 1
+            0 1 1 0 0 
+            ch1
+            1 1 0 1 0 
+            0 0 0 1 1 
+            1 0 1 0 1
+            1 1 1 1 0
+            0 0 0 1 0 
+
+            weight 2
+            ch0
+            0 1 0 1 0 
+            0 0 1 0 1 
+            0 0 0 1 1 
+            1 0 1 0 1 
+            0 1 0 0 0
+            ch1
+            1 1 1 1 0 
+            1 1 0 0 1 
+            1 0 0 1 0 
+            0 0 1 0 1 
+            0 1 0 1 0 
+
+            ifmaps 1
+            ch0
+            0 0 1 1 1 1 1
+            1 1 1 1 0 0 1 
+            1 0 0 1 0 1 0
+            1 1 1 1 0 0 0 
+            1 0 0 0 0 0 1
+            ch1
+            1 0 1 0 1 1 1 
+            0 0 0 1 1 1 0
+            0 1 0 1 0 0 0 
+            1 1 1 0 1 0 1 
+            1 1 0 0 0 1 0 
+            
+            ifmaps 2
+            ch0
+            1 1 1 1 0 0 1
+            1 0 0 1 0 1 0 
+            1 1 1 1 0 0 0 
+            1 0 0 0 0 0 1
+            0 0 0 1 1 0 0 
+            ch1
+            0 0 0 1 1 1 0
+            0 1 0 1 0 0 0 
+            1 1 1 0 1 0 1 
+            1 1 0 0 0 1 0 
+            1 1 1 0 0 0 1
+
+            ifmaps 3
+            ch0
+            1 0 0 1 0 1 0 
+            1 1 1 1 0 0 0 
+            1 0 0 0 0 0 1
+            0 0 0 1 1 0 0 
+            0 0 1 0 0 0 1 
+            ch1
+            0 1 0 1 0 0 0 
+            1 1 1 0 1 0 1 
+            1 1 0 0 0 1 0 
+            1 1 1 0 0 0 1
+            1 1 1 0 1 0 1
+
+            ofmaps sum 
+            ch0
+            26   30   24
+            27   17   31
+            26   29   20
+            ch1
+            24   22   26
+            17   25   23
+            24   27   26
+
+            ofmaps
+            ch0
+            1 1 0
+            1 0 1
+            1 1 0
+            ch1
+            0 0 1
+            0 1 0
+            0 1 1
+            10_1101_0110_0110_0101=2D665
+        */
 
         /*
             ifmaps
@@ -97,12 +189,17 @@ module tb_top_pooling;
             0 1 1
             1 0 0
             1 1 1
-            11_1111_0001_1111_1101 = 2F1FD
+            11_1111_0001_1111_1101 = 2F1FD 
+            333013331
 
         */
+        set_kernel_size(3'd2);
+        set_ofmaps_channel_and_input_channel(2,2);
+        set_stride_function_ofmaps_width(2,1,3);
         #(PERIOD*5);
+    error_axis_input(3000,0);
         compute_start();
-        #20;
+        #(PERIOD*2);
         
         axis_in(32'b000_00_000_01);
         axis_in(32'b000_00_000_00);
@@ -125,13 +222,91 @@ module tb_top_pooling;
         axis_in(32'b000_00_000_10);
         axis_in(32'b000_11_000_00);
 
+    error_axis_input(3000,0);
+
+        while(S_AXI_RDATA!=32'hFFFFFFFF)begin
+            read_AXI_3();
+        end
+/////////////////////////////////////////////////////////////////
+    error_axis_input(3000,0);
+
+        set_kernel_size(3'd5);
+        set_ofmaps_channel_and_input_channel(2,2);
+        set_stride_function_ofmaps_width(1,0,3);
+
+    error_axis_input(3000,0);
+    
+        write_weight_start();
+
+        wait(!clk);
+        axis_in(32'b0110100110);
+        axis_in(32'b0100110001);
+        axis_in(32'b0110011001);
+        axis_in(32'b1101100111);
+        axis_in(32'b0011001001);
+        
+        wait(!clk);
+        axis_in(32'b0011101000);
+        axis_in(32'b1001110001);
+        axis_in(32'b0100101010);
+        axis_in(32'b1010100101);
+        axis_in(32'b0101001110);
+
+    error_axis_input(3000,0);
+
+        //以�?�是weight
+        while(S_AXI_RDATA!=32'd1)begin
+            read_AXI_3();
+        end
+        //以�?�是ifmaps
+        #(PERIOD*5);
+        compute_start();
+        #(PERIOD*2);
+        axis_in(32'b1100111110);
+        axis_in(32'b1110001010);
+        axis_in(32'b0100101011);
+        axis_in(32'b0011001111);
+        axis_in(32'b0101100001);
+        axis_in(32'b1001100101);
+        axis_in(32'b0100110011);
+        // #1000;
+
+        axis_in(32'b1110001111);
+        axis_in(32'b1111000101);
+        axis_in(32'b1010000101);
+        axis_in(32'b0001110111);
+        axis_in(32'b0010110000);
+        axis_in(32'b0100100010);
+        axis_in(32'b1010001001);
+
+        // #1000;
+        axis_in(32'b1111000111);
+        axis_in(32'b1111100010);
+        axis_in(32'b1101010010);
+        axis_in(32'b0000101011);
+        axis_in(32'b1001001000);
+        axis_in(32'b0010000001);
+        axis_in(32'b1101010100);
+        
+    error_axis_input(3000,0);
+
+        while(S_AXI_RDATA!=32'hFFFFFFFF)begin
+            read_AXI_3();
+        end
+        
+///////////////////////////////////////////////////////////
+
+
+
         #10000;
         $finish;
     end
 
     always @(*) begin
-        if(u_top.M_AXIS_TVALID)
-            $display($time,"  M_AXIS_TDATA = %b , M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
+        if(u_top.M_AXIS_TVALID) begin
+            $display($time,"  M_AXIS_TDATA = %h , M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
+            valid_cnt = valid_cnt+1;
+        end
     end
 
     initial
@@ -245,12 +420,12 @@ module tb_top_pooling;
 
         wait(S_AXI_ARREADY==1'b1) begin
             wait(S_AXI_RVALID) begin
-                    $monitor($time,,"AXI_3 read success");
+                // $monitor($time,,"AXI_3 read success");
                 if(S_AXI_RDATA==32'd1) begin
                     $monitor($time,,"write_weight_finish");
                 end
-                else begin
-                    $monitor($time,,"write_weight_not_finish");
+                else if (S_AXI_RDATA==32'hFFFFFFFF)begin
+                    $monitor($time,,"layer_finish");
                 end
                 S_AXI_ARVALID=1'b0;
                 S_AXI_RREADY=1'b1;
@@ -400,4 +575,21 @@ module tb_top_pooling;
     end
     endtask
 
+    task error_axis_input(input integer in_delay, input integer out_delay);begin
+        #(in_delay);
+        axis_in(32'b1111111111);
+        axis_in(32'b1000000111);
+        axis_in(32'b1110000001);
+        axis_in(32'b1110001000);
+        axis_in(32'b0101100001);
+        axis_in(32'b1110001000);
+        axis_in(32'b0101100001);
+        axis_in(32'b1110001000);
+        axis_in(32'b0101100001);
+        axis_in(32'b1110001000);
+        axis_in(32'b0101100001);
+        axis_in(32'b1000000111);
+        #(out_delay);
+    end
+    endtask
 endmodule
