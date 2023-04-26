@@ -92,7 +92,7 @@ module data_path #(
     wire axis_fifo_read;
     wire ifmaps_fifo_full;
 
-    wire [5*MAC_NUM-1:0] MAC_out;
+    wire [6*MAC_NUM-1:0] MAC_out;
     wire MAC_o_valid;
 
     wire psum_out_data_package_o_valid;
@@ -208,7 +208,7 @@ module data_path #(
     assign psum_adder_i_valid = (MAC_o_valid && (operation==2'd0));
     psum_adder
     #(
-        .PSUM_IN_WIDTH          (MAC_NUM*5                ),
+        .PSUM_IN_WIDTH          (MAC_NUM*6                ),
         .OFMAPS_BRAM_ADDR_WIDTH (12                       )
     )
     u_psum_adder(
@@ -257,7 +257,7 @@ module data_path #(
     integer i;
     always @(*) begin
         for(i=0;i<256;i=i+1) begin
-            pool_data_package_data_in[i]=MAC_out[i*5];
+            pool_data_package_data_in[i]=MAC_out[i*6];
         end
     end
     pool_out_data_package#(

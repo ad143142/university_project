@@ -15,7 +15,7 @@ module MAC_array_control #(
 
     input wire [5*MAC_NUM-1:0] weight_from_bram,
 
-    output wire [5*MAC_NUM-1:0] MAC_out,
+    output wire [6*MAC_NUM-1:0] MAC_out,
     //control
     input wire [MAC_NUM-1:0] enable,
     input wire [1:0] operation,

@@ -12,7 +12,7 @@ module ALU (
 
     input wire [24:0] weight_in,
 
-    output wire [4:0] MAC_out,
+    output wire [5:0] MAC_out,
 
     //control in
     input wire enable,
@@ -40,7 +40,13 @@ module ALU (
     reg weight_reg_40,weight_reg_41,weight_reg_42,weight_reg_43,weight_reg_44;
 
     wire [24:0] xnor_op;
-    reg [4:0] bitcount;
+    reg [5:0] summation;
+
+    reg [1:0] summation_layer1 [0:11];
+    reg [2:0] summation_layer2 [0:5];
+    reg [3:0] summation_layer3 [0:2];
+    reg [4:0] summation_layer4 [0:1];
+    reg [4:0] summation_layer5 ;
 
     wire enable_n;//for weight reg to or it. If enable is 1 then or 0 ,enable is 0 then or 1 
     assign enable_n=~enable;
@@ -61,8 +67,9 @@ module ALU (
                     ifmaps_reg_40|ifmaps_reg_41|ifmaps_reg_42|ifmaps_reg_43|ifmaps_reg_44;
 
     //operation  ->  1: Do Pooling  0: Do MUL
-    assign MAC_out = op_pooling ? {4'd0,pooling}:
-                     op_convolution ? bitcount:5'd0; 
+    assign MAC_out = (!enable) ? 6'd0 :
+                     op_pooling ? {5'd0,pooling}:
+                     op_convolution ? summation:5'd0; 
     
     //kernel後的數字代表設定的kernel_size是否有比他大
     wire kenel_2,kenel_3,kenel_4,kenel_5;
@@ -100,14 +107,6 @@ module ALU (
     assign xnor_op[22] = ifmaps_reg_42 ^~ weight_reg_42;
     assign xnor_op[23] = ifmaps_reg_43 ^~ weight_reg_43;
     assign xnor_op[24] = ifmaps_reg_44 ^~ weight_reg_44;
-
-    //bitcount，此為verilog的寫法
-    always @(*) begin
-        bitcount=0;
-        for(idx=0;idx<25;idx=idx+1) begin
-            bitcount=bitcount+xnor_op[idx];
-        end
-    end
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -426,6 +425,47 @@ module ALU (
             end
         end
     end
+
+    
+    
+    integer i;
+    always @(*) begin
+        for(i=0;i<13;i=i+1) begin
+            summation_layer1[i] = xnor_op[i*2] + xnor_op[i*2+1];
+        end
+    end 
+
+    always @(*) begin
+        for(i=0;i<6;i=i+1) begin
+            summation_layer2[i] = summation_layer1[i*2] + summation_layer1[i*2+1];
+        end
+    end 
+
+    always @(*) begin
+        for(i=0;i<3;i=i+1) begin
+            summation_layer3[i] = summation_layer2[i*2] + summation_layer2[i*2+1];
+        end
+    end 
+
+    always @(*) begin
+        summation_layer4[0] = summation_layer3[0] + summation_layer3[1];
+        summation_layer4[1] = summation_layer3[2] + xnor_op[24];
+    end
+
+    always @(*) begin
+        summation_layer5 = summation_layer4[0] + summation_layer4[1];
+    end
+
+    always @(*) begin
+        summation = {summation_layer5,1'd0} - 6'd25;
+    end
+
+
+
+
+
+
+
 
 
 

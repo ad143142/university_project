@@ -1,12 +1,12 @@
-56 58 57 
-54 55 5c 
-55 4d 55 
+fffffffd 1 ffffffff 
+fffffff9 fffffffb 9 
+fffffffb ffffffeb fffffffb 
 
-57 59 58 
-63 5c 5d 
-50 54 58 
+ffffffff 3 1 
+17 9 b 
+fffffff1 fffffff9 1 
 
-62 5a 53 
-4a 4f 5a 
-61 63 5d 
+15 5 fffffff7 
+ffffffe5 ffffffef 5 
+13 17 b 
 

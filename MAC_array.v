@@ -10,7 +10,7 @@ module MAC_array #(
     input wire [25*MAC_NUM-1:0] weight_from_preload,
     input wire [5*MAC_NUM-1:0] ifmaps_from_axis_preload,
 
-    output wire [5*MAC_NUM-1:0] psum_out,
+    output wire [6*MAC_NUM-1:0] psum_out,
 
     //control
     input wire [MAC_NUM-1:0] enable,
@@ -38,7 +38,7 @@ module MAC_array #(
                 .ifmaps_row3_in (ifmaps_from_axis_preload[(idx*5)+3]       ),
                 .ifmaps_row4_in (ifmaps_from_axis_preload[(idx*5)+4]       ),
                 .weight_in      (weight_from_preload[(idx*25+24) -: 25]    ),
-                .MAC_out        (psum_out[(idx*5+4) -: 5]                  ),
+                .MAC_out        (psum_out[(idx*6+5) -: 6]                  ),
                 .enable         (enable[idx]                               ),
                 .load_ifmaps    (load_ifmaps                               ),
                 .load_weight    (load_weight                               ),

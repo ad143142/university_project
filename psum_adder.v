@@ -1,5 +1,5 @@
 module psum_adder #(
-    parameter PSUM_IN_WIDTH = 1280,
+    parameter PSUM_IN_WIDTH = 6*256,
     parameter OFMAPS_BRAM_ADDR_WIDTH = 12
 )
 (
@@ -24,15 +24,15 @@ module psum_adder #(
 
 );
 //////////////////////reg//////////////////////////
-    reg [4 : 0] r_pipe0_data [0 : 256-1];
-    reg [5 : 0] r_pipe1_data [0 : 128-1];
-    reg [6 : 0] r_pipe2_data [0 : 64 -1];
-    reg [7 : 0] r_pipe3_data [0 : 32 -1];
-    reg [8 : 0] r_pipe4_data [0 : 16 -1];
-    reg [9 : 0] r_pipe5_data [0 : 8  -1];
-    reg [10: 0] r_pipe6_data [0 : 4  -1];
-    reg [11: 0] r_pipe7_data [0 : 2  -1];
-    reg [12: 0] r_pipe8_data ;
+    reg signed [5 : 0] r_pipe0_data [0 : 256-1];
+    reg signed [6 : 0] r_pipe1_data [0 : 128-1];
+    reg signed [7 : 0] r_pipe2_data [0 : 64 -1];
+    reg signed [8 : 0] r_pipe3_data [0 : 32 -1];
+    reg signed [9 : 0] r_pipe4_data [0 : 16 -1];
+    reg signed [10: 0] r_pipe5_data [0 : 8  -1];
+    reg signed [11: 0] r_pipe6_data [0 : 4  -1];
+    reg signed [12: 0] r_pipe7_data [0 : 2  -1];
+    reg signed [13: 0] r_pipe8_data ;
     //cmp
     reg r_pipe9_data;
 
@@ -101,10 +101,10 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_0=0;i_0<256;i_0=i_0+1) begin
             if(!rst_n) begin
-                r_pipe0_data[i_0] <= 5'd0;
+                r_pipe0_data[i_0] <= 6'd0;
             end
             else begin
-                r_pipe0_data[i_0] <= i_valid ? psum_in[i_0*5 +: 5] : r_pipe0_data[i_0];
+                r_pipe0_data[i_0] <= i_valid ? psum_in[i_0*6 +: 6] : r_pipe0_data[i_0];
             end
         end
     end
@@ -113,7 +113,7 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_1=0;i_1<128;i_1=i_1+1) begin
             if(!rst_n) begin
-                r_pipe1_data[i_1] <= 6'd0;
+                r_pipe1_data[i_1] <= 7'd0;
             end
             else begin
                 r_pipe1_data[i_1] <= r_pipe0_data[i_1 * 2] + r_pipe0_data[i_1 * 2 + 1];
@@ -125,7 +125,7 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_2=0;i_2<64;i_2=i_2+1) begin
             if(!rst_n) begin
-                r_pipe2_data[i_2] <= 7'd0;
+                r_pipe2_data[i_2] <= 8'd0;
             end
             else begin
                 r_pipe2_data[i_2] <= r_pipe1_data[i_2 * 2] + r_pipe1_data[i_2 * 2 + 1];
@@ -137,7 +137,7 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_3=0;i_3<32;i_3=i_3+1) begin
             if(!rst_n) begin
-                r_pipe3_data[i_3] <= 8'd0;
+                r_pipe3_data[i_3] <= 9'd0;
             end
             else begin
                 r_pipe3_data[i_3] <= r_pipe2_data[i_3 * 2] + r_pipe2_data[i_3 * 2 + 1];
@@ -149,7 +149,7 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_4=0;i_4<16;i_4=i_4+1) begin
             if(!rst_n) begin
-                r_pipe4_data[i_4] <= 9'd0;
+                r_pipe4_data[i_4] <= 10'd0;
             end
             else begin
                 r_pipe4_data[i_4] <= r_pipe3_data[i_4 * 2] + r_pipe3_data[i_4 * 2 + 1];
@@ -161,7 +161,7 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_5=0;i_5<8;i_5=i_5+1) begin
             if(!rst_n) begin
-                r_pipe5_data[i_5] <= 10'd0;
+                r_pipe5_data[i_5] <= 11'd0;
             end
             else begin
                 r_pipe5_data[i_5] <= r_pipe4_data[i_5 * 2] + r_pipe4_data[i_5 * 2 + 1];
@@ -173,7 +173,7 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_6=0;i_6<4;i_6=i_6+1) begin
             if(!rst_n) begin
-                r_pipe6_data[i_6] <= 11'd0;
+                r_pipe6_data[i_6] <= 12'd0;
             end
             else begin
                 r_pipe6_data[i_6] <= r_pipe5_data[i_6 * 2] + r_pipe5_data[i_6 * 2 + 1];
@@ -185,7 +185,7 @@ module psum_adder #(
     always @(posedge clk or negedge rst_n) begin
         for(i_7=0;i_7<2;i_7=i_7+1) begin
             if(!rst_n) begin
-                r_pipe7_data[i_7] <= 12'd0;
+                r_pipe7_data[i_7] <= 13'd0;
             end
             else begin
                 r_pipe7_data[i_7] <= r_pipe6_data[i_7 * 2] + r_pipe6_data[i_7 * 2 + 1];
@@ -209,7 +209,7 @@ module psum_adder #(
             r_pipe9_data <= 1'd0;
         end
         else begin
-            r_pipe9_data <= (r_pipe8_data >= threshold);
+            r_pipe9_data <= (r_pipe8_data >= 0);
         end
     end
 
