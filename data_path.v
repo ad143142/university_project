@@ -106,6 +106,8 @@ module data_path #(
     wire pool_data_package_o_last;
     wire [31:0] pool_data_package_o_data;
 
+    wire wait_weight_preload;
+
     assign M_AXIS_o_valid = (operation==2'd0) ? psum_out_data_package_o_valid : pool_data_package_o_valid;
     assign M_AXIS_o_data  = (operation==2'd0) ? psum_out_data_package_o_data : pool_data_package_o_data;
     assign M_AXIS_o_last  = (operation==2'd0) ? psum_out_data_package_o_last : pool_data_package_o_last;
@@ -164,7 +166,9 @@ module data_path #(
         //control out      
         .fifo_cnt             (axis_preload_fifo_cnt    ),
         .fifo_empty           (ifmaps_fifo_empty        ),
-        .fifo_full            (ifmaps_fifo_full         )
+        .fifo_full            (ifmaps_fifo_full         ),
+
+        .wait_weight_preload  (wait_weight_preload      )
     );
     
     
@@ -216,6 +220,7 @@ module data_path #(
         .in_channel             (input_channel_size        ),
         .kernel_size            (kernel_size               ),
         .layer_finish           (layer_finish              ),
+        
         //inputdata
         .psum_in                (MAC_out                   ),
         //FIXME:
@@ -316,7 +321,8 @@ module data_path #(
         .port_sel               (port_sel                  ),
         .weight_from_bram_valid (weight_from_bram_valid    ),
         .axis_fifo_read         (axis_fifo_read            ),
-        .write_weight_finish    (write_weight_finish       )
+        .write_weight_finish    (write_weight_finish       ),
+        .wait_weight_preload    (wait_weight_preload       )
     );
     
     //BRAM_instance

@@ -2,7 +2,25 @@
 `define INST_COMPUTE 32'd87 
 `define INST_LOADIFMAPS 32'd88 
 `define INST_WRITE_WEIGHT 32'd12 
-module tb_conv_pool;
+
+`define TESTFILEDIR    "F:\\vivado_works\\verilog_code\\git_repo\\university_project\\test_data"
+
+`define DEBUG
+
+module tb_auto_read;
+
+    //setting//
+    parameter FUNC = 0;
+    parameter IFMAPS_WIDTH = 7;
+    parameter IFMAPS_HIGHT = 7;
+    parameter IFMAPS_CH    = 7;
+    parameter WEIGHT_WIDTH = 5;
+    parameter WEIGHT_HIGHT = 5;
+    parameter WEIGHT_NUM   = 3;
+    parameter STRIDE       = 1;
+    //////dont touch/////
+    parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH - WEIGHT_WIDTH) / STRIDE + 1);
+    parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT - WEIGHT_HIGHT) / STRIDE + 1);
 
     // top Parameters
     parameter PERIOD                = 20 ;
@@ -13,6 +31,11 @@ module tb_conv_pool;
     parameter C_S_AXI_ADDR_WIDTH    = 4  ;
     parameter C_M_AXIS_TDATA_WIDTH  = 32 ;
 
+    integer w,z,x,y;//for load mem
+    integer ofmaps_validation_cnt=0;
+    integer psum_validation_cnt=0;
+    integer i;
+    integer error_flag=0;
     // top Inputs
     reg   clk                                  = 0 ;
     reg   rst_n                                = 0 ;
@@ -57,7 +80,14 @@ module tb_conv_pool;
     wire						          M_AXIS_TLAST;
     wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] M_AXIS_TSTRB ; 
 
-    integer valid_cnt=0;
+    reg [0:0] mem_i [0:IFMAPS_CH-1][0:IFMAPS_HIGHT-1][0:IFMAPS_WIDTH-1];
+    reg [0:0] mem_w [0:WEIGHT_NUM-1][0:IFMAPS_CH-1][0:WEIGHT_HIGHT-1][0:WEIGHT_WIDTH-1];
+    reg [0:0] mem_b [0:WEIGHT_NUM-1];
+    reg [31:0] mem_pb [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
+    reg [31:0] mem_pa [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
+    reg [0:0] mem_o [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
+
+    assign psum_out = u_top.u_data_path.u_psum_adder.o_data;
 
     initial
     begin
@@ -68,252 +98,86 @@ module tb_conv_pool;
     begin
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
-        
-        /*
-            weight 1
-            ch0
-            0 1 1 1 1
-            1 0 0 1 0
-            1 0 0 1 0
-            0 0 1 0 1
-            0 1 1 0 0 
-            ch1
-            1 1 0 1 0 
-            0 0 0 1 1 
-            1 0 1 0 1
-            1 1 1 1 0
-            0 0 0 1 0 
+        load_mem_from_file();
 
-            weight 2
-            ch0
-            0 1 0 1 0 
-            0 0 1 0 1 
-            0 0 0 1 1 
-            1 0 1 0 1 
-            0 1 0 0 0
-            ch1
-            1 1 1 1 0 
-            1 1 0 0 1 
-            1 0 0 1 0 
-            0 0 1 0 1 
-            0 1 0 1 0 
+        ////////////////////////////////////////////////////////
 
-            ifmaps 1
-            ch0
-            0 0 1 1 1 1 1
-            1 1 1 1 0 0 1 
-            1 0 0 1 0 1 0
-            1 1 1 1 0 0 0 
-            1 0 0 0 0 0 1
-            ch1
-            1 0 1 0 1 1 1 
-            0 0 0 1 1 1 0
-            0 1 0 1 0 0 0 
-            1 1 1 0 1 0 1 
-            1 1 0 0 0 1 0 
-            
-            ifmaps 2
-            ch0
-            1 1 1 1 0 0 1
-            1 0 0 1 0 1 0 
-            1 1 1 1 0 0 0 
-            1 0 0 0 0 0 1
-            0 0 0 1 1 0 0 
-            ch1
-            0 0 0 1 1 1 0
-            0 1 0 1 0 0 0 
-            1 1 1 0 1 0 1 
-            1 1 0 0 0 1 0 
-            1 1 1 0 0 0 1
-
-            ifmaps 3
-            ch0
-            1 0 0 1 0 1 0 
-            1 1 1 1 0 0 0 
-            1 0 0 0 0 0 1
-            0 0 0 1 1 0 0 
-            0 0 1 0 0 0 1 
-            ch1
-            0 1 0 1 0 0 0 
-            1 1 1 0 1 0 1 
-            1 1 0 0 0 1 0 
-            1 1 1 0 0 0 1
-            1 1 1 0 1 0 1
-
-            ofmaps sum 
-            ch0
-            26   30   24
-            27   17   31
-            26   29   20
-            ch1
-            24   22   26
-            17   25   23
-            24   27   26
-
-            ofmaps
-            ch0
-            1 1 0
-            1 0 1
-            1 1 0
-            ch1
-            0 0 1
-            0 1 0
-            0 1 1
-            10_1101_0110_0110_0101=2D665
-        */
-
-        /*
-            ifmaps
-            ch0
-            1 0 0 0 0 0 
-            0 0 1 0 1 0 
-            0 1 0 1 0 0 
-            1 1 0 0 0 0 
-            1 0 1 1 0 0
-            0 0 1 0 1 0 
-
-            ch1
-            0 0 0 1 1 0 
-            0 0 0 0 0 0
-            0 1 0 0 0 0
-            1 0 0 0 0 0
-            1 1 0 1 0 1
-            0 1 1 1 0 1
-
-            ofmaps
-            ch0
-            1 1 1
-            1 1 0
-            1 1 1
-            ch1
-            0 1 1
-            1 0 0
-            1 1 1
-            11_1111_0001_1111_1101 = 2F1FD 
-            333013331
-
-        */
-        set_kernel_size(3'd2);
-        set_ofmaps_channel_and_input_channel(2,2);
-        set_stride_function_ofmaps_width(2,1,3);
+        set_kernel_size(WEIGHT_WIDTH);
+        set_ofmaps_channel_and_input_channel(WEIGHT_NUM,IFMAPS_CH);
+        set_stride_function_ofmaps_width(STRIDE,FUNC,OFMAPS_WIDTH);
         #(PERIOD*5);
-    error_axis_input(3000,0);
-        compute_start();
-        #(PERIOD*2);
-        
-        axis_in(32'b000_00_000_01);
-        axis_in(32'b000_00_000_00);
-        axis_in(32'b000_00_000_10);
-        axis_in(32'b000_01_000_00);
-        axis_in(32'b000_01_000_10);
-        axis_in(32'b000_00_000_00);
-
-        axis_in(32'b000_10_000_10);
-        axis_in(32'b000_01_000_11);
-        axis_in(32'b000_00_000_00);
-        axis_in(32'b000_00_000_01);
-        axis_in(32'b000_00_000_00);
-        axis_in(32'b000_00_000_00);
-
-        axis_in(32'b000_01_000_01);
-        axis_in(32'b000_11_000_00);
-        axis_in(32'b000_10_000_11);
-        axis_in(32'b000_11_000_01);
-        axis_in(32'b000_00_000_10);
-        axis_in(32'b000_11_000_00);
-
-    error_axis_input(3000,0);
-
-        while(S_AXI_RDATA!=32'hFFFFFFFF)begin
-            read_AXI_3();
-        end
-/////////////////////////////////////////////////////////////////
-    error_axis_input(3000,0);
-
-        set_kernel_size(3'd5);
-        set_ofmaps_channel_and_input_channel(2,2);
-        set_stride_function_ofmaps_width(1,0,3);
-
-    error_axis_input(3000,0);
-    
+    // error_axis_input(3000,0);
         write_weight_start();
+        write_weight();
 
-        wait(!clk);
-        axis_in(32'b0110100110);
-        axis_in(32'b0100110001);
-        axis_in(32'b0110011001);
-        axis_in(32'b1101100111);
-        axis_in(32'b0011001001);
-        
-        wait(!clk);
-        axis_in(32'b0011101000);
-        axis_in(32'b1001110001);
-        axis_in(32'b0100101010);
-        axis_in(32'b1010100101);
-        axis_in(32'b0101001110);
-
-    error_axis_input(3000,0);
-
-        //以�?�是weight
         while(S_AXI_RDATA!=32'd1)begin
             read_AXI_3();
         end
-        //以�?�是ifmaps
+
         #(PERIOD*5);
         compute_start();
         #(PERIOD*2);
-        axis_in(32'b1100111110);
-        axis_in(32'b1110001010);
-        axis_in(32'b0100101011);
-        axis_in(32'b0011001111);
-        axis_in(32'b0101100001);
-        axis_in(32'b1001100101);
-        axis_in(32'b0100110011);
-        // #1000;
 
-        axis_in(32'b1110001111);
-        axis_in(32'b1111000101);
-        axis_in(32'b1010000101);
-        axis_in(32'b0001110111);
-        axis_in(32'b0010110000);
-        axis_in(32'b0100100010);
-        axis_in(32'b1010001001);
-
-        // #1000;
-        axis_in(32'b1111000111);
-        axis_in(32'b1111100010);
-        axis_in(32'b1101010010);
-        axis_in(32'b0000101011);
-        axis_in(32'b1001001000);
-        axis_in(32'b0010000001);
-        axis_in(32'b1101010100);
-        
-    error_axis_input(3000,0);
-
+        write_ifmaps();
         while(S_AXI_RDATA!=32'hFFFFFFFF)begin
             read_AXI_3();
         end
         
-///////////////////////////////////////////////////////////
-
-
+        if(error_flag == 0) begin
+            $display("/////////////////////////////////////////////////////////////////////////////////");
+            $display("//                                                                             //");
+            $display("//                    congratulation you pass the pattern                      //");
+            $display("//                                                                             //");
+            $display("/////////////////////////////////////////////////////////////////////////////////");
+        end
+        else begin
+            $display("/////////////////////////////////////////////////////////////////////////////////");
+            $display("//                                                                             //");
+            $display("//           you fail the pattern there are some error in your design          //");
+            $display("//                                                                             //");
+            $display("/////////////////////////////////////////////////////////////////////////////////");
+        end
 
         #10000;
         $finish;
     end
 
+    
     always @(*) begin
         if(u_top.M_AXIS_TVALID) begin
-            $display($time,"  M_AXIS_TDATA = %h , M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
-            valid_cnt = valid_cnt+1;
+            $display("time=%7d  M_AXIS_TDATA = %h = %b, M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",$time,u_top.M_AXIS_TDATA,u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
+            for(i=0;i<32;i=i+1) begin
+                if(u_top.M_AXIS_TDATA[i] != mem_o[ofmaps_validation_cnt%WEIGHT_NUM][ofmaps_validation_cnt/(WEIGHT_NUM*WEIGHT_WIDTH)][ofmaps_validation_cnt/WEIGHT_NUM]) begin
+                    $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b",$time,i,u_top.M_AXIS_TDATA[i],mem_o[ofmaps_validation_cnt%WEIGHT_NUM][ofmaps_validation_cnt/WEIGHT_NUM/WEIGHT_WIDTH][ofmaps_validation_cnt/WEIGHT_NUM]);   
+                    error_flag = 1;
+                end
+                ofmaps_validation_cnt=ofmaps_validation_cnt+1;
+            end
         end
     end
 
-    initial
-    begin
-        $fsdbDumpfile("top_tb_1.fsdb");
-        $fsdbDumpvars(0);
+`ifdef DEBUG
+    always @(*) begin
+        if(u_top.u_data_path.u_psum_adder.o_valid) begin
+            $display("time=%7d  psum_binarization_valid = %d , address_out = %h , psum_binarization_data = %h",$time,u_top.u_data_path.u_psum_adder.o_valid,u_top.u_data_path.u_psum_adder.address_out,u_top.u_data_path.u_psum_adder.o_data);
+        end
     end
+`endif
+
+    always @(*) begin
+        if(u_top.u_data_path.u_psum_adder.r_pipe8_valid) begin
+`ifdef DEBUG
+            $display("time=%7d  psum_after_bias_valid = %d   , address_out = %h , psum_after_bias_data   = %h",$time,u_top.u_data_path.u_psum_adder.r_pipe8_valid,u_top.u_data_path.u_psum_adder.r_pipe8_addr,u_top.u_data_path.u_psum_adder.r_pipe8_data);
+`endif   
+            if(u_top.u_data_path.u_psum_adder.r_pipe8_data != mem_pa [psum_validation_cnt%WEIGHT_NUM][psum_validation_cnt/(WEIGHT_NUM*WEIGHT_WIDTH)][psum_validation_cnt/WEIGHT_NUM]) begin
+                $display("time=%7d  no.%d :psum_after_bias_data = %h , expect: %h",$time,psum_validation_cnt,u_top.u_data_path.u_psum_adder.r_pipe8_data,mem_pa[psum_validation_cnt%WEIGHT_NUM][psum_validation_cnt/WEIGHT_NUM/WEIGHT_WIDTH][psum_validation_cnt/WEIGHT_NUM]);   
+                error_flag = 1;
+            end
+            psum_validation_cnt=psum_validation_cnt+1;
+        end
+
+    end
+
 
     top #(
             .MAC_NUM              ( MAC_NUM              ),
@@ -369,13 +233,6 @@ module tb_conv_pool;
     );
 
 
-    // task axi_control_set(input [31:0]data0,input [31:0]data1,input [31:0]data2);begin
-    //     axi_control_0=data0;
-    //     axi_control_1=data1;
-    //     axi_control_2=data2;   
-    // end
-    // endtask
-
     task set_kernel_size(input [2:0]kernel_size);begin
         watch_set_kernel_size=1;
 
@@ -401,12 +258,8 @@ module tb_conv_pool;
                 S_AXI_WVALID=1'b0;
                 watch_set_kernel_size=0;
             end
-            $monitor($time,,"set_kernel_size success");
+            $display("time=%7d  set_kernel_size success",$time);
         end
-        // else begin
-        //     $monitor($time,,"set_kernel_size WRITE ERROR : S_AXI_AWREADY= %b   S_AXI_WREADY= %b",S_AXI_AWREADY,S_AXI_WREADY);
-        // end
-        //axi_control_2[4:0];
     end
     endtask
 
@@ -422,10 +275,10 @@ module tb_conv_pool;
             wait(S_AXI_RVALID) begin
                 // $monitor($time,,"AXI_3 read success");
                 if(S_AXI_RDATA==32'd1) begin
-                    $monitor($time,,"write_weight_finish");
+                    $display("time=%7d  write_weight_finish",$time);
                 end
                 else if (S_AXI_RDATA==32'hFFFFFFFF)begin
-                    $monitor($time,,"layer_finish");
+                    $display("time=%7d  layer_finish",$time);
                 end
                 S_AXI_ARVALID=1'b0;
                 S_AXI_RREADY=1'b1;
@@ -455,13 +308,9 @@ module tb_conv_pool;
                 S_AXI_AWVALID=1'b0;
                 S_AXI_WVALID=1'b0;
             end
-            $monitor($time,,"write_weight_start success");
+            $display("time=%7d  write_weight_start success",$time);
             watch_write_weight_start=0;
         end
-        // else begin
-        //     $monitor($time,,"compute_start WRITE ERROR : S_AXI_AWREADY= %b   S_AXI_WREADY= %b",S_AXI_AWREADY,S_AXI_WREADY);
-        // end
-        // axi_control_0[7:0]=`INST_COMPUTE;
     end
     endtask
 
@@ -482,13 +331,9 @@ module tb_conv_pool;
                 S_AXI_AWVALID=1'b0;
                 S_AXI_WVALID=1'b0;
             end
-            $monitor($time,,"compute_start success");
+            $display("time=%7d  compute_start success",$time);
             watch_compute_start=0;
         end
-        // else begin
-        //     $monitor($time,,"compute_start WRITE ERROR : S_AXI_AWREADY= %b   S_AXI_WREADY= %b",S_AXI_AWREADY,S_AXI_WREADY);
-        // end
-        // axi_control_0[7:0]=`INST_COMPUTE;
     end
     endtask 
 
@@ -510,15 +355,10 @@ module tb_conv_pool;
                 S_AXI_AWVALID=1'b0;
                 S_AXI_WVALID=1'b0;
             end
-            $monitor($time,,"set_ofmaps_channel_and_input_channel success");
+            $display("time=%7d  set_ofmaps_channel_and_input_channel success",$time);
             watch_set_ofmaps_channel_and_input_channel=0;
 
         end
-        // else begin
-        //     $monitor($time,,"set_ofmaps_channel_and_input_channel WRITE ERROR : S_AXI_AWREADY= %b   S_AXI_WREADY= %b",S_AXI_AWREADY,S_AXI_WREADY);
-        // end
-        // axi_control_0[31:20]=ofmaps_channel;
-        // axi_control_0[19:8]=input_channel;
     end
     endtask
 
@@ -545,25 +385,11 @@ module tb_conv_pool;
                 S_AXI_AWVALID=1'b0;
                 S_AXI_WVALID=1'b0;
             end
-            $monitor($time,,"set_stride_function_ofmaps_width success");
+            $display("time=%7d  set_stride_function_ofmaps_width success",$time);
             watch_set_function_and_ofmaps_width=0;
         end
-        // else begin
-        //     $monitor($time,,"set_function_and_ofmaps_width WRITE ERROR : S_AXI_AWREADY= %b   S_AXI_WREADY= %b",S_AXI_AWREADY,S_AXI_WREADY);
-        // end
-        // axi_control_1[10:2]=ofmaps_width;
     end
     endtask
-
-    // task set_CONV();begin
-    //     axi_control_1[1:0]=0;
-    // end
-    // endtask
-
-    // task set_POOL();begin
-    //     axi_control_1[1:0]=1;
-    // end
-    // endtask
 
     task axis_in(input [31:0]data);begin
         S_AXIS_TVALID=1;
@@ -597,4 +423,154 @@ module tb_conv_pool;
         #(out_delay);
     end
     endtask
+
+    task load_mem_from_file();begin
+        $readmemb($sformatf("%s/ifmaps.txt",`TESTFILEDIR),mem_i);
+        $readmemb($sformatf("%s/weight.txt",`TESTFILEDIR),mem_w);
+        $readmemb($sformatf("%s/bias.txt",`TESTFILEDIR),mem_b);
+        $readmemh($sformatf("%s/psum_before_bias.txt",`TESTFILEDIR),mem_pb);
+        $readmemh($sformatf("%s/psum_after_bias.txt",`TESTFILEDIR),mem_pa);
+        $readmemb($sformatf("%s/ofmaps.txt",`TESTFILEDIR),mem_o);
+
+        `ifdef DEBUG
+        $write("ifmaps:\n");
+        for(z=0;z<IFMAPS_CH;z=z+1) begin
+            for(x=0;x<IFMAPS_HIGHT;x=x+1) begin
+                for(y=0;y<IFMAPS_WIDTH;y=y+1) begin
+                    $write("%d ",mem_i[z][x][y]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+
+        $write("weight:\n");
+        for(w=0;w<WEIGHT_NUM;w=w+1) begin
+            for(z=0;z<IFMAPS_CH;z=z+1) begin
+                for(x=0;x<WEIGHT_HIGHT;x=x+1) begin
+                    for(y=0;y<WEIGHT_WIDTH;y=y+1) begin
+                        $write("%d ",mem_w[w][z][x][y]);
+                    end
+                    $write("\n");
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+
+        $write("bias:\n");
+        for(y=0;y<WEIGHT_NUM;y=y+1) begin
+            $write("%d ",mem_b[y]);
+        end
+        $write("\n");
+
+        $write("psum_before_bias:\n");
+        for(z=0;z<WEIGHT_NUM;z=z+1) begin
+            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+                    $write("%d ",mem_pb[z][x][y]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+
+        $write("psum_after_bias:\n");
+        for(z=0;z<WEIGHT_NUM;z=z+1) begin
+            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+                    $write("%d ",mem_pa[z][x][y]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+
+        $write("ofmaps:\n");
+        for(z=0;z<WEIGHT_NUM;z=z+1) begin
+            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+                    $write("%d ",mem_o[z][x][y]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+        `endif
+        $display("load test data finish");
+    end
+    endtask
+
+    reg[31:0] write_weight_reg;
+    task write_weight(); begin
+        $display("write weight start");
+        for(x=0;x<WEIGHT_NUM;x=x+1) begin
+            wait(!clk);
+            for(y=0;y<WEIGHT_WIDTH;y=y+1) begin
+                for(z=0;z<IFMAPS_CH;z=z+6) begin
+                    write_weight_reg[30]=1'd0;
+                    write_weight_reg[31]=1'd0;
+                    for(w=0;w<30;w=w+1) begin
+                        if(((w / 5) + z)<IFMAPS_CH) begin
+                            if((w%5)>=WEIGHT_HIGHT) begin
+                                write_weight_reg[w]=1'd0;
+                            end
+                            else begin
+                                write_weight_reg[w]=mem_w[x][((w / 5) + z)][(w%5)][y];
+                            end
+                        end
+                        else begin
+                            write_weight_reg[w]=1'd0;
+                        end
+                        
+                    end
+`ifdef DEBUG
+                        $display("%h",write_weight_reg);
+`endif 
+                    axis_in(write_weight_reg);
+                end
+            end
+`ifdef DEBUG
+            $display("\n");
+`endif
+        end
+    end
+    endtask
+
+    reg[31:0] write_ifmaps_reg;
+    task write_ifmaps(); begin
+        $display("write ifmaps start");
+        for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+            for(y=0;y<IFMAPS_WIDTH;y=y+1) begin
+                for(z=0;z<IFMAPS_CH;z=z+6) begin
+                    write_ifmaps_reg[30]=1'd0;
+                    write_ifmaps_reg[31]=1'd0;
+                    for(w=0;w<30;w=w+1) begin
+                        if(((w/5)*((z/6)+1))<IFMAPS_CH) begin
+                            if(((w / 5) + z)>=IFMAPS_CH) begin
+                                write_ifmaps_reg[w]=1'd0;
+                            end
+                            else begin
+                                write_ifmaps_reg[w]=mem_i[(w / 5) + z][(w%5)+x][y];
+                            end
+                        end
+                        else begin
+                            write_ifmaps_reg[w]=1'd0;
+                        end
+                        
+                    end
+`ifdef DEBUG
+                    $display("%h",write_ifmaps_reg);
+`endif
+                    axis_in(write_ifmaps_reg);
+                end
+            end
+`ifdef DEBUG
+            $display("\n");
+`endif
+        end
+        $display("write ifmaps finish");
+    end
+    endtask
+    
 endmodule

@@ -22,7 +22,9 @@ module axis_preload_fifo #(
     //control out
     output reg [bit_num:0] fifo_cnt,
     output wire fifo_empty,
-    output wire fifo_full
+    output wire fifo_full,
+
+    output wire wait_weight_preload
 );
     //由axis進入的32bit將他擺放成MAC要使用的5*MAC_NUM寬度
     function integer clogb2 (input integer bit_depth);
@@ -46,8 +48,9 @@ module axis_preload_fifo #(
     wire read_en;
     wire write_ptr_add;
 
-    assign write_ptr_add=(fifo_write_cnt+6>input_channel_size);
-
+    assign write_ptr_add=((fifo_write_cnt+6)>input_channel_size);
+    // assign wait_weight_preload = ~write_ptr_add;
+    assign wait_weight_preload = ~fifo_empty;
     assign ifmaps_out=preload_fifo[fifo_read_ptr];
 
     assign fifo_empty=(fifo_cnt==0);
@@ -64,7 +67,7 @@ module axis_preload_fifo #(
         end
         else begin
             if(write_en) begin
-                preload_fifo[fifo_write_ptr][fifo_write_cnt+29 -:30]<=ifmaps_from_axis[29:0];
+                preload_fifo[fifo_write_ptr][(fifo_write_cnt*5)+29 -:30]<=ifmaps_from_axis[29:0];
             end
         end
     end
@@ -133,6 +136,15 @@ module axis_preload_fifo #(
 			end
 		end
     end
+
+    // always @(posedge clk or negedge rst_n) begin
+    //     if(!rst_n) begin
+    //         wait_weight_preload<=0;
+    //     end
+    //     else begin
+    //         wait_weight_preload<=write_ptr_add;
+	// 	end
+    // end
 
     
 

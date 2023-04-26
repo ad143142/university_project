@@ -39,6 +39,8 @@ module bram_control #(
     input wire bram_control_add2,
     input wire port_sel,
 
+    input wire wait_weight_preload,
+
     //control out
     output wire weight_from_bram_valid,
     output wire axis_fifo_read,
@@ -53,7 +55,8 @@ module bram_control #(
 	endfunction
 
     localparam RIDLE=2'd0,RS0=2'd1,RS1=2'd2,RVALID=2'd3;
-    localparam WIDLE=3'd0,WS0=3'd1,WS1=3'd2,WVALID1=3'd3,WVALID2=3'd4;
+    localparam WIDLE=3'd0,WWAITWEIGHT=3'd1,WS0=3'd2,WVALID1=3'd3,WS1=3'd4,WVALID2=3'd5;
+    // localparam WIDLE=3'd0,WWAITWEIGHT=3'd1,WS0=3'd2,WS1=3'd3,WVALID1=3'd4,WVALID2=3'd5;
     
     reg [1:0] read_state;
     reg [2:0] write_state;
@@ -121,16 +124,25 @@ module bram_control #(
         end
         else begin
             case (write_state)
-                WIDLE:    write_state<=write_FSM_start ? WS0:WIDLE;
-                WS0:      write_state<=(!write_en) ? WIDLE:
-                                       (axis_fifo_cnt==0) ? WS0:
-                                       (axis_fifo_cnt==1) ? WVALID1:WS1;                                       
-                WS1:      write_state<=(!write_en) ? WIDLE: 
-                                       (next_write_bram_cnt + 13'd1 == write_bram_num) ? WVALID1 : WVALID2;
-                WVALID1:  write_state<=(!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WS0);
-                WVALID2:  write_state<=(!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WS0);
-                default:  write_state<=WIDLE;         
+                WIDLE       : write_state <= write_FSM_start ? WWAITWEIGHT :WIDLE;
+                WWAITWEIGHT : write_state <= (wait_weight_preload) ? WS0:WWAITWEIGHT;
+                WS0         : write_state <= (!write_en) ? WIDLE:WVALID1;                                   
+                WVALID1     : write_state <= (!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WWAITWEIGHT);
+                default     : write_state <= WIDLE;         
             endcase
+            // case (write_state)
+            //     WIDLE       : write_state <= write_FSM_start ? 
+            //                                  (wait_weight_preload) ? WS0:WWAITWEIGHT :WIDLE;
+            //     WWAITWEIGHT : write_state <= (wait_weight_preload) ? WS0:WWAITWEIGHT;
+            //     WS0         : write_state <= (!write_en) ? WIDLE:
+            //                                  (axis_fifo_cnt==0) ? WWAITWEIGHT:
+            //                                  (axis_fifo_cnt==1) ? WVALID1:WS1;                                       
+            //     WS1         : write_state <= (!write_en) ? WIDLE: 
+            //                                  (next_write_bram_cnt + 13'd1 == write_bram_num) ? WVALID1 : WVALID2;
+            //     WVALID1     : write_state <= (!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WWAITWEIGHT);
+            //     WVALID2     : write_state <= (!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WWAITWEIGHT);
+            //     default     : write_state <= WIDLE;         
+            // endcase
         end
     end
 

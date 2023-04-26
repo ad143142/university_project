@@ -391,11 +391,16 @@ module tb_top_pooling;
     // endtask
 
     task axis_in(input [31:0]data);begin
-        S_AXIS_TDATA=data;
         S_AXIS_TVALID=1;
+        S_AXIS_TDATA=data;
         S_AXIS_TSTRB=0;
         S_AXIS_TLAST=0;
-        #(PERIOD);
+        
+        @(posedge clk);
+        while(~S_AXIS_TREADY) begin
+            @(posedge clk);
+        end
+
         S_AXIS_TVALID=0;
     end
     endtask

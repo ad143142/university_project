@@ -83,6 +83,23 @@ module top #(
     wire [C_M_AXIS_TDATA_WIDTH-1:0] M_AXIS_o_data;
     wire M_AXIS_o_last;
 
+    reg [C_S_AXIS_TDATA_WIDTH-1 : 0] S_AXIS_TDATA_buf;
+    reg [(C_S_AXIS_TDATA_WIDTH/8)-1 : 0] S_AXIS_TSTRB_buf;
+    reg  S_AXIS_TLAST_buf;
+    reg  S_AXIS_TVALID_buf;
+    reg  [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_AWADDR_buf;
+    reg  [2 : 0] S_AXI_AWPROT_buf;
+    reg   S_AXI_AWVALID_buf;
+    reg  [C_S_AXI_DATA_WIDTH-1 : 0] S_AXI_WDATA_buf;
+    reg  [(C_S_AXI_DATA_WIDTH/8)-1 : 0] S_AXI_WSTRB_buf;
+    reg   S_AXI_WVALID_buf;
+    reg   S_AXI_BREADY_buf;
+    reg  [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_ARADDR_buf;
+    reg  [2 : 0] S_AXI_ARPROT_buf;
+    reg   S_AXI_ARVALID_buf;
+    reg   S_AXI_RREADY_buf;
+    reg  M_AXIS_TREADY_buf;
+
     // wire [31:0]axi_control_3_from_datapath;
 
     wire M_AXIS_output_finsih;
@@ -105,25 +122,25 @@ module top #(
         .layer_finish         (M_AXIS_output_finsih              ),
         .write_weight_finish  (write_weight_finish               ),
 
-        .S_AXI_AWADDR         (S_AXI_AWADDR                      ),
-        .S_AXI_AWPROT         (S_AXI_AWPROT                      ),
-        .S_AXI_AWVALID        (S_AXI_AWVALID                     ),
+        .S_AXI_AWADDR         (S_AXI_AWADDR                  ),
+        .S_AXI_AWPROT         (S_AXI_AWPROT                  ),
+        .S_AXI_AWVALID        (S_AXI_AWVALID                 ),
         .S_AXI_AWREADY        (S_AXI_AWREADY                     ),
-        .S_AXI_WDATA          (S_AXI_WDATA                       ),
-        .S_AXI_WSTRB          (S_AXI_WSTRB                       ),
-        .S_AXI_WVALID         (S_AXI_WVALID                      ),
+        .S_AXI_WDATA          (S_AXI_WDATA                  ),
+        .S_AXI_WSTRB          (S_AXI_WSTRB                  ),
+        .S_AXI_WVALID         (S_AXI_WVALID                 ),
         .S_AXI_WREADY         (S_AXI_WREADY                      ),
         .S_AXI_BRESP          (S_AXI_BRESP                       ),
         .S_AXI_BVALID         (S_AXI_BVALID                      ),
-        .S_AXI_BREADY         (S_AXI_BREADY                      ),
-        .S_AXI_ARADDR         (S_AXI_ARADDR                      ),
-        .S_AXI_ARPROT         (S_AXI_ARPROT                      ),
-        .S_AXI_ARVALID        (S_AXI_ARVALID                     ),
+        .S_AXI_BREADY         (S_AXI_BREADY                  ),
+        .S_AXI_ARADDR         (S_AXI_ARADDR                  ),
+        .S_AXI_ARPROT         (S_AXI_ARPROT                  ),
+        .S_AXI_ARVALID        (S_AXI_ARVALID                 ),
         .S_AXI_ARREADY        (S_AXI_ARREADY                     ),
         .S_AXI_RDATA          (S_AXI_RDATA                       ),
         .S_AXI_RRESP          (S_AXI_RRESP                       ),
         .S_AXI_RVALID         (S_AXI_RVALID                      ),
-        .S_AXI_RREADY         (S_AXI_RREADY                      )
+        .S_AXI_RREADY         (S_AXI_RREADY                  )
     );
     
 
@@ -182,10 +199,10 @@ module top #(
         .rst_n                         (rst_n                          ),
         //data path in            
         .S_AXIS_TREADY                 (S_AXIS_TREADY                  ),
-        .S_AXIS_TDATA                  (S_AXIS_TDATA                   ),
-        .S_AXIS_TSTRB                  (S_AXIS_TSTRB                   ),
-        .S_AXIS_TLAST                  (S_AXIS_TLAST                   ),
-        .S_AXIS_TVALID                 (S_AXIS_TVALID                  ),
+        .S_AXIS_TDATA                  (S_AXIS_TDATA               ),
+        .S_AXIS_TSTRB                  (S_AXIS_TSTRB               ),
+        .S_AXIS_TLAST                  (S_AXIS_TLAST               ),
+        .S_AXIS_TVALID                 (S_AXIS_TVALID              ),
         //data path out
         .M_AXIS_o_data                 (M_AXIS_o_data                  ),
         .M_AXIS_o_valid                (M_AXIS_o_valid                 ),
@@ -238,5 +255,47 @@ module top #(
         .M_AXIS_TLAST            ( M_AXIS_TLAST                                     ),
         .M_AXIS_TSTRB            ( M_AXIS_TSTRB    [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] )
     );
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            S_AXIS_TDATA_buf  <= 32'd0 ;
+            S_AXIS_TSTRB_buf  <= 4'd0 ;
+            S_AXIS_TLAST_buf  <= 1'd0 ;
+            S_AXIS_TVALID_buf <= 1'd0 ;
+            S_AXI_AWADDR_buf  <= 4'd0 ;
+            S_AXI_AWPROT_buf  <= 3'd0 ;
+            S_AXI_AWVALID_buf <= 1'd0 ;
+            S_AXI_WDATA_buf   <= 32'd0 ;
+            S_AXI_WSTRB_buf   <= 4'd0 ;
+            S_AXI_WVALID_buf  <= 1'd0 ;
+            S_AXI_BREADY_buf  <= 1'd0 ;
+            S_AXI_ARADDR_buf  <= 4'd0 ;
+            S_AXI_ARPROT_buf  <= 3'd0 ;
+            S_AXI_ARVALID_buf <= 1'd0 ;
+            S_AXI_RREADY_buf  <= 1'd0 ;
+            M_AXIS_TREADY_buf <= 1'd0;
+        end            
+        else begin
+            S_AXIS_TDATA_buf  <= S_AXIS_TDATA  ;
+            S_AXIS_TSTRB_buf  <= S_AXIS_TSTRB  ;
+            S_AXIS_TLAST_buf  <= S_AXIS_TLAST  ;
+            S_AXIS_TVALID_buf <= S_AXIS_TVALID ;
+            S_AXI_AWADDR_buf  <= S_AXI_AWADDR  ;
+            S_AXI_AWPROT_buf  <= S_AXI_AWPROT  ;
+            S_AXI_AWVALID_buf <= S_AXI_AWVALID ;
+            S_AXI_WDATA_buf   <= S_AXI_WDATA   ;
+            S_AXI_WSTRB_buf   <= S_AXI_WSTRB   ;
+            S_AXI_WVALID_buf  <= S_AXI_WVALID  ;
+            S_AXI_BREADY_buf  <= S_AXI_BREADY  ;
+            S_AXI_ARADDR_buf  <= S_AXI_ARADDR  ;
+            S_AXI_ARPROT_buf  <= S_AXI_ARPROT  ;
+            S_AXI_ARVALID_buf <= S_AXI_ARVALID ;
+            S_AXI_RREADY_buf  <= S_AXI_RREADY  ;
+            M_AXIS_TREADY_buf <= M_AXIS_TREADY ;
+
+        end
+    end
+   
 
 endmodule
