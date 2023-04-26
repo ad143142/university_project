@@ -122,10 +122,10 @@ module axis_preload_fifo #(
             if(axis_clear) begin
                 fifo_cnt<=0;
             end
-			else if(read_en & write_en && fifo_write_cnt==0) begin
+			else if(read_en & write_en && write_ptr_add) begin
 				fifo_cnt<=fifo_cnt;
 			end
-			else if(write_en && fifo_write_cnt==0) begin
+			else if(write_en && write_ptr_add) begin
 				fifo_cnt<=fifo_cnt+1;
 			end
 			else if(read_en) begin

@@ -48,6 +48,8 @@ module ALU (
     reg [4:0] summation_layer4 [0:1];
     reg [4:0] summation_layer5 ;
 
+    reg [4:0] kenel_constant;
+
     wire enable_n;//for weight reg to or it. If enable is 1 then or 0 ,enable is 0 then or 1 
     assign enable_n=~enable;
 
@@ -239,7 +241,7 @@ module ALU (
                         weight_reg_01 <= 1;
                         weight_reg_02 <= 1;
                         weight_reg_03 <= 1;
-                        weight_reg_04 <= weight_in[0] | enable_n;
+                        weight_reg_04 <= weight_in[4] | enable_n;
 
                         weight_reg_10 <= 1;
                         weight_reg_11 <= 1;
@@ -269,14 +271,14 @@ module ALU (
                         weight_reg_00 <= 1;
                         weight_reg_01 <= 1;
                         weight_reg_02 <= 1;
-                        weight_reg_03 <= weight_in[0] | enable_n;
-                        weight_reg_04 <= weight_in[1] | enable_n;
+                        weight_reg_03 <= weight_in[3] | enable_n;
+                        weight_reg_04 <= weight_in[4] | enable_n;
 
                         weight_reg_10 <= 1;
                         weight_reg_11 <= 1;
                         weight_reg_12 <= 1;
-                        weight_reg_13 <= weight_in[2] | enable_n;
-                        weight_reg_14 <= weight_in[3] | enable_n;
+                        weight_reg_13 <= weight_in[8] | enable_n;
+                        weight_reg_14 <= weight_in[9] | enable_n;
 
                         weight_reg_20 <= 1;
                         weight_reg_21 <= 1;
@@ -299,21 +301,21 @@ module ALU (
                     5'b??1??:begin
                         weight_reg_00 <= 1;
                         weight_reg_01 <= 1;
-                        weight_reg_02 <= weight_in[0] | enable_n;
-                        weight_reg_03 <= weight_in[1] | enable_n;
-                        weight_reg_04 <= weight_in[2] | enable_n;
+                        weight_reg_02 <= weight_in[2]  | enable_n;
+                        weight_reg_03 <= weight_in[3]  | enable_n;
+                        weight_reg_04 <= weight_in[4]  | enable_n;
 
                         weight_reg_10 <= 1;
                         weight_reg_11 <= 1;
-                        weight_reg_12 <= weight_in[3] | enable_n;
-                        weight_reg_13 <= weight_in[4] | enable_n;
-                        weight_reg_14 <= weight_in[5] | enable_n;
+                        weight_reg_12 <= weight_in[7]  | enable_n;
+                        weight_reg_13 <= weight_in[8]  | enable_n;
+                        weight_reg_14 <= weight_in[9]  | enable_n;
 
                         weight_reg_20 <= 1;
                         weight_reg_21 <= 1;
-                        weight_reg_22 <= weight_in[6] | enable_n;
-                        weight_reg_23 <= weight_in[7] | enable_n;
-                        weight_reg_24 <= weight_in[8] | enable_n;
+                        weight_reg_22 <= weight_in[12] | enable_n;
+                        weight_reg_23 <= weight_in[13] | enable_n;
+                        weight_reg_24 <= weight_in[14] | enable_n;
 
                         weight_reg_30 <= 1;
                         weight_reg_31 <= 1;
@@ -329,28 +331,28 @@ module ALU (
                     end
                     5'b?1???:begin
                         weight_reg_00 <= 1;
-                        weight_reg_01 <= weight_in[0] | enable_n;
-                        weight_reg_02 <= weight_in[1] | enable_n;
-                        weight_reg_03 <= weight_in[2] | enable_n;
-                        weight_reg_04 <= weight_in[3] | enable_n;
+                        weight_reg_01 <= weight_in[1]  | enable_n;
+                        weight_reg_02 <= weight_in[2]  | enable_n;
+                        weight_reg_03 <= weight_in[3]  | enable_n;
+                        weight_reg_04 <= weight_in[4]  | enable_n;
 
                         weight_reg_10 <= 1;
-                        weight_reg_11 <= weight_in[4] | enable_n;
-                        weight_reg_12 <= weight_in[5] | enable_n;
-                        weight_reg_13 <= weight_in[6] | enable_n;
-                        weight_reg_14 <= weight_in[7] | enable_n;
+                        weight_reg_11 <= weight_in[6]  | enable_n;
+                        weight_reg_12 <= weight_in[7]  | enable_n;
+                        weight_reg_13 <= weight_in[8]  | enable_n;
+                        weight_reg_14 <= weight_in[9]  | enable_n;
 
                         weight_reg_20 <= 1;
-                        weight_reg_21 <= weight_in[8]  | enable_n;
-                        weight_reg_22 <= weight_in[9]  | enable_n;
-                        weight_reg_23 <= weight_in[10] | enable_n;
-                        weight_reg_24 <= weight_in[11] | enable_n;
+                        weight_reg_21 <= weight_in[11] | enable_n;
+                        weight_reg_22 <= weight_in[12] | enable_n;
+                        weight_reg_23 <= weight_in[13] | enable_n;
+                        weight_reg_24 <= weight_in[14] | enable_n;
 
                         weight_reg_30 <= 1;
-                        weight_reg_31 <= weight_in[12] | enable_n;
-                        weight_reg_32 <= weight_in[13] | enable_n;
-                        weight_reg_33 <= weight_in[14] | enable_n;
-                        weight_reg_34 <= weight_in[15] | enable_n;
+                        weight_reg_31 <= weight_in[16] | enable_n;
+                        weight_reg_32 <= weight_in[17] | enable_n;
+                        weight_reg_33 <= weight_in[18] | enable_n;
+                        weight_reg_34 <= weight_in[19] | enable_n;
 
                         weight_reg_40 <= 1;
                         weight_reg_41 <= 1;
@@ -430,7 +432,7 @@ module ALU (
     
     integer i;
     always @(*) begin
-        for(i=0;i<13;i=i+1) begin
+        for(i=0;i<12;i=i+1) begin
             summation_layer1[i] = xnor_op[i*2] + xnor_op[i*2+1];
         end
     end 
@@ -455,9 +457,16 @@ module ALU (
     always @(*) begin
         summation_layer5 = summation_layer4[0] + summation_layer4[1];
     end
-
+    
     always @(*) begin
-        summation = {summation_layer5,1'd0} - 6'd25;
+        kenel_constant = kernel_size[4] ? 5'd25 :
+                         kernel_size[3] ? 5'd16 :
+                         kernel_size[2] ? 5'd9  :
+                         kernel_size[1] ? 5'd4  : 5'd1;
+    end
+    
+    always @(*) begin
+        summation = {summation_layer5,1'd0} - kenel_constant;
     end
 
 

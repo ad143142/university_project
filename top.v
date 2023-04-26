@@ -83,7 +83,7 @@ module top #(
     wire [C_M_AXIS_TDATA_WIDTH-1:0] M_AXIS_o_data;
     wire M_AXIS_o_last;
 
-    reg [C_S_AXIS_TDATA_WIDTH-1 : 0] S_AXIS_TDATA_buf;
+    /*reg [C_S_AXIS_TDATA_WIDTH-1 : 0] S_AXIS_TDATA_buf;
     reg [(C_S_AXIS_TDATA_WIDTH/8)-1 : 0] S_AXIS_TSTRB_buf;
     reg  S_AXIS_TLAST_buf;
     reg  S_AXIS_TVALID_buf;
@@ -98,7 +98,7 @@ module top #(
     reg  [2 : 0] S_AXI_ARPROT_buf;
     reg   S_AXI_ARVALID_buf;
     reg   S_AXI_RREADY_buf;
-    reg  M_AXIS_TREADY_buf;
+    reg  M_AXIS_TREADY_buf;*/
 
     // wire [31:0]axi_control_3_from_datapath;
 
@@ -257,7 +257,7 @@ module top #(
     );
 
     ///////////////////////////////////////////////////////////////////////////////////////
-    always @(posedge clk or negedge rst_n) begin
+    /*always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             S_AXIS_TDATA_buf  <= 32'd0 ;
             S_AXIS_TSTRB_buf  <= 4'd0 ;
@@ -295,7 +295,7 @@ module top #(
             M_AXIS_TREADY_buf <= M_AXIS_TREADY ;
 
         end
-    end
+    end*/
    
 
 endmodule

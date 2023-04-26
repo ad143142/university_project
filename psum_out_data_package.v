@@ -33,7 +33,7 @@
 
 	///////////////////reg//////////////////////////
 	reg [4:0] write_ptr;
-	
+	reg write_ptr_31_buf;
 	///////////////////wire//////////////////////////
 	
 	/////////////////////assign////////////////////////
@@ -61,7 +61,15 @@
             out_valid <= 1'd0;
         end
         else begin
-            out_valid <= (write_ptr == 5'd31 || (layer_finish && (operation == 2'd0)));
+            out_valid <= (((write_ptr != 5'd31) && write_ptr_31_buf) || (layer_finish && (operation == 2'd0)));
+        end
+    end
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            write_ptr_31_buf <= 1'd0;
+        end
+        else begin
+            write_ptr_31_buf <= (write_ptr == 5'd31);
         end
     end
 

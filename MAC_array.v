@@ -17,7 +17,7 @@ module MAC_array #(
     input wire [1:0] operation,
     input wire [4:0] kernel_size,
 
-    input wire ifmaps_input_valid,
+    //input wire ifmaps_input_valid,
 
     input wire load_ifmaps,
     input wire load_weight

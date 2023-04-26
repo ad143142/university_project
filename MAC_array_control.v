@@ -49,7 +49,7 @@ module MAC_array_control #(
 
     //TODO: 雙斜線的是指還沒實作
     // assign axi_control_3=0;//
-    wire ifmaps_input_valid;
+    //wire ifmaps_input_valid;
     // wire load_weight;
 
     wire address_reset;
@@ -59,7 +59,7 @@ module MAC_array_control #(
 
     wire [25*MAC_NUM-1:0] weight_from_preload;
 
-    assign ifmaps_input_valid=~ifmaps_fifo_empty;
+    //assign ifmaps_input_valid=~ifmaps_fifo_empty;
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -104,7 +104,7 @@ module MAC_array_control #(
         .enable                      (enable                    ),
         .operation                   (operation                 ),
         .kernel_size                 (kernel_size               ),
-        .ifmaps_input_valid          (ifmaps_input_valid        ),//
+        //.ifmaps_input_valid          (ifmaps_input_valid        ),//
         .load_ifmaps                 (load_ifmaps               ),//
         .load_weight                 (load_MAC_weight           ) 
     );

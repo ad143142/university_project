@@ -1,3 +1,4 @@
+(* use_dsp = "yes" *)
 module psum_adder #(
     parameter PSUM_IN_WIDTH = 6*256,
     parameter OFMAPS_BRAM_ADDR_WIDTH = 12
@@ -7,8 +8,8 @@ module psum_adder #(
     input wire clk,
     input wire rst_n,
     //control
-    input [11:0] in_channel,
-    input [4:0] kernel_size,
+    //input [11:0] in_channel,
+    //input [4:0] kernel_size,
     input wire layer_finish,
 
     //input data
@@ -73,10 +74,10 @@ module psum_adder #(
     reg r_pipe10_last;
 
 //////////////////////wire//////////////////////////
-    wire [12:0] threshold_0;
-    wire [12:0] threshold;
+    /*wire [12:0] threshold_0;
+    wire [12:0] threshold;*/
 
-    reg [2:0] kernel_num;
+    /*reg [2:0] kernel_num;
     always @(*) begin
         case(kernel_size)
             5'b10000 : kernel_num = 3'd5;
@@ -87,10 +88,10 @@ module psum_adder #(
 
             default  : kernel_num = 3'd1;
         endcase
-    end
+    end*/
 
-    assign threshold_0 = kernel_num * kernel_num * in_channel;
-    assign threshold = {1'd0,threshold_0[12:1]}; 
+    /*assign threshold_0 = kernel_num * kernel_num * in_channel;
+    assign threshold = {1'd0,threshold_0[12:1]}; */
 
     assign o_data = r_pipe9_data;
     assign address_out = r_pipe9_addr;

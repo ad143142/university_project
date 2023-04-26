@@ -206,8 +206,8 @@ module control_unit #(
     assign load_weight=(load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT ||
                         load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
 
-    assign bram_control_add1=weight_from_bram_valid && (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT || load_weight_state==K3_0 || load_weight_state==K5_4);   
-    assign bram_control_add2=weight_from_bram_valid && (load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_0 || 
+    assign bram_control_add1=weight_from_bram_valid && (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT || (load_weight_state==K3_2 && weight_from_bram_valid) || load_weight_state==K5_4);   
+    assign bram_control_add2=weight_from_bram_valid && (load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_1 || load_weight_state==K4_0 || 
                                                         load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_0  || load_weight_state==K5_2);
 
     assign bram_port_sel=(load_weight_state==K2_1 || load_weight_state==K3_1 || load_weight_state==K4_1 || load_weight_state==K4_3 || load_weight_state==K5_1 ||

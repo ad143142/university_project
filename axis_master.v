@@ -24,7 +24,7 @@
 		output wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] M_AXIS_TSTRB                     
 	);
 	//=================================================================================
-
+	
 	///////////////////function//////////////////////////
 	function integer clogb2 (input integer bit_depth);                                   
 	  begin                                                                              
@@ -67,6 +67,7 @@
 			M_AXIS_TVALID <= 1'd0;
 		end
 		else begin
+			//FIXME:不應該等TREADY
 			M_AXIS_TVALID <= (!fifo_empty && M_AXIS_TREADY);
 		end
 	end

@@ -217,8 +217,8 @@ module data_path #(
         .rst_n                  (rst_n                     ),
    
         //control
-        .in_channel             (input_channel_size        ),
-        .kernel_size            (kernel_size               ),
+        //.in_channel             (input_channel_size        ),
+        //.kernel_size            (kernel_size               ),
         .layer_finish           (layer_finish              ),
         
         //inputdata
