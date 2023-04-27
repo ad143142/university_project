@@ -1,12 +1,18 @@
-fffffffd 1 ffffffff 
-fffffff9 fffffffb 9 
-fffffffb ffffffeb fffffffb 
+       5 fffffffd        7 fffffffd        7 
+       5        f        7 fffffff7        d 
+       5        9 ffffffff        7 fffffff7 
+       d ffffffff        b        5        b 
+       3        9        1        1        1 
 
-ffffffff 3 1 
-17 9 b 
-fffffff1 fffffff9 1 
+fffffffd        5        3 fffffffd fffffffb 
+       5        3 fffffff7 fffffffb        5 
+       5        9 fffffffb ffffffeb        b 
+fffffffd fffffffb ffffffff fffffff9 fffffff7 
+       b fffffff5 fffffffd        1 fffffffd 
 
-15 5 fffffff7 
-ffffffe5 ffffffef 5 
-13 17 b 
+       5 fffffff9        7        1 ffffffff 
+ffffffed fffffff3        b fffffff7        5 
+       1 fffffffd        b        3 fffffffb 
+fffffffd        b        b fffffff9 ffffffff 
+ffffffff        5 fffffffd       11 fffffffd 
 

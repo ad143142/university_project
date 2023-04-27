@@ -7,9 +7,9 @@
 //ifmaps_channel
 7
 //weight_width
-5
+3
 //weight_hight
-5
+3
 //weight_num
 3
 //stride
