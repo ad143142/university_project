@@ -4,6 +4,8 @@
       By 被這個問題困擾三天覺得靠杯の王柏穎  
 注意：給出compute_start()之後要等至少2cycle才可以有資料輸入  
 
+注意：使用tb_auto_read時須先調整路徑及setting，視需求開啟#define DEBUG
+
 如果是還在開發的code會有  
 //TODO:  
 //FIXME:  

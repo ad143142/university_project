@@ -5,7 +5,7 @@
 
 `define TESTFILEDIR    "F:\\vivado_works\\verilog_code\\git_repo\\university_project\\test_data"
 
-// `define DEBUG
+`define DEBUG
 
 module tb_auto_read;
 
@@ -120,6 +120,7 @@ module tb_auto_read;
         compute_start();
         #(PERIOD*2);
 
+        @(posedge clk);
         write_ifmaps();
         while(S_AXI_RDATA!=32'hFFFFFFFF)begin
             read_AXI_3();
