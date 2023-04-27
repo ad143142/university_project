@@ -99,7 +99,7 @@ module control_unit #(
     wire write_weight_state_enable;
 
     //control
-    wire [7:0] MAC_enable_in;
+    wire [8:0] MAC_enable_in;
     wire all_finish;
     wire all_weight_compute_finish;
     wire last_weight;
@@ -358,7 +358,7 @@ module control_unit #(
     /////////////////////////////////////////////////
     
     //FIXME:MAC_enable等增加round之後要更改input
-    assign MAC_enable_in=input_channel_size[7:0];
+    assign MAC_enable_in=input_channel_size[8:0];
 
     integer idx;
     always @(*) begin

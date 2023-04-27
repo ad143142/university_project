@@ -14,8 +14,8 @@ module tb_auto_read;
     parameter IFMAPS_WIDTH = 7;
     parameter IFMAPS_HIGHT = 7;
     parameter IFMAPS_CH    = 7;
-    parameter WEIGHT_WIDTH = 5;
-    parameter WEIGHT_HIGHT = 5;
+    parameter WEIGHT_WIDTH = 3;
+    parameter WEIGHT_HIGHT = 3;
     parameter WEIGHT_NUM   = 3;
     parameter STRIDE       = 1;
     //////dont touch/////
