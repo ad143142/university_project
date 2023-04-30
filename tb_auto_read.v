@@ -128,16 +128,16 @@ module tb_auto_read;
         
         if(error_flag == 0) begin
             $display("/////////////////////////////////////////////////////////////////////////////////");
-            $display("//                                                                             //");
-            $display("//                    congratulation you pass the pattern                      //");
-            $display("//                                                                             //");
+            $display("//                                                                                                                                      //");
+            $display("//          Congratulations! you pass the pattern                                            //");
+            $display("//                                                                                                                                      //");
             $display("/////////////////////////////////////////////////////////////////////////////////");
         end
         else begin
             $display("/////////////////////////////////////////////////////////////////////////////////");
-            $display("//                                                                             //");
-            $display("//           you fail the pattern there are some error in your design          //");
-            $display("//                                                                             //");
+            $display("//                                                                                                                                      //");
+            $display("//           you fail the pattern there are some error in your design         //");
+            $display("//                                                                                                                                      //");
             $display("/////////////////////////////////////////////////////////////////////////////////");
         end
 

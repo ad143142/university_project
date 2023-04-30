@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenRun Id="synth_1" LaunchPart="xc7z020clg400-1" LaunchTime="1682821608" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/top_module_wrapper.dcp">
-  <File Type="VDS-TIMINGSUMMARY" Name="top_module_wrapper_timing_summary_synth.rpt"/>
   <File Type="RDS-DCP" Name="top_module_wrapper.dcp"/>
   <File Type="RDS-UTIL-PB" Name="top_module_wrapper_utilization_synth.pb"/>
-  <File Type="RDS-UTIL" Name="top_module_wrapper_utilization_synth.rpt"/>
-  <File Type="RDS-PROPCONSTRS" Name="top_module_wrapper_drc_synth.rpt"/>
-  <File Type="RDS-RDS" Name="top_module_wrapper.vds"/>
-  <File Type="REPORTS-TCL" Name="top_module_wrapper_reports.tcl"/>
-  <File Type="VDS-TIMING-PB" Name="top_module_wrapper_timing_summary_synth.pb"/>
   <File Type="PA-TCL" Name="top_module_wrapper.tcl"/>
+  <File Type="RDS-UTIL" Name="top_module_wrapper_utilization_synth.rpt"/>
+  <File Type="REPORTS-TCL" Name="top_module_wrapper_reports.tcl"/>
+  <File Type="RDS-RDS" Name="top_module_wrapper.vds"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/bd/design_1/design_1.bd">
@@ -186,16 +183,14 @@
     </Config>
   </FileSet>
   <Strategy Version="1" Minor="2">
-    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2022">
-      <Desc>Vivado Synthesis Defaults</Desc>
-    </StratHandle>
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2022"/>
     <Step Id="synth_design"/>
   </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="design_1_blk_mem_gen_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="top_module_xbar_2"/>
+  <BlockFileSet Type="BlockSrcs" Name="top_module_xbar_3"/>
   <BlockFileSet Type="BlockSrcs" Name="top_module_top_0_2"/>
   <BlockFileSet Type="BlockSrcs" Name="top_module_axi_dma_0_2"/>
-  <BlockFileSet Type="BlockSrcs" Name="top_module_rst_ps7_0_100M_2"/>
   <BlockFileSet Type="BlockSrcs" Name="top_module_processing_system7_0_3"/>
-  <BlockFileSet Type="BlockSrcs" Name="top_module_xbar_3"/>
-  <BlockFileSet Type="BlockSrcs" Name="top_module_xbar_2"/>
-  <BlockFileSet Type="BlockSrcs" Name="design_1_blk_mem_gen_0_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="top_module_rst_ps7_0_100M_2"/>
 </GenRun>
