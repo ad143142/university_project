@@ -9,8 +9,8 @@ module data_path #(
     parameter AXIS_FIFO_SIZE  = 16,
     parameter C_M_AXIS_TDATA_WIDTH = 32,
 
-    parameter AXIS_PRELOAD_BIT_NUM=clogb2(AXIS_PRELOAD_FIFO_DEPTH-1),
-    parameter AXIS_BIT_NUM  = clogb2(AXIS_FIFO_SIZE-1)
+    parameter AXIS_PRELOAD_BIT_NUM = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1),
+    parameter AXIS_BIT_NUM = clogb2(AXIS_FIFO_SIZE-1)
 )
 (
     //golbal
