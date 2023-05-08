@@ -75,16 +75,18 @@
 	wire write_en;
 	wire read_en;
 
-	assign fifo_full=(fifo_cnt==FIFO_SIZE);
+	assign fifo_full=(fifo_cnt==(FIFO_SIZE-1));
 	assign fifo_empty=(fifo_cnt==0);
 
-	// assign S_AXIS_TREADY=~fifo_full;
-	assign S_AXIS_TREADY=(fifo_cnt<(FIFO_SIZE-1)) ? 1'd1 : 
-						 (read_en & write_en) ? 1'd1 : 1'd0;
+	assign S_AXIS_TREADY=~fifo_full;
+	// assign S_AXIS_TREADY=(fifo_cnt<(FIFO_SIZE-1)) ? 1'd1 : 
+	// 					 (read_en & write_en) ? 1'd1 : 1'd0;
+
 	// assign S_AXIS_TREADY=(fifo_cnt<(FIFO_SIZE-1));
 
 	// assign write_en=S_AXIS_TVALID & S_AXIS_TREADY ;	
-	assign write_en=S_AXIS_TVALID & S_AXIS_TREADY & ((~fifo_full) | read_want) & axis_en;
+	// assign write_en=S_AXIS_TVALID & S_AXIS_TREADY & ((~fifo_full) | read_want) & axis_en;
+	assign write_en=S_AXIS_TVALID & (~fifo_full)  & axis_en;
 	assign read_en=read_want & ~fifo_empty;
 
 	assign data_out=fifo[fifo_read_ptr];

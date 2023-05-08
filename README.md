@@ -6,6 +6,8 @@
 
 注意：使用tb_auto_read時須先調整路徑及setting，視需求開啟#define DEBUG
 
+注意：執行pooling時WEIGHT_NUM須設定為0
+
 如果是還在開發的code會有  
 //TODO:  
 //FIXME:  
