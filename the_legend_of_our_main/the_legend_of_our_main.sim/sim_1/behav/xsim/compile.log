@@ -1,0 +1,43 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.ip_user_files/bd/design_1/ip/design_1_blk_mem_gen_0_0/sim/design_1_blk_mem_gen_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_blk_mem_gen_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.ip_user_files/bd/design_1/sim/design_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/ALU.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ALU
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/AXI_interface.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module AXI_interface
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/MAC_array.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module MAC_array
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/MAC_array_control.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module MAC_array_control
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/axis_fifo_my.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axis_fifo_my
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/axis_preload_fifo.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axis_preload_fifo
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/bram_control.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module bram_control
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/control_unit.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module control_unit
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/data_path.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module data_path
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_wrapper
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/pool_out_data_package.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module pool_out_data_package
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/psum_adder.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module psum_adder
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/psum_out_data_package.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module psum_out_data_package
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/top.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/weight_preload.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module weight_preload
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_auto_read
+ERROR: [VRFC 10-9406] system call 'sformatf' is not allowed in this dialect; use SystemVerilog mode instead [/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v:431]
+ERROR: [VRFC 10-9406] system call 'sformatf' is not allowed in this dialect; use SystemVerilog mode instead [/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v:432]
+ERROR: [VRFC 10-9406] system call 'sformatf' is not allowed in this dialect; use SystemVerilog mode instead [/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v:433]
+ERROR: [VRFC 10-9406] system call 'sformatf' is not allowed in this dialect; use SystemVerilog mode instead [/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v:434]
+ERROR: [VRFC 10-9406] system call 'sformatf' is not allowed in this dialect; use SystemVerilog mode instead [/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v:435]
+ERROR: [VRFC 10-9406] system call 'sformatf' is not allowed in this dialect; use SystemVerilog mode instead [/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v:436]
+ERROR: [VRFC 10-8530] module 'tb_auto_read' is ignored due to previous errors [/home/yinchian/Univ_Proj_Local/university_project/tb_auto_read.v:10]
