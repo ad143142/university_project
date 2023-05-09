@@ -9,8 +9,8 @@ module data_path #(
     parameter AXIS_FIFO_SIZE  = 16,
     parameter C_M_AXIS_TDATA_WIDTH = 32,
 
-    parameter AXIS_PRELOAD_BIT_NUM = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1),
-    parameter AXIS_BIT_NUM = clogb2(AXIS_FIFO_SIZE-1)
+    parameter AXIS_PRELOAD_BIT_NUM=clogb2(AXIS_PRELOAD_FIFO_DEPTH-1),
+    parameter AXIS_BIT_NUM  = clogb2(AXIS_FIFO_SIZE-1)
 )
 (
     //golbal
@@ -269,7 +269,7 @@ module data_path #(
         .layer_finish            (pool_data_package_layer_finish ),
         .MAC_o_valid             (pool_data_package_i_valid      ),
         .MAC_out                 (pool_data_package_data_in      ),
-        .output_channel_size     (output_channel_size            ),
+        .input_channel_size      (input_channel_size             ),
         .stride                  (stride                         ),
         .pooling_finish          (pooling_finish                 ),
         .out_valid               (pool_data_package_o_valid      ),

@@ -1,7 +1,7 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0xCC6CFA539DDF0AAD",
+      "boundary_crc": "0xCC6CFA535221FB6E",
       "device": "xc7z020clg400-1",
       "gen_directory": "../../../../the_legend_of_our_main.gen/sources_1/bd/top_module",
       "name": "top_module",

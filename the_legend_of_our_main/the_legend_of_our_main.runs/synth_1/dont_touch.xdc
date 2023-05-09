@@ -19,9 +19,6 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_
 # IP: bd/top_module/ip/top_module_xbar_2/top_module_xbar_2.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_xbar_2 || ORIG_REF_NAME==top_module_xbar_2} -quiet] -quiet
 
-# IP: bd/top_module/ip/top_module_auto_pc_0/top_module_auto_pc_0.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_pc_0 || ORIG_REF_NAME==top_module_auto_pc_0} -quiet] -quiet
-
 # IP: bd/top_module/ip/top_module_ps7_0_axi_periph_2/top_module_ps7_0_axi_periph_2.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_ps7_0_axi_periph_2 || ORIG_REF_NAME==top_module_ps7_0_axi_periph_2} -quiet] -quiet
 
@@ -30,15 +27,6 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_
 
 # IP: bd/top_module/ip/top_module_xbar_3/top_module_xbar_3.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_xbar_3 || ORIG_REF_NAME==top_module_xbar_3} -quiet] -quiet
-
-# IP: bd/top_module/ip/top_module_auto_us_0/top_module_auto_us_0.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_us_0 || ORIG_REF_NAME==top_module_auto_us_0} -quiet] -quiet
-
-# IP: bd/top_module/ip/top_module_auto_us_1/top_module_auto_us_1.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_us_1 || ORIG_REF_NAME==top_module_auto_us_1} -quiet] -quiet
-
-# IP: bd/top_module/ip/top_module_auto_pc_1/top_module_auto_pc_1.xci
-set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_pc_1 || ORIG_REF_NAME==top_module_auto_pc_1} -quiet] -quiet
 
 # IP: bd/top_module/ip/top_module_axi_mem_intercon_1/top_module_axi_mem_intercon_1.xci
 set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_axi_mem_intercon_1 || ORIG_REF_NAME==top_module_axi_mem_intercon_1} -quiet] -quiet
@@ -51,6 +39,18 @@ set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_
 
 # IP: bd/design_1/ip/design_1_blk_mem_gen_0_0/design_1_blk_mem_gen_0_0.xci
 #dup# set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==design_1_blk_mem_gen_0_0 || ORIG_REF_NAME==design_1_blk_mem_gen_0_0} -quiet] -quiet
+
+# IP: bd/top_module/ip/top_module_auto_pc_0/top_module_auto_pc_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_pc_0 || ORIG_REF_NAME==top_module_auto_pc_0} -quiet] -quiet
+
+# IP: bd/top_module/ip/top_module_auto_us_0/top_module_auto_us_0.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_us_0 || ORIG_REF_NAME==top_module_auto_us_0} -quiet] -quiet
+
+# IP: bd/top_module/ip/top_module_auto_us_1/top_module_auto_us_1.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_us_1 || ORIG_REF_NAME==top_module_auto_us_1} -quiet] -quiet
+
+# IP: bd/top_module/ip/top_module_auto_pc_1/top_module_auto_pc_1.xci
+set_property KEEP_HIERARCHY SOFT [get_cells -hier -filter {REF_NAME==top_module_auto_pc_1 || ORIG_REF_NAME==top_module_auto_pc_1} -quiet] -quiet
 
 # XDC: /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/design_1/design_1_ooc.xdc
 

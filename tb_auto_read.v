@@ -1,4 +1,5 @@
-`timescale  1ns / 1ps
+// `timescale  1ns / 1ps
+`timescale  1ns / 1ns
 `define INST_COMPUTE 32'd87 
 `define INST_LOADIFMAPS 32'd88 
 `define INST_WRITE_WEIGHT 32'd12 
@@ -10,17 +11,24 @@
 module tb_auto_read;
 
     //setting//
-    parameter FUNC = 0;
-    parameter IFMAPS_WIDTH = 7;
-    parameter IFMAPS_HIGHT = 7;
-    parameter IFMAPS_CH    = 7;
+    // parameter FUNC = 1;
+    `define CONV ;
+    // `define POOL ;
+    parameter IFMAPS_WIDTH = 8;
+    parameter IFMAPS_HIGHT = 8;
+    parameter IFMAPS_CH    = 256;
     parameter WEIGHT_WIDTH = 3;
     parameter WEIGHT_HIGHT = 3;
-    parameter WEIGHT_NUM   = 3;
+    parameter WEIGHT_NUM   = 1;
     parameter STRIDE       = 1;
     //////dont touch/////
+`ifdef CONV
     parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH - WEIGHT_WIDTH) / STRIDE + 1);
     parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT - WEIGHT_HIGHT) / STRIDE + 1);
+`elsif POOL
+    parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH) / WEIGHT_WIDTH);
+    parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT) / WEIGHT_HIGHT);
+`endif
 
     // top Parameters
     parameter PERIOD                = 20 ;
@@ -81,13 +89,22 @@ module tb_auto_read;
     wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] M_AXIS_TSTRB ; 
 
     reg [0:0] mem_i [0:IFMAPS_CH-1][0:IFMAPS_HIGHT-1][0:IFMAPS_WIDTH-1];
+`ifdef CONV
     reg [0:0] mem_w [0:WEIGHT_NUM-1][0:IFMAPS_CH-1][0:WEIGHT_HIGHT-1][0:WEIGHT_WIDTH-1];
     reg [0:0] mem_b [0:WEIGHT_NUM-1];
     reg [31:0] mem_pb [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
     reg [31:0] mem_pa [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
     reg [0:0] mem_o [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
+    reg [OFMAPS_WIDTH*OFMAPS_HIGHT*WEIGHT_NUM+32:0] TDATA_ANS = 0;
+`endif
+`ifdef POOL
+    reg [0:0] mem_o [0:IFMAPS_CH-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
+    reg [OFMAPS_WIDTH*OFMAPS_HIGHT*IFMAPS_CH*((IFMAPS_CH+31)/32)+32:0] TDATA_ANS = 0;
+    integer TDATA_NEED_OUT_TIMES = (IFMAPS_CH+31)/32; 
+    integer TDATA_NEED_OUT_CNT = 0; 
+    reg [31:0] TDATA_buf;
+`endif
 
-    reg [OFMAPS_WIDTH*OFMAPS_HIGHT*WEIGHT_NUM+32:0] TVALID_ANS = 0;
 
     assign psum_out = u_top.u_data_path.u_psum_adder.o_data;
 
@@ -105,16 +122,26 @@ module tb_auto_read;
         ////////////////////////////////////////////////////////
 
         set_kernel_size(WEIGHT_WIDTH);
-        set_ofmaps_channel_and_input_channel(WEIGHT_NUM,IFMAPS_CH);
-        set_stride_function_ofmaps_width(STRIDE,FUNC,OFMAPS_WIDTH);
-        #(PERIOD*5);
-    // error_axis_input(3000,0);
-        write_weight_start();
-        write_weight();
+`ifdef POOL
+            set_ofmaps_channel_and_input_channel(0,IFMAPS_CH);
+            set_stride_function_ofmaps_width(STRIDE,2'd1,OFMAPS_WIDTH);
 
-        while(S_AXI_RDATA!=32'd1)begin
-            read_AXI_3();
-        end
+`endif
+`ifdef CONV
+            set_ofmaps_channel_and_input_channel(WEIGHT_NUM,IFMAPS_CH);
+            set_stride_function_ofmaps_width(STRIDE,2'd0,OFMAPS_WIDTH);
+            
+`endif
+        #(PERIOD*5);
+
+`ifdef CONV
+            write_weight_start();
+            write_weight();
+
+            while(S_AXI_RDATA!=32'd1)begin
+                read_AXI_3();
+            end
+`endif
 
         #(PERIOD*5);
         compute_start();
@@ -128,16 +155,16 @@ module tb_auto_read;
         
         if(error_flag == 0) begin
             $display("/////////////////////////////////////////////////////////////////////////////////");
-            $display("//                                                                                                                                      //");
-            $display("//          Congratulations! you pass the pattern                                            //");
-            $display("//                                                                                                                                      //");
+            $display("//                                                                             //");
+            $display("//                    congratulation you pass the pattern                      //");
+            $display("//                                                                             //");
             $display("/////////////////////////////////////////////////////////////////////////////////");
         end
         else begin
             $display("/////////////////////////////////////////////////////////////////////////////////");
-            $display("//                                                                                                                                      //");
-            $display("//           you fail the pattern there are some error in your design         //");
-            $display("//                                                                                                                                      //");
+            $display("//                                                                             //");
+            $display("//           you fail the pattern there are some error in your design          //");
+            $display("//                                                                             //");
             $display("/////////////////////////////////////////////////////////////////////////////////");
         end
 
@@ -145,7 +172,7 @@ module tb_auto_read;
         $finish;
     end
 
-    
+`ifdef CONV    
     always @(*) begin
         if(u_top.M_AXIS_TVALID) begin
             $display("time=%7d  M_AXIS_TDATA = %h = %b, M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",$time,u_top.M_AXIS_TDATA,u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
@@ -158,20 +185,44 @@ module tb_auto_read;
             end
         end
     end
+`endif
+`ifdef POOL
+    integer stop_flag=0;
+    always @(posedge clk) begin
+        if(u_top.M_AXIS_TVALID) begin
+            $display("time=%7d  M_AXIS_TDATA = %h = %b, M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",$time,u_top.M_AXIS_TDATA,u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
+            for(i=0;i<32;i=i+1) begin
+                if(u_top.M_AXIS_TDATA[i] != TDATA_ANS[ofmaps_validation_cnt]) begin
+                    $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b , at ofmaps[%d][%d][%d]",$time,i,u_top.M_AXIS_TDATA[i],TDATA_ANS[ofmaps_validation_cnt],ofmaps_validation_cnt%IFMAPS_CH,ofmaps_validation_cnt/(IFMAPS_CH*OFMAPS_WIDTH),ofmaps_validation_cnt/(IFMAPS_CH)%OFMAPS_WIDTH);   
+                    error_flag = 1;
+                    `ifdef DEBUG
+                        if(stop_flag==0) begin
+                            $stop;
+                            stop_flag=1;
+                        end
+                    `endif 
+                end
+                ofmaps_validation_cnt=ofmaps_validation_cnt+1;
+            end
+        end
+    end
+`endif
 
-`ifdef DEBUG
+
+`ifdef CONV
+    `ifdef DEBUG
     always @(*) begin
         if(u_top.u_data_path.u_psum_adder.o_valid) begin
             $display("time=%7d  psum_binarization_valid = %d , address_out = %h , psum_binarization_data = %h",$time,u_top.u_data_path.u_psum_adder.o_valid,u_top.u_data_path.u_psum_adder.address_out,u_top.u_data_path.u_psum_adder.o_data);
         end
     end
-`endif
+    `endif
 
     always @(*) begin
         if(u_top.u_data_path.u_psum_adder.r_pipe8_valid) begin
-`ifdef DEBUG
+    `ifdef DEBUG
             $display("time=%7d  psum_after_bias_valid = %d   , address_out = %h , psum_after_bias_data   = %h",$time,u_top.u_data_path.u_psum_adder.r_pipe8_valid,u_top.u_data_path.u_psum_adder.r_pipe8_addr,u_top.u_data_path.u_psum_adder.r_pipe8_data);
-`endif   
+    `endif   
             if({{18{u_top.u_data_path.u_psum_adder.r_pipe8_data[13]}},u_top.u_data_path.u_psum_adder.r_pipe8_data} != mem_pa [psum_validation_cnt%WEIGHT_NUM][psum_validation_cnt/(WEIGHT_NUM*OFMAPS_WIDTH)][(psum_validation_cnt/WEIGHT_NUM)%OFMAPS_WIDTH]) begin
                 $display("time=%7d  no.%d :psum_after_bias_data = %h , expect: %h",$time,psum_validation_cnt,u_top.u_data_path.u_psum_adder.r_pipe8_data,mem_pa[psum_validation_cnt%WEIGHT_NUM][psum_validation_cnt/(WEIGHT_NUM*OFMAPS_WIDTH)][(psum_validation_cnt/WEIGHT_NUM)%OFMAPS_WIDTH]);   
                 error_flag = 1;
@@ -180,7 +231,7 @@ module tb_auto_read;
         end
 
     end
-
+`endif
 
     top #(
             .MAC_NUM              ( MAC_NUM              ),
@@ -429,10 +480,12 @@ module tb_auto_read;
 
     task load_mem_from_file();begin
         $readmemb($sformatf("%s/ifmaps.txt",`TESTFILEDIR),mem_i);
+`ifdef CONV
         $readmemb($sformatf("%s/weight.txt",`TESTFILEDIR),mem_w);
         $readmemb($sformatf("%s/bias.txt",`TESTFILEDIR),mem_b);
         $readmemh($sformatf("%s/psum_before_bias.txt",`TESTFILEDIR),mem_pb);
         $readmemh($sformatf("%s/psum_after_bias.txt",`TESTFILEDIR),mem_pa);
+`endif 
         $readmemb($sformatf("%s/ofmaps.txt",`TESTFILEDIR),mem_o);
 
 `ifdef DEBUG
@@ -446,7 +499,7 @@ module tb_auto_read;
             end
             $write("\n");
         end
-
+    `ifdef CONV
         $write("weight:\n");
         for(w=0;w<WEIGHT_NUM;w=w+1) begin
             for(z=0;z<IFMAPS_CH;z=z+1) begin
@@ -499,21 +552,61 @@ module tb_auto_read;
             end
             $write("\n");
         end
+    `endif
+    `ifdef POOL
+        $write("ofmaps:\n");
+        for(z=0;z<IFMAPS_CH;z=z+1) begin
+            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+                    $write("%h ",mem_o[z][x][y]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+    `endif
 
 `endif
+`ifdef CONV
         $write("M_AXIS_ANS:\n");
         for(ofmaps_validation_cnt = 0 ; ofmaps_validation_cnt < OFMAPS_HIGHT*OFMAPS_WIDTH*WEIGHT_NUM;ofmaps_validation_cnt=ofmaps_validation_cnt+1) begin
-            TVALID_ANS[ofmaps_validation_cnt] = mem_o[ofmaps_validation_cnt%WEIGHT_NUM][ofmaps_validation_cnt/(WEIGHT_NUM*OFMAPS_WIDTH)][(ofmaps_validation_cnt/WEIGHT_NUM)%OFMAPS_WIDTH];
+            TDATA_ANS[ofmaps_validation_cnt] = mem_o[ofmaps_validation_cnt%WEIGHT_NUM][ofmaps_validation_cnt/(WEIGHT_NUM*OFMAPS_WIDTH)][(ofmaps_validation_cnt/WEIGHT_NUM)%OFMAPS_WIDTH];
         end
+        ofmaps_validation_cnt = 0 ;
         for(x=0;(x * 32) < OFMAPS_HIGHT*OFMAPS_WIDTH*WEIGHT_NUM;x=x+1) begin
-            $write("%h\n",TVALID_ANS[x*32 +: 32]);
+            $write("%h\n",TDATA_ANS[x*32 +: 32]);
         end
 
         $display("load test data finish");
+`endif
+`ifdef POOL
+        $write("M_AXIS_ANS:\n");
+        ofmaps_validation_cnt=0;
+        for(y=0;y<OFMAPS_HIGHT*OFMAPS_WIDTH;y=y+1) begin
+            for(x=0;x<((IFMAPS_CH+31)/32)*32;x=x+1) begin
+                if(x>=IFMAPS_CH) begin
+                    TDATA_buf[x%32] = 0;
+                end
+                else begin
+                    TDATA_buf[x%32] = mem_o[ofmaps_validation_cnt%IFMAPS_CH][ofmaps_validation_cnt/(IFMAPS_CH*OFMAPS_WIDTH)][(ofmaps_validation_cnt/IFMAPS_CH)%OFMAPS_WIDTH];
+                    ofmaps_validation_cnt=ofmaps_validation_cnt+1;
+                end
+
+                if(x%32 == 31)begin
+                    TDATA_ANS[(y*((IFMAPS_CH+31)/32)+(x/32))*32 +: 32] = TDATA_buf;
+                    $write("%h\n",TDATA_buf);
+                end
+            end
+        end
+        ofmaps_validation_cnt=0;
+        $display("load test data finish");
+`endif
+
     end
     endtask
 
     reg[31:0] write_weight_reg;
+`ifdef CONV
     task write_weight(); begin
         $display("write weight start");
         for(x=0;x<WEIGHT_NUM;x=x+1) begin
@@ -544,23 +637,25 @@ module tb_auto_read;
                         // end
                         
                     end
-`ifdef DEBUG
-                        $display("%h     %b",write_weight_reg,write_weight_reg);
-`endif 
+    `ifdef DEBUG
+                        $display("number %3d weight = %h     %b_%b_%b_%b_%b_%b_%b",x,write_weight_reg,write_weight_reg[31:30],write_weight_reg[29:25],write_weight_reg[24:20],write_weight_reg[19:15],write_weight_reg[14:10],write_weight_reg[9:5],write_weight_reg[4:0]);
                     axis_in(write_weight_reg);
                 end
             end
-`ifdef DEBUG
+    `endif
+    `ifdef DEBUG
             $display("\n");
-`endif
+    `endif
         end
     end
     endtask
+`endif 
 
     reg[31:0] write_ifmaps_reg;
     task write_ifmaps(); begin
+`ifdef POOL
         $display("write ifmaps start");
-        for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+        for(x=0;x<IFMAPS_HIGHT;x=x+STRIDE) begin
             for(y=0;y<IFMAPS_WIDTH;y=y+1) begin
                 for(z=0;z<IFMAPS_CH;z=z+6) begin
                     write_ifmaps_reg[30]=1'd0;
@@ -572,31 +667,49 @@ module tb_auto_read;
                         else begin
                             write_ifmaps_reg[w]=mem_i[(w / 5) + z][(w%5)+x][y];
                         end
-
-                        // if( (((w/5)*((z/6)+1))<IFMAPS_CH) ) begin
-                        //     if(((w / 5) + z)>=IFMAPS_CH  || w%5>=WEIGHT_HIGHT ) begin
-                        //         write_ifmaps_reg[w]=1'd0;
-                        //     end
-                        //     else begin
-                        //         write_ifmaps_reg[w]=mem_i[(w / 5) + z][(w%5)+x][y];
-                        //     end
-                        // end
-                        // else begin
-                        //     write_ifmaps_reg[w]=1'd0;
-                        // end
                         
                     end
-`ifdef DEBUG
-                    $display("%h    %b",write_ifmaps_reg,write_ifmaps_reg);
-`endif
+    `ifdef DEBUG
+                    $display("x = %3d y = %3d,input = %h    %b_%b_%b_%b_%b_%b_%b",x,y,write_ifmaps_reg,write_ifmaps_reg[31:30],write_ifmaps_reg[29:25],write_ifmaps_reg[24:20],write_ifmaps_reg[19:15],write_ifmaps_reg[14:10],write_ifmaps_reg[9:5],write_ifmaps_reg[4:0]);
+    `endif
                     axis_in(write_ifmaps_reg);
                 end
             end
-`ifdef DEBUG
+    `ifdef DEBUG
             $display("\n");
-`endif
+    `endif
         end
         $display("write ifmaps finish");
+`endif
+`ifdef CONV
+        $display("write ifmaps start");
+        for(x=0;x<OFMAPS_HIGHT;x=x+STRIDE) begin
+            for(y=0;y<IFMAPS_WIDTH;y=y+STRIDE) begin
+                for(z=0;z<IFMAPS_CH;z=z+6) begin
+                    write_ifmaps_reg[30]=1'd0;
+                    write_ifmaps_reg[31]=1'd0;
+                    for(w=0;w<30;w=w+1) begin 
+                        if( (w%5 >= WEIGHT_HIGHT) || (((w/5) + z)>=IFMAPS_CH) ) begin
+                            write_ifmaps_reg[w]=1'd0;
+                        end
+                        else begin
+                            write_ifmaps_reg[w]=mem_i[(w / 5) + z][(w%5)+x][y];
+                        end
+                    end
+    `ifdef DEBUG
+                    $display("x = %3d y = %3d,input = %h    %b_%b_%b_%b_%b_%b_%b",x,y,write_ifmaps_reg,write_ifmaps_reg[31:30],write_ifmaps_reg[29:25],write_ifmaps_reg[24:20],write_ifmaps_reg[19:15],write_ifmaps_reg[14:10],write_ifmaps_reg[9:5],write_ifmaps_reg[4:0]);
+
+    `endif
+                    axis_in(write_ifmaps_reg);
+                end
+            end
+    `ifdef DEBUG
+            $display("\n");
+    `endif
+        end
+        $display("write ifmaps finish");
+
+`endif
     end
     endtask
     

@@ -70,6 +70,7 @@ proc create_report { reportName command } {
   }
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
+set_msg_config -id {HDL-1065} -limit 10000
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7z020clg400-1
 
@@ -94,11 +95,11 @@ set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Pr
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_axi_dma_0_2/top_module_axi_dma_0_2_clocks.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_axi_dma_0_2/top_module_axi_dma_0_2_ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_xbar_2/top_module_xbar_2_ooc.xdc]
-set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_auto_pc_0/top_module_auto_pc_0_ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_rst_ps7_0_100M_2/top_module_rst_ps7_0_100M_2_board.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_rst_ps7_0_100M_2/top_module_rst_ps7_0_100M_2.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_rst_ps7_0_100M_2/top_module_rst_ps7_0_100M_2_ooc.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_xbar_3/top_module_xbar_3_ooc.xdc]
+set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_auto_pc_0/top_module_auto_pc_0_ooc.xdc]
 set_property used_in_synthesis false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_auto_us_0/top_module_auto_us_0_clocks.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_auto_us_0/top_module_auto_us_0_clocks.xdc]
 set_property used_in_implementation false [get_files -all /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_auto_us_0/top_module_auto_us_0_ooc.xdc]

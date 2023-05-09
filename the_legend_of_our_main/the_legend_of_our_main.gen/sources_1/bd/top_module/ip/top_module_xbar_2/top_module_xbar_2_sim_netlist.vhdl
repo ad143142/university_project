@@ -1,10 +1,10 @@
 -- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
--- Date        : Sun Apr 30 00:10:28 2023
+-- Date        : Sun Apr 30 00:10:27 2023
 -- Host        : yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II running 64-bit Ubuntu 22.04.2 LTS
--- Command     : write_vhdl -force -mode funcsim
---               /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_xbar_2/top_module_xbar_2_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim -rename_top top_module_xbar_2 -prefix
+--               top_module_xbar_2_ top_module_xbar_2_sim_netlist.vhdl
 -- Design      : top_module_xbar_2
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -69,8 +69,6 @@ entity top_module_xbar_2_axi_crossbar_v2_1_28_addr_arbiter_sasd is
     s_axi_araddr : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axi_awaddr : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_xbar_2_axi_crossbar_v2_1_28_addr_arbiter_sasd : entity is "axi_crossbar_v2_1_28_addr_arbiter_sasd";
 end top_module_xbar_2_axi_crossbar_v2_1_28_addr_arbiter_sasd;
 
 architecture STRUCTURE of top_module_xbar_2_axi_crossbar_v2_1_28_addr_arbiter_sasd is
@@ -1434,8 +1432,6 @@ entity top_module_xbar_2_axi_crossbar_v2_1_28_decerr_slave is
     \gen_axilite.s_axi_awready_i_reg_0\ : in STD_LOGIC;
     m_ready_d : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_xbar_2_axi_crossbar_v2_1_28_decerr_slave : entity is "axi_crossbar_v2_1_28_decerr_slave";
 end top_module_xbar_2_axi_crossbar_v2_1_28_decerr_slave;
 
 architecture STRUCTURE of top_module_xbar_2_axi_crossbar_v2_1_28_decerr_slave is
@@ -1608,8 +1604,6 @@ entity top_module_xbar_2_axi_crossbar_v2_1_28_splitter is
     m_ready_d0 : in STD_LOGIC_VECTOR ( 1 downto 0 );
     aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_xbar_2_axi_crossbar_v2_1_28_splitter : entity is "axi_crossbar_v2_1_28_splitter";
 end top_module_xbar_2_axi_crossbar_v2_1_28_splitter;
 
 architecture STRUCTURE of top_module_xbar_2_axi_crossbar_v2_1_28_splitter is
@@ -1795,8 +1789,6 @@ entity top_module_xbar_2_axi_register_slice_v2_1_27_axic_register_slice is
     \m_axi_rready[1]\ : in STD_LOGIC_VECTOR ( 1 downto 0 );
     SR : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_xbar_2_axi_register_slice_v2_1_27_axic_register_slice : entity is "axi_register_slice_v2_1_27_axic_register_slice";
 end top_module_xbar_2_axi_register_slice_v2_1_27_axic_register_slice;
 
 architecture STRUCTURE of top_module_xbar_2_axi_register_slice_v2_1_27_axic_register_slice is
@@ -3002,8 +2994,6 @@ entity top_module_xbar_2_axi_crossbar_v2_1_28_crossbar_sasd is
     s_axi_araddr : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axi_awaddr : in STD_LOGIC_VECTOR ( 31 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_xbar_2_axi_crossbar_v2_1_28_crossbar_sasd : entity is "axi_crossbar_v2_1_28_crossbar_sasd";
 end top_module_xbar_2_axi_crossbar_v2_1_28_crossbar_sasd;
 
 architecture STRUCTURE of top_module_xbar_2_axi_crossbar_v2_1_28_crossbar_sasd is
@@ -3411,8 +3401,6 @@ entity top_module_xbar_2_axi_crossbar_v2_1_28_axi_crossbar is
   attribute C_S_AXI_WRITE_ACCEPTANCE of top_module_xbar_2_axi_crossbar_v2_1_28_axi_crossbar : entity is 1;
   attribute DowngradeIPIdentifiedWarnings : string;
   attribute DowngradeIPIdentifiedWarnings of top_module_xbar_2_axi_crossbar_v2_1_28_axi_crossbar : entity is "yes";
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_xbar_2_axi_crossbar_v2_1_28_axi_crossbar : entity is "axi_crossbar_v2_1_28_axi_crossbar";
   attribute P_ADDR_DECODE : integer;
   attribute P_ADDR_DECODE of top_module_xbar_2_axi_crossbar_v2_1_28_axi_crossbar : entity is 1;
   attribute P_AXI3 : integer;

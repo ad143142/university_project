@@ -115,6 +115,7 @@ proc step_failed { step } {
 OPTRACE "impl_1" END { }
 }
 
+set_msg_config -id {HDL-1065} -limit 10000
 
 OPTRACE "impl_1" START { ROLLUP_1 }
 OPTRACE "Phase: Init Design" START { ROLLUP_AUTO }
@@ -308,23 +309,6 @@ start_step write_bitstream
 set ACTIVE_STEP write_bitstream
 set rc [catch {
   create_msg_db write_bitstream.pb
-OPTRACE "Write Bitstream: pre hook" START { }
-  set src_rc [catch { 
-    puts "source /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/error_bypass.tcl"
-    source /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/error_bypass.tcl
-  } _RESULT] 
-  if {$src_rc} { 
-    set tool_flow [get_property -quiet TOOL_FLOW [current_project -quiet]]
-    if { $tool_flow eq {SDx} } { 
-      send_gid_msg -id 2 -ssname VPL_TCL -severity ERROR $_RESULT
-      send_gid_msg -id 3 -ssname VPL_TCL -severity ERROR "sourcing script /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/error_bypass.tcl failed"
-    } else {
-      send_msg_id runtcl-1 status "$_RESULT"
-      send_msg_id runtcl-2 status "sourcing script /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/error_bypass.tcl failed"
-    }
-    return -code error
-  }
-OPTRACE "Write Bitstream: pre hook" END { }
 OPTRACE "read constraints: write_bitstream" START { }
 OPTRACE "read constraints: write_bitstream" END { }
   set_property XPM_LIBRARIES {XPM_CDC XPM_FIFO XPM_MEMORY} [current_project]

@@ -3,7 +3,6 @@ module bram_control #(
     parameter integer BRAM_ADDRESS_WIDTH = 12,
     parameter AXIS_PRELOAD_FIFO_DEPTH  = 4,
     parameter bit_num  = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1)
-//    parameter bit_num = 2
 )
 (
     //golbal
@@ -66,7 +65,7 @@ module bram_control #(
     reg [12:0] write_bram_cnt;
     reg [12:0] next_write_bram_cnt;
 
-    assign write_weight_finish=(next_write_bram_cnt>=write_bram_num);
+    assign write_weight_finish=((next_write_bram_cnt>=write_bram_num) && (output_channel_size != 12'd0));
 
     assign axis_fifo_read=(write_state==WS0 || write_state==WS1);
 

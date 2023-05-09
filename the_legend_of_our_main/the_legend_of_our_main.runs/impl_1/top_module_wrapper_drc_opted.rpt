@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
-| Date         : Sun Apr 30 10:28:50 2023
+| Date         : Tue May  9 23:20:55 2023
 | Host         : yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II running 64-bit Ubuntu 22.04.2 LTS
 | Command      : report_drc -file top_module_wrapper_drc_opted.rpt -pb top_module_wrapper_drc_opted.pb -rpx top_module_wrapper_drc_opted.rpx
 | Design       : top_module_wrapper
@@ -24,25 +24,19 @@ Table of Contents
       Design limits: <entire design considered>
            Ruledeck: default
              Max violations: <unlimited>
-             Violations found: 705
-+-----------+------------------+----------------------------+------------+
-| Rule      | Severity         | Description                | Violations |
-+-----------+------------------+----------------------------+------------+
-| LUTLP-1   | Critical Warning | Combinatorial Loop Alert   | 1          |
-| CHECK-3   | Warning          | Report rule limit reached  | 2          |
-| DPIP-1    | Warning          | Input pipelining           | 660        |
-| REQP-1839 | Warning          | RAMB36 async control check | 20         |
-| REQP-1840 | Warning          | RAMB18 async control check | 20         |
-| REQP-181  | Advisory         | writefirst                 | 2          |
-+-----------+------------------+----------------------------+------------+
+             Violations found: 704
++-----------+----------+----------------------------+------------+
+| Rule      | Severity | Description                | Violations |
++-----------+----------+----------------------------+------------+
+| CHECK-3   | Warning  | Report rule limit reached  | 2          |
+| DPIP-1    | Warning  | Input pipelining           | 660        |
+| REQP-1839 | Warning  | RAMB36 async control check | 20         |
+| REQP-1840 | Warning  | RAMB18 async control check | 20         |
+| REQP-181  | Advisory | writefirst                 | 2          |
++-----------+----------+----------------------------+------------+
 
 2. REPORT DETAILS
 -----------------
-LUTLP-1#1 Critical Warning
-Combinatorial Loop Alert  
-1 LUT cells form a combinatorial loop. This can create a race condition. Timing analysis may not be accurate. The preferred resolution is to modify the design to remove combinatorial logic loops. If the loop is known and understood, this DRC can be bypassed by acknowledging the condition and setting the following XDC constraint on any one of the nets in the loop: 'set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets <myHier/myNet>]'. One net in the loop is top_module_i/top_0/inst/u_data_path/u_axis_fifo_my/S_AXIS_TVALID_0. Please evaluate your design. The cells in the loop are: top_module_i/top_0/inst/u_data_path/u_axis_fifo_my/S_AXIS_TREADY_INST_0_i_3.
-Related violations: <none>
-
 CHECK-3#1 Warning
 Report rule limit reached  
 REQP-1839 rule limit reached: 20 violations have been found.

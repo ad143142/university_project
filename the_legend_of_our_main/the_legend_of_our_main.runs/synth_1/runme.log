@@ -12,6 +12,7 @@ source top_module_wrapper.tcl -notrace
 INFO: [IP_Flow 19-234] Refreshing IP repositories
 INFO: [IP_Flow 19-1704] No user IP repositories specified
 INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/yinchian/Xilinx/Vivado/2022.2/data/ip'.
+add_files: Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1481.414 ; gain = 152.074 ; free physical = 7425 ; free virtual = 12239
 Command: read_checkpoint -auto_incremental -incremental /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.srcs/utils_1/imports/synth_1/top_module_wrapper.dcp
 INFO: [Vivado 12-5825] Read reference checkpoint from /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.srcs/utils_1/imports/synth_1/top_module_wrapper.dcp for incremental synthesis
 INFO: [Vivado 12-7989] Please ensure there are no constraint changes
@@ -24,17 +25,17 @@ INFO: [Designutils 20-5440] No compile time benefit to using incremental synthes
 INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 10600
+INFO: [Synth 8-7075] Helper process launched with PID 23208
 INFO: [Synth 8-11241] undeclared symbol 'REGCCE', assumed default net type 'wire' [/home/yinchian/Xilinx/Vivado/2022.2/data/verilog/src/unimacro/BRAM_SINGLE_MACRO.v:2170]
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2032.023 ; gain = 364.734 ; free physical = 4984 ; free virtual = 10407
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1428.567; parent = 1223.135; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3067.316; parent = 2037.965; children = 1029.352
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 2032.746 ; gain = 366.734 ; free physical = 6609 ; free virtual = 11424
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3038.000; parent = 2038.688; children = 999.312
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'top_module_wrapper' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/hdl/top_module_wrapper.v:12]
 INFO: [Synth 8-6157] synthesizing module 'top_module' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1349]
-INFO: [Synth 8-6157] synthesizing module 'top_module_axi_dma_0_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_axi_dma_0_2_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_axi_dma_0_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_axi_dma_0_2_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_axi_dma_0_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_axi_dma_0_2_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_axi_dma_0_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_axi_dma_0_2_stub.v:5]
 WARNING: [Synth 8-7071] port 'mm2s_prmry_reset_out_n' of module 'top_module_axi_dma_0_2' is unconnected for instance 'axi_dma_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1567]
 WARNING: [Synth 8-7071] port 'm_axis_mm2s_tkeep' of module 'top_module_axi_dma_0_2' is unconnected for instance 'axi_dma_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1567]
 WARNING: [Synth 8-7071] port 's2mm_prmry_reset_out_n' of module 'top_module_axi_dma_0_2' is unconnected for instance 'axi_dma_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1567]
@@ -44,23 +45,23 @@ WARNING: [Synth 8-7071] port 'axi_dma_tstvec' of module 'top_module_axi_dma_0_2'
 WARNING: [Synth 8-7023] instance 'axi_dma_0' of module 'top_module_axi_dma_0_2' has 64 connections declared, but only 58 given [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1567]
 INFO: [Synth 8-6157] synthesizing module 'top_module_axi_mem_intercon_1' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1929]
 INFO: [Synth 8-6157] synthesizing module 'm00_couplers_imp_ECIHT4' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:137]
-INFO: [Synth 8-6157] synthesizing module 'top_module_auto_pc_1' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_1_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_pc_1' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_1_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_auto_pc_1' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_1_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_pc_1' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_1_stub.v:5]
 INFO: [Synth 8-6155] done synthesizing module 'm00_couplers_imp_ECIHT4' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:137]
 INFO: [Synth 8-6157] synthesizing module 's00_couplers_imp_MQH2EH' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:993]
-INFO: [Synth 8-6157] synthesizing module 'top_module_auto_us_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_0_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_us_0' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_0_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_auto_us_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_us_0' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_0_stub.v:5]
 WARNING: [Synth 8-7071] port 'm_axi_arregion' of module 'top_module_auto_us_0' is unconnected for instance 'auto_us' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1120]
 WARNING: [Synth 8-7023] instance 'auto_us' of module 'top_module_auto_us_0' has 34 connections declared, but only 33 given [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1120]
 INFO: [Synth 8-6155] done synthesizing module 's00_couplers_imp_MQH2EH' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:993]
 INFO: [Synth 8-6157] synthesizing module 's01_couplers_imp_ELBVVZ' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1156]
-INFO: [Synth 8-6157] synthesizing module 'top_module_auto_us_1' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_1_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_us_1' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_1_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_auto_us_1' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_1_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_us_1' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_us_1_stub.v:5]
 WARNING: [Synth 8-7071] port 'm_axi_awregion' of module 'top_module_auto_us_1' is unconnected for instance 'auto_us' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1307]
 WARNING: [Synth 8-7023] instance 'auto_us' of module 'top_module_auto_us_1' has 40 connections declared, but only 39 given [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1307]
 INFO: [Synth 8-6155] done synthesizing module 's01_couplers_imp_ELBVVZ' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1156]
-INFO: [Synth 8-6157] synthesizing module 'top_module_xbar_3' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_3_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_xbar_3' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_3_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_xbar_3' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_3_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_xbar_3' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_3_stub.v:5]
 WARNING: [Synth 8-689] width (1) of port connection 's_axi_arready' does not match port width (2) of module 'top_module_xbar_3' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:2500]
 WARNING: [Synth 8-689] width (64) of port connection 's_axi_rdata' does not match port width (128) of module 'top_module_xbar_3' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:2517]
 WARNING: [Synth 8-689] width (1) of port connection 's_axi_rlast' does not match port width (2) of module 'top_module_xbar_3' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:2518]
@@ -70,8 +71,8 @@ WARNING: [Synth 8-7071] port 's_axi_bid' of module 'top_module_xbar_3' is unconn
 WARNING: [Synth 8-7071] port 's_axi_rid' of module 'top_module_xbar_3' is unconnected for instance 'xbar' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:2450]
 WARNING: [Synth 8-7023] instance 'xbar' of module 'top_module_xbar_3' has 78 connections declared, but only 76 given [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:2450]
 INFO: [Synth 8-6155] done synthesizing module 'top_module_axi_mem_intercon_1' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1929]
-INFO: [Synth 8-6157] synthesizing module 'top_module_processing_system7_0_3' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_processing_system7_0_3_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_processing_system7_0_3' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_processing_system7_0_3_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_processing_system7_0_3' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_processing_system7_0_3_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_processing_system7_0_3' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_processing_system7_0_3_stub.v:5]
 WARNING: [Synth 8-7071] port 'USB0_PORT_INDCTL' of module 'top_module_processing_system7_0_3' is unconnected for instance 'processing_system7_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1702]
 WARNING: [Synth 8-7071] port 'USB0_VBUS_PWRSELECT' of module 'top_module_processing_system7_0_3' is unconnected for instance 'processing_system7_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1702]
 WARNING: [Synth 8-7071] port 'S_AXI_HP0_RCOUNT' of module 'top_module_processing_system7_0_3' is unconnected for instance 'processing_system7_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1702]
@@ -85,21 +86,21 @@ INFO: [Synth 8-6155] done synthesizing module 'm00_couplers_imp_15Q91JY' (0#1) [
 INFO: [Synth 8-6157] synthesizing module 'm01_couplers_imp_1VFCFO8' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:542]
 INFO: [Synth 8-6155] done synthesizing module 'm01_couplers_imp_1VFCFO8' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:542]
 INFO: [Synth 8-6157] synthesizing module 's00_couplers_imp_1VQI6SF' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:688]
-INFO: [Synth 8-6157] synthesizing module 'top_module_auto_pc_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_0_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_pc_0' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_0_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_auto_pc_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_auto_pc_0' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_auto_pc_0_stub.v:5]
 INFO: [Synth 8-6155] done synthesizing module 's00_couplers_imp_1VQI6SF' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:688]
-INFO: [Synth 8-6157] synthesizing module 'top_module_xbar_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_2_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_xbar_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_2_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_xbar_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_2_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_xbar_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_xbar_2_stub.v:5]
 INFO: [Synth 8-6155] done synthesizing module 'top_module_ps7_0_axi_periph_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:2529]
-INFO: [Synth 8-6157] synthesizing module 'top_module_rst_ps7_0_100M_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_rst_ps7_0_100M_2_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_rst_ps7_0_100M_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_rst_ps7_0_100M_2_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_rst_ps7_0_100M_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_rst_ps7_0_100M_2_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_rst_ps7_0_100M_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_rst_ps7_0_100M_2_stub.v:5]
 WARNING: [Synth 8-7071] port 'mb_reset' of module 'top_module_rst_ps7_0_100M_2' is unconnected for instance 'rst_ps7_0_100M' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1889]
 WARNING: [Synth 8-7071] port 'bus_struct_reset' of module 'top_module_rst_ps7_0_100M_2' is unconnected for instance 'rst_ps7_0_100M' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1889]
 WARNING: [Synth 8-7071] port 'peripheral_reset' of module 'top_module_rst_ps7_0_100M_2' is unconnected for instance 'rst_ps7_0_100M' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1889]
 WARNING: [Synth 8-7071] port 'interconnect_aresetn' of module 'top_module_rst_ps7_0_100M_2' is unconnected for instance 'rst_ps7_0_100M' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1889]
 WARNING: [Synth 8-7023] instance 'rst_ps7_0_100M' of module 'top_module_rst_ps7_0_100M_2' has 10 connections declared, but only 6 given [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1889]
-INFO: [Synth 8-6157] synthesizing module 'top_module_top_0_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_top_0_2_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'top_module_top_0_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-10516-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_top_0_2_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'top_module_top_0_2' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_top_0_2_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'top_module_top_0_2' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/.Xil/Vivado-23123-yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II/realtime/top_module_top_0_2_stub.v:5]
 WARNING: [Synth 8-7071] port 'M_AXIS_TSTRB' of module 'top_module_top_0_2' is unconnected for instance 'top_0' [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1896]
 WARNING: [Synth 8-7023] instance 'top_0' of module 'top_module_top_0_2' has 31 connections declared, but only 30 given [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1896]
 INFO: [Synth 8-6155] done synthesizing module 'top_module' (0#1) [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/synth/top_module.v:1349]
@@ -143,24 +144,24 @@ WARNING: [Synth 8-7129] Port S00_ARESETN in module top_module_axi_mem_intercon_1
 WARNING: [Synth 8-7129] Port S01_ACLK in module top_module_axi_mem_intercon_1 is either unconnected or has no load
 WARNING: [Synth 8-7129] Port S01_ARESETN in module top_module_axi_mem_intercon_1 is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2106.930 ; gain = 439.641 ; free physical = 5069 ; free virtual = 10494
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1428.567; parent = 1223.135; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3136.285; parent = 2106.934; children = 1029.352
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2106.652 ; gain = 440.641 ; free physical = 6696 ; free virtual = 11512
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3105.969; parent = 2106.656; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2124.742 ; gain = 457.453 ; free physical = 5068 ; free virtual = 10493
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1428.567; parent = 1223.135; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3154.098; parent = 2124.746; children = 1029.352
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2121.496 ; gain = 455.484 ; free physical = 6695 ; free virtual = 11511
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3120.812; parent = 2121.500; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2124.742 ; gain = 457.453 ; free physical = 5068 ; free virtual = 10493
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1428.567; parent = 1223.135; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3154.098; parent = 2124.746; children = 1029.352
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2121.496 ; gain = 455.484 ; free physical = 6696 ; free virtual = 11511
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3120.812; parent = 2121.500; children = 999.312
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00.02 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2124.742 ; gain = 0.000 ; free physical = 5063 ; free virtual = 10489
+Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.02 . Memory (MB): peak = 2121.496 ; gain = 0.000 ; free physical = 6691 ; free virtual = 11507
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
@@ -189,27 +190,27 @@ Parsing XDC File [/home/yinchian/Univ_Proj_Local/university_project/the_legend_o
 Finished Parsing XDC File [/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/dont_touch.xdc]
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2173.668 ; gain = 0.000 ; free physical = 4977 ; free virtual = 10403
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2174.391 ; gain = 0.000 ; free physical = 6604 ; free virtual = 11421
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2173.668 ; gain = 0.000 ; free physical = 4977 ; free virtual = 10403
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2174.391 ; gain = 0.000 ; free physical = 6604 ; free virtual = 11421
 INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
 INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
 INFO: [Synth 8-11241] undeclared symbol 'REGCCE', assumed default net type 'wire' [/home/yinchian/Xilinx/Vivado/2022.2/data/verilog/src/unimacro/BRAM_SINGLE_MACRO.v:2170]
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 5043 ; free virtual = 10469
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1461.677; parent = 1256.255; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Constraint Validation : Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6663 ; free virtual = 11480
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z020clg400-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 5043 ; free virtual = 10469
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1461.677; parent = 1256.255; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6666 ; free virtual = 11483
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
@@ -488,14 +489,14 @@ Applied set_property KEEP_HIERARCHY = SOFT for top_module_i/axi_mem_intercon/m00
 Applied set_property KEEP_HIERARCHY = SOFT for top_module_i/axi_mem_intercon. (constraint file  auto generated constraint).
 Applied set_property KEEP_HIERARCHY = SOFT for top_module_i/top_0. (constraint file  auto generated constraint).
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 5043 ; free virtual = 10469
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1461.677; parent = 1256.255; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6666 ; free virtual = 11483
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 5040 ; free virtual = 10467
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1461.677; parent = 1256.255; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6664 ; free virtual = 11482
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -540,33 +541,33 @@ WARNING: [Synth 8-7129] Port S00_ARESETN in module top_module_axi_mem_intercon_1
 WARNING: [Synth 8-7129] Port S01_ACLK in module top_module_axi_mem_intercon_1 is either unconnected or has no load
 WARNING: [Synth 8-7129] Port S01_ARESETN in module top_module_axi_mem_intercon_1 is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 5028 ; free virtual = 10461
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1461.677; parent = 1256.255; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6652 ; free virtual = 11474
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1456.928; parent = 1240.394; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4912 ; free virtual = 10344
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1510.341; parent = 1304.950; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:16 ; elapsed = 00:00:17 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6531 ; free virtual = 11353
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1543.072; parent = 1326.622; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4912 ; free virtual = 10344
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1510.614; parent = 1305.224; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Timing Optimization : Time (s): cpu = 00:00:16 ; elapsed = 00:00:18 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6531 ; free virtual = 11353
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1543.346; parent = 1326.896; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4910 ; free virtual = 10343
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1511.712; parent = 1306.321; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Technology Mapping : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6530 ; free virtual = 11352
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.428; parent = 1327.978; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -584,49 +585,49 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:19 ; elapsed = 00:00:19 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4908 ; free virtual = 10340
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1511.950; parent = 1306.560; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished IO Insertion : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6526 ; free virtual = 11348
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.689; parent = 1328.239; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4908 ; free virtual = 10340
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1511.966; parent = 1306.575; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6526 ; free virtual = 11348
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.705; parent = 1328.255; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4908 ; free virtual = 10340
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1512.028; parent = 1306.638; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6526 ; free virtual = 11348
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.752; parent = 1328.302; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4908 ; free virtual = 10340
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1512.091; parent = 1306.700; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6526 ; free virtual = 11348
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.814; parent = 1328.364; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4908 ; free virtual = 10340
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1512.091; parent = 1306.700; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6526 ; free virtual = 11348
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.814; parent = 1328.364; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4908 ; free virtual = 10340
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1512.106; parent = 1306.716; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6526 ; free virtual = 11348
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.830; parent = 1328.380; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -661,26 +662,26 @@ Report Cell Usage:
 |9     |top_module_xbar                 |     2|
 +------+--------------------------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4908 ; free virtual = 10340
-Synthesis current peak Physical Memory [PSS] (MB): peak = 1512.138; parent = 1306.747; children = 205.433
-Synthesis current peak Virtual Memory [VSS] (MB): peak = 3171.008; parent = 2141.656; children = 1029.352
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6526 ; free virtual = 11348
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1544.861; parent = 1328.411; children = 216.534
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3141.691; parent = 2142.379; children = 999.312
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 23 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 2173.668 ; gain = 457.453 ; free physical = 4963 ; free virtual = 10396
-Synthesis Optimization Complete : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 2173.668 ; gain = 506.379 ; free physical = 4963 ; free virtual = 10396
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:18 ; elapsed = 00:00:19 . Memory (MB): peak = 2174.391 ; gain = 455.484 ; free physical = 6586 ; free virtual = 11408
+Synthesis Optimization Complete : Time (s): cpu = 00:00:20 ; elapsed = 00:00:21 . Memory (MB): peak = 2174.391 ; gain = 508.379 ; free physical = 6586 ; free virtual = 11409
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2173.668 ; gain = 0.000 ; free physical = 4956 ; free virtual = 10390
+Netlist sorting complete. Time (s): cpu = 00:00:03 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2174.391 ; gain = 0.000 ; free physical = 6692 ; free virtual = 11514
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2173.668 ; gain = 0.000 ; free physical = 5001 ; free virtual = 10435
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2174.391 ; gain = 0.000 ; free physical = 6628 ; free virtual = 11450
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Synth Design complete, checksum: f7532301
+Synth Design complete, checksum: 54009a36
 INFO: [Common 17-83] Releasing license: Synthesis
 63 Infos, 94 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:25 ; elapsed = 00:00:24 . Memory (MB): peak = 2173.668 ; gain = 735.758 ; free physical = 5203 ; free virtual = 10637
+synth_design: Time (s): cpu = 00:00:26 ; elapsed = 00:00:26 . Memory (MB): peak = 2174.391 ; gain = 692.977 ; free physical = 6830 ; free virtual = 11652
 INFO: [Common 17-1381] The checkpoint '/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.runs/synth_1/top_module_wrapper.dcp' has been generated.
 INFO: [runtcl-4] Executing : report_utilization -file top_module_wrapper_utilization_synth.rpt -pb top_module_wrapper_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Sun Apr 30 10:27:27 2023...
+INFO: [Common 17-206] Exiting Vivado at Tue May  9 23:19:28 2023...

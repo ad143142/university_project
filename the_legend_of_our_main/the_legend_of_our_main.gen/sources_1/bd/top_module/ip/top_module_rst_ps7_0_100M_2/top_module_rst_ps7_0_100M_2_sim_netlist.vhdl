@@ -1,10 +1,10 @@
 -- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
--- Date        : Sun Apr 30 00:10:22 2023
+-- Date        : Sun Apr 30 00:10:21 2023
 -- Host        : yinchian-ASUS-TUF-Gaming-A15-FA506II-FA506II running 64-bit Ubuntu 22.04.2 LTS
--- Command     : write_vhdl -force -mode funcsim
---               /home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.gen/sources_1/bd/top_module/ip/top_module_rst_ps7_0_100M_2/top_module_rst_ps7_0_100M_2_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim -rename_top top_module_rst_ps7_0_100M_2 -prefix
+--               top_module_rst_ps7_0_100M_2_ top_module_rst_ps7_0_100M_2_sim_netlist.vhdl
 -- Design      : top_module_rst_ps7_0_100M_2
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -25,8 +25,6 @@ entity top_module_rst_ps7_0_100M_2_cdc_sync is
     aux_reset_in : in STD_LOGIC;
     slowest_sync_clk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_rst_ps7_0_100M_2_cdc_sync : entity is "cdc_sync";
 end top_module_rst_ps7_0_100M_2_cdc_sync;
 
 architecture STRUCTURE of top_module_rst_ps7_0_100M_2_cdc_sync is
@@ -247,8 +245,6 @@ entity top_module_rst_ps7_0_100M_2_upcnt_n is
     seq_cnt_en : in STD_LOGIC;
     slowest_sync_clk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_rst_ps7_0_100M_2_upcnt_n : entity is "upcnt_n";
 end top_module_rst_ps7_0_100M_2_upcnt_n;
 
 architecture STRUCTURE of top_module_rst_ps7_0_100M_2_upcnt_n is
@@ -413,8 +409,6 @@ entity top_module_rst_ps7_0_100M_2_lpf is
     ext_reset_in : in STD_LOGIC;
     aux_reset_in : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_rst_ps7_0_100M_2_lpf : entity is "lpf";
 end top_module_rst_ps7_0_100M_2_lpf;
 
 architecture STRUCTURE of top_module_rst_ps7_0_100M_2_lpf is
@@ -603,8 +597,6 @@ entity top_module_rst_ps7_0_100M_2_sequence_psr is
     lpf_int : in STD_LOGIC;
     slowest_sync_clk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_rst_ps7_0_100M_2_sequence_psr : entity is "sequence_psr";
 end top_module_rst_ps7_0_100M_2_sequence_psr;
 
 architecture STRUCTURE of top_module_rst_ps7_0_100M_2_sequence_psr is
@@ -943,8 +935,6 @@ entity top_module_rst_ps7_0_100M_2_proc_sys_reset is
   attribute C_NUM_PERP_ARESETN of top_module_rst_ps7_0_100M_2_proc_sys_reset : entity is 1;
   attribute C_NUM_PERP_RST : integer;
   attribute C_NUM_PERP_RST of top_module_rst_ps7_0_100M_2_proc_sys_reset : entity is 1;
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of top_module_rst_ps7_0_100M_2_proc_sys_reset : entity is "proc_sys_reset";
 end top_module_rst_ps7_0_100M_2_proc_sys_reset;
 
 architecture STRUCTURE of top_module_rst_ps7_0_100M_2_proc_sys_reset is
