@@ -1,0 +1,7 @@
+0.7
+2020.2
+Oct 14 2022
+05:07:14
+/home/yinchian/Univ_Proj_Local/university_project/axis_master.v,1682839605,verilog,,/home/yinchian/Univ_Proj_Local/university_project/tb_axis_out.v,,axis_master,,axi_vip_v1_1_13;processing_system7_vip_v1_0_15;xilinx_vip,../../../../the_legend_of_our_main.gen/sources_1/bd/top_module/ipshared/ec67/hdl;../../../../the_legend_of_our_main.gen/sources_1/bd/top_module/ipshared/ee60/hdl;/home/yinchian/Xilinx/Vivado/2022.2/data/xilinx_vip/include,,,,,
+/home/yinchian/Univ_Proj_Local/university_project/tb_axis_out.v,1682839605,verilog,,,,tb_axis_out,,axi_vip_v1_1_13;processing_system7_vip_v1_0_15;xilinx_vip,../../../../the_legend_of_our_main.gen/sources_1/bd/top_module/ipshared/ec67/hdl;../../../../the_legend_of_our_main.gen/sources_1/bd/top_module/ipshared/ee60/hdl;/home/yinchian/Xilinx/Vivado/2022.2/data/xilinx_vip/include,,,,,
+/home/yinchian/Univ_Proj_Local/university_project/the_legend_of_our_main/the_legend_of_our_main.sim/sim_1/behav/xsim/glbl.v,1665704903,verilog,,,,glbl,,axi_vip_v1_1_13;processing_system7_vip_v1_0_15;xilinx_vip,,,,,,
