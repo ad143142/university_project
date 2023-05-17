@@ -28,6 +28,10 @@ module bram_control #(
 
     output wire bram_A_wen,//
     output wire bram_B_wen,//
+    
+    //FSM output
+    output wire [1:0] read_state_o,
+    output wire [2:0] write_state_o,
 
     //control in
     input wire [4:0] kernel_size,
@@ -41,6 +45,7 @@ module bram_control #(
 
     input wire wait_weight_preload,
 
+    input wire layer_finish,
     //control out
     output wire weight_from_bram_valid,
     output wire axis_fifo_read,
@@ -64,6 +69,9 @@ module bram_control #(
     reg [12:0] write_bram_num;
     reg [12:0] write_bram_cnt;
     reg [12:0] next_write_bram_cnt;
+
+    assign read_state_o  = read_state;
+    assign write_state_o = write_state;
 
     assign write_weight_finish=((next_write_bram_cnt>=write_bram_num) && (output_channel_size != 12'd0));
 
@@ -101,6 +109,9 @@ module bram_control #(
     assign read_FSM_start=(transfer_start && (~write_en));
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
+            read_state<=RIDLE;
+        end
+        else if(layer_finish) begin
             read_state<=RIDLE;
         end
         else begin

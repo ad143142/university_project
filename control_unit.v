@@ -34,7 +34,10 @@ module control_unit #(
     output wire bram_control_add1,
     output wire bram_control_add2,
     output wire bram_transfer_start,
-        
+        //state_output
+    output wire [4:0] load_weight_state_o,
+    output wire [4:0] load_ifmaps_state_o,
+    output wire [2:0] write_weight_state_o,
     //control input 
     input wire weight_from_bram_valid,
     input wire ifmaps_fifo_empty,
@@ -97,7 +100,7 @@ module control_unit #(
     wire load_ifmaps_state_enable;
     wire load_weight_state_enable;
     wire write_weight_state_enable;
-
+    
     //control
     wire [8:0] MAC_enable_in;
     wire all_finish;
@@ -109,7 +112,12 @@ module control_unit #(
     wire axi_control_3_clear;
 
     // wire [12:0] next_write_bram_cnt;
-    
+    //FSM output
+
+    assign load_weight_state_o  = load_weight_state;
+    assign load_ifmaps_state_o  = load_ifmaps_state;
+    assign write_weight_state_o = write_weight_state;
+
     //decode
     assign inst_compute=(axi_control_0[7:0]==`INST_COMPUTE);
     assign inst_write_weight=(axi_control_0[7:0]==`INST_WRITE_WEIGHT);

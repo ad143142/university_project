@@ -36,7 +36,7 @@ module tb_auto_read;
     parameter BRAM_ADDRESS_WIDTH    = 12 ;
     parameter C_S_AXIS_TDATA_WIDTH  = 32 ;
     parameter C_S_AXI_DATA_WIDTH    = 32 ;
-    parameter C_S_AXI_ADDR_WIDTH    = 4  ;
+    parameter C_S_AXI_ADDR_WIDTH    = 5  ;
     parameter C_M_AXIS_TDATA_WIDTH  = 32 ;
 
     integer w,z,x,y;//for load mem
@@ -68,7 +68,8 @@ module tb_auto_read;
     reg   watch_set_function_and_ofmaps_width=0;
     reg   watch_compute_start=0;
     reg   watch_write_weight_start=0;
-    reg   watch_read_AXI_3=0;
+    reg   watch_read_AXI=0;
+    reg   watch_read_FSM=0;
     // top Outputs
     wire  S_AXIS_TREADY                        ;
     wire  [1279:0]  psum_out                   ;
@@ -118,6 +119,7 @@ module tb_auto_read;
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
         load_mem_from_file();
+        read_FSM();
 
         ////////////////////////////////////////////////////////
 
@@ -139,8 +141,9 @@ module tb_auto_read;
             write_weight();
 
             while(S_AXI_RDATA!=32'd1)begin
-                read_AXI_3();
+                read_AXI(3);
             end
+            read_FSM();
 `endif
 
         #(PERIOD*5);
@@ -150,9 +153,9 @@ module tb_auto_read;
         @(posedge clk);
         write_ifmaps();
         while(S_AXI_RDATA!=32'hFFFFFFFF)begin
-            read_AXI_3();
+            read_AXI(3);
         end
-        
+        read_FSM();
         if(error_flag == 0) begin
             $display("/////////////////////////////////////////////////////////////////////////////////");
             $display("//                                                                             //");
@@ -317,31 +320,51 @@ module tb_auto_read;
     end
     endtask
 
-    task read_AXI_3();begin
-        watch_read_AXI_3=1;
+    task read_AXI(input [2:0] addr);begin
+        @(posedge clk);
+        watch_read_AXI=1;
 
-        S_AXI_ARADDR=4'b1100;
+        S_AXI_ARADDR={addr,2'd0};
         S_AXI_ARPROT=3'b000;
         S_AXI_ARVALID=1'b1;
         S_AXI_RREADY=1'd0;
 
         wait(S_AXI_ARREADY==1'b1) begin
             wait(S_AXI_RVALID) begin
-                // $monitor($time,,"AXI_3 read success");
-                if(S_AXI_RDATA==32'd1) begin
-                    $display("time=%7d  write_weight_finish",$time);
-                end
-                else if (S_AXI_RDATA==32'hFFFFFFFF)begin
-                    $display("time=%7d  layer_finish",$time);
-                end
+                $display($time,,"read AXI[%d] = %d = %h = %b ",addr,S_AXI_RDATA,S_AXI_RDATA,S_AXI_RDATA);
+
                 S_AXI_ARVALID=1'b0;
                 S_AXI_RREADY=1'b1;
-                watch_read_AXI_3=0;
+                watch_read_AXI=0;
                 #(PERIOD*2)
                 S_AXI_RREADY=1'b0;
 
             end            
         end
+    end
+    endtask
+    task read_FSM();begin
+        @(posedge clk);
+        watch_read_FSM=1;
+
+        S_AXI_ARADDR={3'd4,2'd0};
+        S_AXI_ARPROT=3'b000;
+        S_AXI_ARVALID=1'b1;
+        S_AXI_RREADY=1'd0;
+
+        wait(S_AXI_ARREADY==1'b1) begin
+            wait(S_AXI_RVALID) begin
+                $display("control_load_weight_state = %d\ncontrol_load_ifmaps_state = %d\ncontrol_write_weight_state = %d\nbram_control_read_state = %d\nbram_control_write_state = %d",S_AXI_RDATA[4:0],S_AXI_RDATA[9:5],S_AXI_RDATA[12:10],S_AXI_RDATA[14:13],S_AXI_RDATA[17:15]);
+
+                S_AXI_ARVALID=1'b0;
+                S_AXI_RREADY=1'b1;
+                watch_read_FSM=0;
+                #(PERIOD*2)
+                S_AXI_RREADY=1'b0;
+
+            end            
+        end
+        
     end
     endtask
 

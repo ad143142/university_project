@@ -26,13 +26,14 @@ module data_path #(
     input wire S_AXIS_TLAST ,
     input wire S_AXIS_TVALID,
     
-    //TODO:還沒完成AXI_S_out
-
-    //temp_out
-    
+    //AXIS_out
     output wire M_AXIS_o_valid,
     output wire [C_M_AXIS_TDATA_WIDTH-1:0] M_AXIS_o_data,
     output wire M_AXIS_o_last,
+
+    //FSM output
+    output wire [1:0]bram_read_state_o,
+    output wire [2:0]bram_write_state_o,
 
     //control in 
     input wire [MAC_NUM-1:0] MAC_enable,
@@ -322,7 +323,12 @@ module data_path #(
         .weight_from_bram_valid (weight_from_bram_valid    ),
         .axis_fifo_read         (axis_fifo_read            ),
         .write_weight_finish    (write_weight_finish       ),
-        .wait_weight_preload    (wait_weight_preload       )
+        .wait_weight_preload    (wait_weight_preload       ),
+        .layer_finish           (layer_finish              ),
+
+        //FSM output
+        .read_state_o           (bram_read_state_o         ),
+        .write_state_o          (bram_write_state_o        )
     );
     
     //BRAM_instance
