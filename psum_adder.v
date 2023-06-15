@@ -17,6 +17,8 @@ module psum_adder #(
     input [OFMAPS_BRAM_ADDR_WIDTH-1:0] address_in,
     input i_valid,
 
+    input [15:0] bias_in,
+    input bias_valid,
     //output data
     output o_last,
     output o_data,
@@ -73,7 +75,14 @@ module psum_adder #(
     reg r_pipe9_last;
     reg r_pipe10_last;
 
+    reg signed [15:0] bias_fifo [0:7];
+    reg [2:0] write_ptr;
+    reg [2:0] read_ptr;
+    reg signed [15:0] bias_out;
+
 //////////////////////wire//////////////////////////
+
+
     /*wire [12:0] threshold_0;
     wire [12:0] threshold;*/
 
@@ -97,6 +106,47 @@ module psum_adder #(
     assign address_out = r_pipe9_addr;
     assign o_valid = r_pipe9_valid;
     assign o_last = r_pipe10_last;
+
+//////////////////////bias_fifo//////////////////////////
+
+    integer x ;
+    always @(posedge clk or negedge rst_n) begin
+        for(x=0;x<8;x=x+1) begin
+            if(!rst_n) begin
+                bias_fifo[x] <= 16'd0;
+            end
+            else begin
+                bias_fifo[write_ptr] <= bias_valid ? bias_in : bias_fifo[write_ptr];
+            end
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            write_ptr <= 3'd0;
+        end
+        else begin
+            write_ptr <= bias_valid ? write_ptr+3'd1 : write_ptr;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            read_ptr <= 3'd0;
+        end
+        else begin
+            read_ptr <= r_pipe9_valid ? read_ptr+3'd1 : read_ptr;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            bias_out <= 16'd0;
+        end
+        else begin
+            bias_out <= -bias_fifo[read_ptr];//psum+bias>=0 simplify psum>=-bias
+        end
+    end
 //////////////////////data_pipeline//////////////////////////
     integer i_0 ;
     always @(posedge clk or negedge rst_n) begin
@@ -194,7 +244,6 @@ module psum_adder #(
         end
     end
 
-    integer i_8 ;
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             r_pipe8_data <= 13'd0;
@@ -210,7 +259,7 @@ module psum_adder #(
             r_pipe9_data <= 1'd0;
         end
         else begin
-            r_pipe9_data <= (r_pipe8_data >= 0);
+            r_pipe9_data <= (r_pipe8_data >= bias_out);
         end
     end
 

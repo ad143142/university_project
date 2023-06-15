@@ -1,4 +1,4 @@
-module bram_control #(
+module weight_bram_control #(
     parameter integer MAC_NUM = 256,
     parameter integer BRAM_ADDRESS_WIDTH = 12,
     parameter AXIS_PRELOAD_FIFO_DEPTH  = 4,
@@ -43,12 +43,12 @@ module bram_control #(
     input wire bram_control_add2,
     input wire port_sel,
 
-    input wire wait_weight_preload,
+    input wire wait_input_from_preload,
 
     input wire layer_finish,
     //control out
     output wire weight_from_bram_valid,
-    output wire axis_fifo_read,
+    output wire read_axis_preload_fifo,
     output wire write_weight_finish
 
 );
@@ -75,7 +75,8 @@ module bram_control #(
 
     assign write_weight_finish=((next_write_bram_cnt>=write_bram_num) && (output_channel_size != 12'd0));
 
-    assign axis_fifo_read=(write_state==WS0 || write_state==WS1);
+    assign read_axis_preload_fifo=(write_state == WS0);
+    // assign axis_preload_fifo_read=(write_state==WS0 || write_state==WS1);
 
     assign bram_A_en=1;
     assign bram_B_en=1;
@@ -136,15 +137,15 @@ module bram_control #(
         else begin
             case (write_state)
                 WIDLE       : write_state <= write_FSM_start ? WWAITWEIGHT :WIDLE;
-                WWAITWEIGHT : write_state <= (wait_weight_preload) ? WS0:WWAITWEIGHT;
+                WWAITWEIGHT : write_state <= (wait_input_from_preload) ? WS0:WWAITWEIGHT;
                 WS0         : write_state <= (!write_en) ? WIDLE:WVALID1;                                   
                 WVALID1     : write_state <= (!write_en) ? WIDLE:(write_weight_finish ? WIDLE:WWAITWEIGHT);
                 default     : write_state <= WIDLE;         
             endcase
             // case (write_state)
             //     WIDLE       : write_state <= write_FSM_start ? 
-            //                                  (wait_weight_preload) ? WS0:WWAITWEIGHT :WIDLE;
-            //     WWAITWEIGHT : write_state <= (wait_weight_preload) ? WS0:WWAITWEIGHT;
+            //                                  (wait_input_from_preload) ? WS0:WWAITWEIGHT :WIDLE;
+            //     WWAITWEIGHT : write_state <= (wait_input_from_preload) ? WS0:WWAITWEIGHT;
             //     WS0         : write_state <= (!write_en) ? WIDLE:
             //                                  (axis_fifo_cnt==0) ? WWAITWEIGHT:
             //                                  (axis_fifo_cnt==1) ? WVALID1:WS1;                                       

@@ -1,12 +1,15 @@
 module top #(
-    parameter MAC_NUM=256,
-    parameter BRAM_ADDRESS_WIDTH=12,
+    parameter MAC_NUM = 256,
+    parameter WEITGHT_BRAM_ADDRESS_WIDTH = 12,
+    parameter BIAS_BRAM_ADDRESS_WIDTH = 9,
+    parameter BIAS_BRAM_DATA_WIDTH = 32,
+    parameter AXIS_PRELOAD_FIFO_DEPTH = 4,
+    parameter AXIS_FIFO_SIZE  = 16,
     parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
     parameter integer C_S_AXI_DATA_WIDTH	= 32,
     parameter integer C_S_AXI_ADDR_WIDTH	= 4,
     parameter C_M_AXIS_TDATA_WIDTH = 32,
     parameter M_AXIS_FIFO_DEPTH = 4
-    
 ) 
 (
     //golbal
@@ -53,32 +56,43 @@ module top #(
 
     wire [MAC_NUM-1:0] MAC_enable;
     wire weight_from_bram_valid;
+    wire bias_from_bram_valid;
     wire [1:0] operation;
     wire [4:0] kernel_size;
     wire [2:0] stride;
     wire [11:0]input_channel_size;
     wire [11:0]output_channel_size;
     wire axis_en;
+    wire axis_preload_en;
     wire axis_clear;
     wire load_weight_preload;
     wire load_weight;
-    wire bram_port_sel;
-    wire bram_control_add1;
-    wire bram_control_add2;
+    wire weight_bram_port_sel;
+    wire weight_bram_control_add1;
+    wire weight_bram_control_add2;
+    wire weight_bram_transfer_start;
+    wire bias_bram_write_en;      
+    wire bias_bram_control_add;   
+    wire bias_bram_transfer_start;
     wire address_reset;
     wire ifmaps_fifo_empty;
     wire load_ifmaps;
     wire layer_finish;
-    wire bram_write_en;
+    wire weight_bram_write_en;
     wire write_weight_finish;
+    wire write_bias_finish;
     wire pooling_compute;
     wire pooling_finish;
 
     wire [4:0] control_load_weight_state_o;
     wire [4:0] control_load_ifmaps_state_o;
     wire [2:0] control_write_weight_state_o;
-    wire [1:0] bram_read_state_o;
-    wire [2:0] bram_write_state_o;
+    wire [2:0] control_write_bias_state_o;
+    wire [2:0] control_load_bias_state_o;
+    wire [1:0] weight_bram_read_state_o;
+    wire [2:0] weight_bram_write_state_o;
+    wire [1:0] bias_bram_read_state_o;
+    wire [2:0] bias_bram_write_state_o;
 
     wire [31:0]reg0_read_data;
     wire [31:0]reg1_read_data;
@@ -111,7 +125,16 @@ module top #(
 
     wire M_AXIS_output_finsih;
     assign M_AXIS_output_finsih = (M_AXIS_TVALID && M_AXIS_TLAST);
-    assign reg4_write_data = {14'd0,bram_write_state_o,bram_read_state_o,control_write_weight_state_o, control_load_ifmaps_state_o, control_load_weight_state_o};
+    assign reg4_write_data = {3'd0,
+                              bias_bram_write_state_o,
+                              bias_bram_read_state_o,
+                              weight_bram_write_state_o,
+                              weight_bram_read_state_o,
+                              control_load_bias_state_o,
+                              control_write_bias_state_o,
+                              control_write_weight_state_o, 
+                              control_load_ifmaps_state_o, 
+                              control_load_weight_state_o};
     AXI_interface 
     #(
         .C_S_AXI_DATA_WIDTH   (C_S_AXI_DATA_WIDTH                ),
@@ -130,6 +153,7 @@ module top #(
         //control     
         .layer_finish         (M_AXIS_output_finsih              ),
         .write_weight_finish  (write_weight_finish               ),
+        .write_bias_finish    (write_bias_finish                 ),
 
         .S_AXI_AWADDR         (S_AXI_AWADDR                      ),
         .S_AXI_AWPROT         (S_AXI_AWPROT                      ),
@@ -156,7 +180,6 @@ module top #(
     control_unit 
     #(
         .MAC_NUM                    (MAC_NUM                     ),
-        .BRAM_ADDRESS_WIDTH         (BRAM_ADDRESS_WIDTH          ),
         .C_S_AXIS_TDATA_WIDTH       (C_S_AXIS_TDATA_WIDTH        )
     )
     u_control_unit(
@@ -168,6 +191,8 @@ module top #(
         .axi_control_1              (reg1_read_data              ),
         .axi_control_2              (reg2_read_data              ),
         .weight_from_bram_valid     (weight_from_bram_valid      ),
+        .bias_from_bram_valid       (bias_from_bram_valid        ),
+
         .ifmaps_fifo_empty          (ifmaps_fifo_empty           ),
         .pooling_finish             (pooling_finish              ),
         .M_AXIS_output_finsih       (M_AXIS_output_finsih        ),
@@ -175,36 +200,51 @@ module top #(
         //control out          
         .layer_finish               (layer_finish                ),
         .write_weight_finish        (write_weight_finish         ),
+        .write_bias_finish          (write_bias_finish           ),
 
         .MAC_enable                 (MAC_enable                  ),
         .operation                  (operation                   ),
         .input_channel_size         (input_channel_size          ),
         .output_channel_size        (output_channel_size         ),
         .axis_en                    (axis_en                     ),
+        .axis_preload_en            (axis_preload_en             ),
         .axis_clear                 (axis_clear                  ),
         .kernel_size                (kernel_size                 ),
         .stride                     (stride                      ),
         .load_weight_preload        (load_weight_preload         ),
         .load_weight                (load_weight                 ),
         .pooling_compute            (pooling_compute             ),
-        .bram_write_en              (bram_write_en               ),
-        .bram_port_sel              (bram_port_sel               ),
-        .bram_control_add1          (bram_control_add1           ),
-        .bram_control_add2          (bram_control_add2           ),
-        .bram_transfer_start        (bram_transfer_start         ),
+        
+        .weight_bram_write_en       (weight_bram_write_en        ),
+        .weight_bram_port_sel       (weight_bram_port_sel        ),
+        .weight_bram_control_add1   (weight_bram_control_add1    ),
+        .weight_bram_control_add2   (weight_bram_control_add2    ),
+        .weight_bram_transfer_start (weight_bram_transfer_start  ),
+        
+        .bias_bram_write_en         (bias_bram_write_en          ),
+        .bias_bram_control_add      (bias_bram_control_add       ),
+        .bias_bram_transfer_start   (bias_bram_transfer_start    ),
+
         .load_ifmaps                (load_ifmaps                 ),
         .axi_control_3              (reg3_write_data             ),
         //FSM output
         .load_weight_state_o        (control_load_weight_state_o ),
         .load_ifmaps_state_o        (control_load_ifmaps_state_o ),
-        .write_weight_state_o       (control_write_weight_state_o)
+        .write_weight_state_o       (control_write_weight_state_o),
+        .write_bias_state_o         (control_write_bias_state_o  ),
+        .load_bias_state_o          (control_load_bias_state_o   )
     );
-    
+
     data_path 
     #(
-        .MAC_NUM                    (MAC_NUM                           ),
-        .BRAM_ADDRESS_WIDTH         (BRAM_ADDRESS_WIDTH                ),
-        .C_S_AXIS_TDATA_WIDTH       (C_S_AXIS_TDATA_WIDTH              )
+        .MAC_NUM                       (MAC_NUM                        ),
+        .WEITGHT_BRAM_ADDRESS_WIDTH    (WEITGHT_BRAM_ADDRESS_WIDTH     ),
+        .BIAS_BRAM_ADDRESS_WIDTH       (BIAS_BRAM_ADDRESS_WIDTH        ),
+        .C_S_AXIS_TDATA_WIDTH          (C_S_AXIS_TDATA_WIDTH           ),
+        .AXIS_PRELOAD_FIFO_DEPTH       (AXIS_PRELOAD_FIFO_DEPTH        ),
+        .AXIS_FIFO_SIZE                (AXIS_FIFO_SIZE                 ),
+        .C_M_AXIS_TDATA_WIDTH          (C_M_AXIS_TDATA_WIDTH           ),
+        .BIAS_BRAM_DATA_WIDTH          (BIAS_BRAM_DATA_WIDTH           )
     )
     u_data_path(
         //golbal
@@ -228,6 +268,7 @@ module top #(
         .kernel_size                   (kernel_size                    ),
         .stride                        (stride                         ),
         .axis_en                       (axis_en                        ),
+        .axis_preload_en               (axis_preload_en                ),
         .axis_clear                    (axis_clear                     ),
         .layer_finish                  (layer_finish                   ),
         .pooling_compute               (pooling_compute                ),
@@ -236,23 +277,31 @@ module top #(
         .load_weight                   (load_weight                    ),
         .load_ifmaps                   (load_ifmaps                    ),
             //BRAM_control
-        .bram_write_en                 (bram_write_en                  ),
-        .bram_transfer_start           (bram_transfer_start            ),
-        .bram_control_add1             (bram_control_add1              ),
-        .bram_control_add2             (bram_control_add2              ),
-        .port_sel                      (bram_port_sel                  ),
+        .weight_bram_write_en          (weight_bram_write_en           ),
+        .weight_bram_transfer_start    (weight_bram_transfer_start     ),
+        .weight_bram_control_add1      (weight_bram_control_add1       ),
+        .weight_bram_control_add2      (weight_bram_control_add2       ),
+        .weight_bram_port_sel          (weight_bram_port_sel           ),
+
+        .bias_bram_write_en            (bias_bram_write_en             ),
+        .bias_bram_control_add         (bias_bram_control_add          ),
+        .bias_bram_transfer_start      (bias_bram_transfer_start       ),
             //weight_preload
         .load_weight_preload           (load_weight_preload            ),
         //control out
         .ifmaps_fifo_empty             (ifmaps_fifo_empty              ),
         .weight_from_bram_valid        (weight_from_bram_valid         ),
+        .bias_from_bram_valid          (bias_from_bram_valid           ),
+
         .pooling_finish                (pooling_finish                 ),
         // .axi_control_3              (axi_control_3_from_datapath),
         .write_weight_finish           (write_weight_finish            ),
-
+        .write_bias_finish             (write_bias_finish              ),
         //FSM output
-        .bram_read_state_o             (bram_read_state_o              ),
-        .bram_write_state_o            (bram_write_state_o             )
+        .weight_bram_read_state_o      (weight_bram_read_state_o       ),
+        .weight_bram_write_state_o     (weight_bram_write_state_o      ),
+        .bias_bram_read_state_o        (bias_bram_read_state_o         ),
+        .bias_bram_write_state_o       (bias_bram_write_state_o        )
     );
 
 

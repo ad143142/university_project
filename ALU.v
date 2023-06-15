@@ -24,7 +24,7 @@ module ALU (
 
 );
 //2022/08/31已測試
-    integer idx;
+    // integer idx;
     //ifmaps和weight皆從右邊idx=4進入往左推，這樣在看波型時才不會鏡像相反
     //用不到的reg會有預設值ifmaps=0 weight=1，目的是為了xnor才會=0不會引響bitcount結果
     reg ifmaps_reg_00,ifmaps_reg_01,ifmaps_reg_02,ifmaps_reg_03,ifmaps_reg_04;

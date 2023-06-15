@@ -1,0 +1,70 @@
+6 2 2 fffffff6 fffffff8 fffffff6 
+fffffffc fffffffa 0 c e fffffffc 
+fffffff8 fffffff8 8 fffffff8 4 8 
+4 4 8 fffffff8 fffffffe fffffff6 
+fffffff6 4 ffffffe6 fffffff2 6 12 
+2 fffffffe 2 fffffffe 0 8 
+
+fffffff6 fffffffe fffffffe fffffffe 8 fffffffe 
+4 6 fffffff4 fffffffc 6 fffffff8 
+fffffff4 ffffffe4 8 fffffff8 0 0 
+fffffffc fffffffc 8 4 2 6 
+fffffff6 fffffffc 2 2 fffffff6 fffffffe 
+ffffffea fffffffe e ffffffee fffffff8 10 
+
+fffffffa 6 ffffffee 6 fffffff8 fffffff2 
+fffffffc fffffff6 fffffffc 4 6 0 
+fffffff8 fffffffc 10 0 fffffff8 fffffff8 
+fffffffc ffffffe8 fffffffc c 6 fffffffe 
+fffffff2 4 a a fffffffe fffffffa 
+a fffffffe fffffffe fffffff6 fffffffc 0 
+
+2 a fffffff6 fffffff6 fffffffc a 
+fffffff4 e c c fffffff2 fffffffc 
+0 fffffff4 fffffffc 0 4 0 
+0 fffffff8 c 8 ffffffee 6 
+6 4 fffffffa 2 fffffffe fffffffe 
+2 fffffff2 ffffffee 6 8 0 
+
+fffffffe a 2 a 0 fffffffa 
+14 6 fffffff0 fffffff8 a fffffffc 
+4 fffffffc fffffff8 10 0 4 
+0 fffffffc fffffff4 0 6 fffffff6 
+6 4 ffffffea fffffff2 2 fffffffa 
+6 6 6 6 8 8 
+
+2 2 2 fffffff2 fffffffc e 
+8 fffffffa 0 c fffffff6 4 
+fffffff8 c fffffff8 4 8 0 
+18 0 fffffff0 fffffff8 fffffff2 2 
+2 0 fffffffe 6 a 2 
+fffffffa fffffffe fffffffe 2 0 4 
+
+0 fffffff8 fffffff8 fffffff8 a fffffff8 
+2 fffffff4 e 6 4 fffffffe 
+6 2 fffffff6 fffffff6 2 2 
+a a 2 a 0 fffffff8 
+fffffff4 fffffff6 0 c 4 8 
+4 10 0 10 fffffff6 ffffffee 
+
+fffffffa a 12 fffffffe fffffff8 6 
+fffffff4 fffffffe 0 fffffff0 2 0 
+c 4 fffffff8 ffffffe8 8 8 
+fffffffc fffffff4 fffffff4 4 fffffffa 2 
+6 fffffff8 a fffffffe 2 fffffffe 
+6 fffffffe ffffffee 2 fffffff0 8 
+
+fffffff4 0 fffffff0 8 fffffffa 4 
+fffffffa 0 fffffff2 a 0 2 
+fffffff6 fffffffa 2 6 6 fffffff6 
+12 e 6 fffffff2 8 8 
+fffffff4 fffffff6 c fffffffc fffffffc 10 
+4 10 10 fffffff8 6 6 
+
+fffffff8 c 4 fffffff8 2 fffffffc 
+6 8 2 fffffff6 8 2 
+fffffff6 6 fffffff2 6 fffffffa a 
+fffffffe 6 ffffffee fffffffe 4 fffffffc 
+8 6 fffffff4 fffffffc fffffff4 fffffff4 
+fffffff8 fffffff8 0 c 6 fffffffa 
+

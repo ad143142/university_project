@@ -25,6 +25,7 @@
 			//control
 		input wire layer_finish,
 		input wire write_weight_finish,
+		input wire write_bias_finish,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -326,7 +327,7 @@
 		/////////////////PL WRITE BACK/////////////////////////////
 
 		slv_reg0[7:0] <= ((slv_reg_wren) && (axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==3'h0) && (S_AXI_WSTRB[0] == 1)) ? S_AXI_WDATA[7:0]:
-						 (layer_finish || write_weight_finish) ? 8'd0:slv_reg0[7:0];//
+						 (layer_finish || write_weight_finish || write_bias_finish) ? 8'd0:slv_reg0[7:0];//
 
 		//   slv_reg0[7:0] <= ((slv_reg_wren) && (axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]==2'h0) && (S_AXI_WSTRB[0] == 1)) ? S_AXI_WDATA[7:0]:slv_reg0[7:0];//
 		  //write reg3

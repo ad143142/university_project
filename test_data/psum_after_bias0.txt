@@ -1,0 +1,70 @@
+ffffffb9 ffffffe3 ffffffbd ffffffd1 ffffffcd ffffffcf 
+ffffffd9 ffffffd1 ffffffb7 ffffffb1 ffffffbf ffffffcf 
+ffffffe1 ffffffd3 ffffffc3 ffffffbd ffffffcb ffffffd5 
+fffffff3 ffffffcf ffffffc7 ffffffb9 ffffffc1 ffffffc1 
+ffffffc5 ffffffd7 ffffffd7 ffffffd1 ffffffc9 ffffffbd 
+ffffffc5 ffffffbb ffffffbf ffffffcb ffffffcd ffffffcd 
+
+ffffffd9 ffffffd7 ffffffe1 ffffffe5 fffffff9 ffffffef 
+fffffff1 fffffff1 ffffffdb ffffffe9 ffffffe7 ffffffff 
+fffffff1 ffffffeb ffffffc7 ffffffe9 ffffffd3 ffffffd9 
+ffffffdb ffffffdf 3 ffffffe9 ffffffd1 ffffffd1 
+ffffffd1 ffffffe3 ffffffe3 fffffff5 fffffff9 ffffffd9 
+ffffffdd ffffffdf fffffffb ffffffd3 ffffffd1 ffffffed 
+
+ffffffba ffffffd4 ffffffbe ffffffb2 ffffffce ffffffb4 
+ffffffa6 ffffffc6 ffffffcc ffffffbe ffffffb4 ffffffc4 
+ffffffba ffffffc0 ffffffa8 ffffffc2 ffffffb0 ffffffde 
+ffffffcc ffffffbc ffffffc0 ffffffd6 ffffffca ffffffc6 
+ffffffda ffffffc8 ffffffc4 ffffffba ffffffca ffffffd6 
+ffffffbe ffffffc4 ffffffd8 ffffffdc ffffffba ffffffea 
+
+6 10 6 12 a 1c 
+e fffffff6 c 16 28 1c 
+e 14 8 1e 24 fffffffe 
+8 fffffffc fffffff4 fffffffe a fffffffe 
+22 fffffff4 c 1e 2 fffffff6 
+16 0 c 10 fffffff6 fffffffe 
+
+44 26 3c 64 44 3a 
+44 54 3a 24 32 2a 
+28 3e 3e 40 32 48 
+3e 5a 2e 30 2c 38 
+28 2a 4e 2c 30 44 
+44 3a 3e 36 2c 50 
+
+ffffffd5 ffffffe7 ffffffdd ffffffdd ffffffd1 ffffffcf 
+ffffffc9 ffffffdd ffffffe3 ffffffe1 ffffffcf ffffffeb 
+ffffffcd ffffffc7 ffffffc3 ffffffa9 ffffffd7 ffffffdd 
+ffffffdb ffffffdb ffffffeb ffffffd9 ffffffc1 ffffffdd 
+ffffffe1 ffffffdf ffffff9f ffffffd9 ffffffd9 ffffffb9 
+ffffffd1 ffffffd3 ffffffcb ffffffc3 ffffffbd ffffffbd 
+
+ffffffd8 ffffffca ffffffd4 ffffffcc ffffffe8 ffffffca 
+ffffffd8 ffffffe8 ffffffc2 fffffff0 ffffffb2 ffffffd6 
+ffffffb8 ffffffda ffffffd6 ffffffc0 ffffffda ffffffc0 
+ffffffe6 ffffffba ffffffca ffffffcc ffffffb0 ffffffdc 
+ffffffe0 ffffffc6 ffffffc2 ffffffd4 ffffffec ffffffd4 
+ffffffd0 ffffffa6 ffffffda fffffff2 ffffffd4 ffffffc8 
+
+9 fffffff7 5 1d 11 fffffff3 
+fffffff5 fffffff9 fffffffb 9 3 ffffffff 
+1 f 23 9 7 fffffffd 
+fffffff3 b 7 d 9 9 
+d 17 fffffffb fffffff1 9 1 
+fffffff5 3 ffffffeb ffffffe7 5 1d 
+
+ffffffbe ffffffe4 ffffffd6 ffffffe2 ffffffde ffffffdc 
+ffffffc2 fffffffa ffffffe0 ffffffe2 ffffffd0 ffffffe8 
+ffffffe6 ffffffc8 ffffffcc ffffffe6 ffffffdc ffffffc2 
+ffffffd0 ffffffe8 ffffffe0 ffffffe6 ffffffc2 ffffffde 
+fffffff2 ffffffc4 ffffffdc ffffffca ffffffc6 ffffffca 
+fffffffe ffffffb4 ffffffdc ffffffe0 fffffff2 ffffffce 
+
+57 2d 37 43 27 29 
+47 3f 25 2b 31 29 
+43 39 39 27 1d 33 
+4d 11 31 27 43 37 
+3b 3d 39 23 4f 37 
+f 15 41 39 2f 2f 
+

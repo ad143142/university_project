@@ -9,13 +9,17 @@
 
 `define DEBUG
 
-module tb_auto_read;
+module tb_auto_read2_0;
 
     //setting//
     // parameter FUNC = 1;
     `define CONV ;
     `define BIAS ;
     // `define POOL ;
+
+    parameter LAYER_CNT    = 3;
+
+    //input the first layer configuration
     parameter IFMAPS_WIDTH = 10;
     parameter IFMAPS_HIGHT = 10;
     parameter IFMAPS_CH    = 10;
@@ -23,14 +27,17 @@ module tb_auto_read;
     parameter WEIGHT_HIGHT = 5;
     parameter WEIGHT_NUM   = 10;
     parameter STRIDE       = 1;
+
+    parameter OFMAPS_WIDTH = IFMAPS_WIDTH;
+    parameter OFMAPS_HIGHT = IFMAPS_HIGHT;
     //////dont touch/////
-`ifdef CONV
-    parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH - WEIGHT_WIDTH) / STRIDE + 1);
-    parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT - WEIGHT_HIGHT) / STRIDE + 1);
-`elsif POOL
-    parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH) / WEIGHT_WIDTH);
-    parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT) / WEIGHT_HIGHT);
-`endif
+// `ifdef CONV
+//     parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH - WEIGHT_WIDTH) / STRIDE + 1);
+//     parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT - WEIGHT_HIGHT) / STRIDE + 1);
+// `elsif POOL
+//     parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH) / WEIGHT_WIDTH);
+//     parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT) / WEIGHT_HIGHT);
+// `endif
 
     // top Parameters
     parameter PERIOD                     = 20 ;
@@ -116,6 +123,22 @@ module tb_auto_read;
     reg [31:0] TDATA_buf;
 `endif
 
+    integer function_now;
+    integer ifmaps_width_now; 
+    integer ifmaps_hight_now; 
+    integer ifmaps_ch_now; 
+    integer weight_width_now; 
+    integer weight_hight_now; 
+    integer weight_num_now; 
+    integer ofmaps_hight_now;
+    integer ofmaps_width_now;
+    integer stride_now;
+    integer layer;
+
+    integer status, fd;
+    integer n,ch,h;
+    reg [256*8-1:0] file_dir;
+    reg [256*8-1:0] comment;
 
     assign psum_out = u_top.u_data_path.u_psum_adder.o_data;
 
@@ -124,27 +147,26 @@ module tb_auto_read;
         forever #(PERIOD/2)  clk=~clk;
     end
 
-integer a=0;
     initial
     begin
-    for(a=0;a<1;a=a+1) begin
+    for(layer=0;layer<3;layer=layer+1) begin
 
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
-        load_mem_from_file(a+48);
+        load_mem_from_file(layer+48);
         read_FSM();
 
         ////////////////////////////////////////////////////////
 
-        set_kernel_size(WEIGHT_WIDTH);
+        set_kernel_size(weight_width_now);
 `ifdef POOL
-        set_ofmaps_channel_and_input_channel(0,IFMAPS_CH);
-        set_stride_function_ofmaps_width(STRIDE,2'd1,OFMAPS_WIDTH);
+        set_ofmaps_channel_and_input_channel(0,ifmaps_ch_now);
+        set_stride_function_ofmaps_width(stride_now,2'd1,ofmaps_width_now);
 
 `endif
 `ifdef CONV
-        set_ofmaps_channel_and_input_channel(WEIGHT_NUM,IFMAPS_CH);
-        set_stride_function_ofmaps_width(STRIDE,2'd0,OFMAPS_WIDTH);
+        set_ofmaps_channel_and_input_channel(weight_num_now,ifmaps_ch_now);
+        set_stride_function_ofmaps_width(stride_now,2'd0,ofmaps_width_now);
             
 `endif
         #(PERIOD*5);
@@ -210,8 +232,8 @@ integer a=0;
         if(u_top.M_AXIS_TVALID) begin
             $display("time=%7d  M_AXIS_TDATA = %h = %b, M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",$time,u_top.M_AXIS_TDATA,u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
             for(i=0;i<32;i=i+1) begin
-                if(u_top.M_AXIS_TDATA[i] != mem_o[ofmaps_validation_cnt%WEIGHT_NUM][ofmaps_validation_cnt/(WEIGHT_NUM*OFMAPS_WIDTH)][(ofmaps_validation_cnt/WEIGHT_NUM)%OFMAPS_WIDTH]) begin
-                    $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b",$time,i,u_top.M_AXIS_TDATA[i],mem_o[ofmaps_validation_cnt%WEIGHT_NUM][ofmaps_validation_cnt/(WEIGHT_NUM*OFMAPS_WIDTH)][(ofmaps_validation_cnt/WEIGHT_NUM)%OFMAPS_WIDTH]);   
+                if(u_top.M_AXIS_TDATA[i] != mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now]) begin
+                    $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b",$time,i,u_top.M_AXIS_TDATA[i],mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now]);   
                     error_flag = 1;
                     error_cnt = error_cnt+1;
                 end
@@ -227,7 +249,7 @@ integer a=0;
             $display("time=%7d  M_AXIS_TDATA = %h = %b, M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",$time,u_top.M_AXIS_TDATA,u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
             for(i=0;i<32;i=i+1) begin
                 if(u_top.M_AXIS_TDATA[i] != TDATA_ANS[ofmaps_validation_cnt]) begin
-                    $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b , at ofmaps[%d][%d][%d]",$time,i,u_top.M_AXIS_TDATA[i],TDATA_ANS[ofmaps_validation_cnt],ofmaps_validation_cnt%IFMAPS_CH,ofmaps_validation_cnt/(IFMAPS_CH*OFMAPS_WIDTH),ofmaps_validation_cnt/(IFMAPS_CH)%OFMAPS_WIDTH);   
+                    $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b , at ofmaps[%d][%d][%d]",$time,i,u_top.M_AXIS_TDATA[i],TDATA_ANS[ofmaps_validation_cnt],ofmaps_validation_cnt%ifmaps_ch_now,ofmaps_validation_cnt/(ifmaps_ch_now*ofmaps_width_now),ofmaps_validation_cnt/(ifmaps_ch_now)%ofmaps_width_now);   
                     error_flag = 1;
                     `ifdef DEBUG
                         if(stop_flag==0) begin
@@ -326,11 +348,7 @@ integer a=0;
         .M_AXIS_TSTRB      ( M_AXIS_TSTRB    [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0])
     );
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////                                                                                                             //////////////////////////////////////////
-///////////////////////////                                                task                                                         //////////////////////////////////////////
-///////////////////////////                                                                                                             //////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     task set_kernel_size(input [2:0]kernel_size);begin
         watch_set_kernel_size=1;
 
@@ -565,8 +583,9 @@ integer a=0;
     end
     endtask
 
-    task load_mem_from_file(input [7:0] file_idx);begin
-        if(file_idx == "") begin
+    task load_mem_from_file(input [7:0] layer);begin
+        update_setting(layer);
+        if(layer == "") begin
             $readmemb($sformatf("%s/ifmaps.txt",`TESTFILEDIR),mem_i);
 `ifdef CONV
             $readmemb($sformatf("%s/weight.txt",`TESTFILEDIR),mem_w);
@@ -577,102 +596,102 @@ integer a=0;
             $readmemb($sformatf("%s/ofmaps.txt",`TESTFILEDIR),mem_o);
         end
         else begin
-            $readmemb($sformatf("%s/ifmaps%s.txt",`TESTFILEDIR,file_idx),mem_i);
+            read_mem_i(layer);
 `ifdef CONV
-            $readmemb($sformatf("%s/weight%s.txt",`TESTFILEDIR,file_idx),mem_w);
-            $readmemh($sformatf("%s/bias%s.txt",`TESTFILEDIR,file_idx),mem_b);
-            $readmemh($sformatf("%s/psum_before_bias%s.txt",`TESTFILEDIR,file_idx),mem_pb);
-            $readmemh($sformatf("%s/psum_after_bias%s.txt",`TESTFILEDIR,file_idx),mem_pa);
+            read_mem_w(layer);
+            read_mem_b(layer);
+            read_mem_pb(layer);
+            read_mem_pa(layer);
 `endif 
-            $readmemb($sformatf("%s/ofmaps%s.txt",`TESTFILEDIR,file_idx),mem_o);
+            read_mem_o(layer);
         end
 
-`ifdef DEBUG
-        $write("ifmaps:\n");
-        for(z=0;z<IFMAPS_CH;z=z+1) begin
-            for(x=0;x<IFMAPS_HIGHT;x=x+1) begin
-                for(y=0;y<IFMAPS_WIDTH;y=y+1) begin
-                    $write("%h ",mem_i[z][x][y]);
-                end
-                $write("\n");
-            end
-            $write("\n");
-        end
-    `ifdef CONV
-        $write("weight:\n");
-        for(w=0;w<WEIGHT_NUM;w=w+1) begin
-            for(z=0;z<IFMAPS_CH;z=z+1) begin
-                for(x=0;x<WEIGHT_HIGHT;x=x+1) begin
-                    for(y=0;y<WEIGHT_WIDTH;y=y+1) begin
-                        $write("%h ",mem_w[w][z][x][y]);
-                    end
-                    $write("\n");
-                end
-                $write("\n");
-            end
-            $write("\n");
-        end
+// `ifdef DEBUG
+//         $write("ifmaps:\n");
+//         for(z=0;z<IFMAPS_CH;z=z+1) begin
+//             for(x=0;x<IFMAPS_HIGHT;x=x+1) begin
+//                 for(y=0;y<IFMAPS_WIDTH;y=y+1) begin
+//                     $write("%h ",mem_i[z][x][y]);
+//                 end
+//                 $write("\n");
+//             end
+//             $write("\n");
+//         end
+//     `ifdef CONV
+//         $write("weight:\n");
+//         for(w=0;w<WEIGHT_NUM;w=w+1) begin
+//             for(z=0;z<IFMAPS_CH;z=z+1) begin
+//                 for(x=0;x<WEIGHT_HIGHT;x=x+1) begin
+//                     for(y=0;y<WEIGHT_WIDTH;y=y+1) begin
+//                         $write("%h ",mem_w[w][z][x][y]);
+//                     end
+//                     $write("\n");
+//                 end
+//                 $write("\n");
+//             end
+//             $write("\n");
+//         end
 
-        $write("bias:\n");
-        for(y=0;y<WEIGHT_NUM;y=y+1) begin
-            $write("%h ",mem_b[y]);
-        end
-        $write("\n");
+//         $write("bias:\n");
+//         for(y=0;y<WEIGHT_NUM;y=y+1) begin
+//             $write("%h ",mem_b[y]);
+//         end
+//         $write("\n");
 
-        $write("psum_before_bias:\n");
-        for(z=0;z<WEIGHT_NUM;z=z+1) begin
-            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-                    $write("%h ",mem_pb[z][x][y]);
-                end
-                $write("\n");
-            end
-            $write("\n");
-        end
+//         $write("psum_before_bias:\n");
+//         for(z=0;z<WEIGHT_NUM;z=z+1) begin
+//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+//                     $write("%h ",mem_pb[z][x][y]);
+//                 end
+//                 $write("\n");
+//             end
+//             $write("\n");
+//         end
 
-        $write("psum_after_bias:\n");
-        for(z=0;z<WEIGHT_NUM;z=z+1) begin
-            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-                    $write("%h ",mem_pa[z][x][y]);
-                end
-                $write("\n");
-            end
-            $write("\n");
-        end
+//         $write("psum_after_bias:\n");
+//         for(z=0;z<WEIGHT_NUM;z=z+1) begin
+//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+//                     $write("%h ",mem_pa[z][x][y]);
+//                 end
+//                 $write("\n");
+//             end
+//             $write("\n");
+//         end
 
-        $write("ofmaps:\n");
-        for(z=0;z<WEIGHT_NUM;z=z+1) begin
-            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-                    $write("%h ",mem_o[z][x][y]);
-                end
-                $write("\n");
-            end
-            $write("\n");
-        end
-    `endif
-    `ifdef POOL
-        $write("ofmaps:\n");
-        for(z=0;z<IFMAPS_CH;z=z+1) begin
-            for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-                for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-                    $write("%h ",mem_o[z][x][y]);
-                end
-                $write("\n");
-            end
-            $write("\n");
-        end
-    `endif
-
-`endif
+//         $write("ofmaps:\n");
+//         for(z=0;z<WEIGHT_NUM;z=z+1) begin
+//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+//                     $write("%h ",mem_o[z][x][y]);
+//                 end
+//                 $write("\n");
+//             end
+//             $write("\n");
+//         end
+//     `endif
+//     `ifdef POOL
+//         $write("ofmaps:\n");
+//         for(z=0;z<IFMAPS_CH;z=z+1) begin
+//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
+//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
+//                     $write("%h ",mem_o[z][x][y]);
+//                 end
+//                 $write("\n");
+//             end
+//             $write("\n");
+//         end
+//     `endif
+// 
+// `endif
 `ifdef CONV
         $write("M_AXIS_ANS:\n");
-        for(ofmaps_validation_cnt = 0 ; ofmaps_validation_cnt < OFMAPS_HIGHT*OFMAPS_WIDTH*WEIGHT_NUM;ofmaps_validation_cnt=ofmaps_validation_cnt+1) begin
-            TDATA_ANS[ofmaps_validation_cnt] = mem_o[ofmaps_validation_cnt%WEIGHT_NUM][ofmaps_validation_cnt/(WEIGHT_NUM*OFMAPS_WIDTH)][(ofmaps_validation_cnt/WEIGHT_NUM)%OFMAPS_WIDTH];
+        for(ofmaps_validation_cnt = 0 ; ofmaps_validation_cnt < ofmaps_hight_now*ofmaps_width_now*weight_num_now;ofmaps_validation_cnt=ofmaps_validation_cnt+1) begin
+            TDATA_ANS[ofmaps_validation_cnt] = mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now];
         end
         ofmaps_validation_cnt = 0 ;
-        for(x=0;(x * 32) < OFMAPS_HIGHT*OFMAPS_WIDTH*WEIGHT_NUM;x=x+1) begin
+        for(x=0;(x * 32) < ofmaps_hight_now*ofmaps_width_now*weight_num_now;x=x+1) begin
             $write("%h\n",TDATA_ANS[x*32 +: 32]);
         end
 
@@ -681,18 +700,18 @@ integer a=0;
 `ifdef POOL
         $write("M_AXIS_ANS:\n");
         ofmaps_validation_cnt=0;
-        for(y=0;y<OFMAPS_HIGHT*OFMAPS_WIDTH;y=y+1) begin
-            for(x=0;x<((IFMAPS_CH+31)/32)*32;x=x+1) begin
-                if(x>=IFMAPS_CH) begin
+        for(y=0;y<ofmaps_hight_now*ofmaps_width_now;y=y+1) begin
+            for(x=0;x<((ifmaps_ch_now+31)/32)*32;x=x+1) begin
+                if(x>=ifmaps_ch_now) begin
                     TDATA_buf[x%32] = 0;
                 end
                 else begin
-                    TDATA_buf[x%32] = mem_o[ofmaps_validation_cnt%IFMAPS_CH][ofmaps_validation_cnt/(IFMAPS_CH*OFMAPS_WIDTH)][(ofmaps_validation_cnt/IFMAPS_CH)%OFMAPS_WIDTH];
+                    TDATA_buf[x%32] = mem_o[ofmaps_validation_cnt%ifmaps_ch_now][ofmaps_validation_cnt/(ifmaps_ch_now*ofmaps_width_now)][(ofmaps_validation_cnt/ifmaps_ch_now)%ofmaps_width_now];
                     ofmaps_validation_cnt=ofmaps_validation_cnt+1;
                 end
 
                 if(x%32 == 31)begin
-                    TDATA_ANS[(y*((IFMAPS_CH+31)/32)+(x/32))*32 +: 32] = TDATA_buf;
+                    TDATA_ANS[(y*((ifmaps_ch_now+31)/32)+(x/32))*32 +: 32] = TDATA_buf;
                     $write("%h\n",TDATA_buf);
                 end
             end
@@ -708,14 +727,14 @@ integer a=0;
 `ifdef CONV
     task write_weight(); begin
         $display("write weight start");
-        for(x=0;x<WEIGHT_NUM;x=x+1) begin
+        for(x=0;x<weight_num_now;x=x+1) begin
             wait(!clk);
-            for(y=0;y<WEIGHT_WIDTH;y=y+1) begin
-                for(z=0;z<IFMAPS_CH;z=z+6) begin
+            for(y=0;y<weight_width_now;y=y+1) begin
+                for(z=0;z<ifmaps_ch_now;z=z+6) begin
                     write_weight_reg[30]=1'd0;
                     write_weight_reg[31]=1'd0;
                     for(w=0;w<30;w=w+1) begin
-                        if( (w%5 >= WEIGHT_HIGHT) || (((w/5) + z)>=IFMAPS_CH) ) begin
+                        if( (w%5 >= weight_hight_now) || (((w/5) + z)>=ifmaps_ch_now) ) begin
                             write_weight_reg[w]=1'd0;
                         end
                         else begin
@@ -752,7 +771,7 @@ integer a=0;
     reg[31:0] write_bias_reg;
     task write_bias(); begin
         $display("write bias start");
-        for(x=0;x<WEIGHT_NUM;x=x+1) begin
+        for(x=0;x<weight_num_now;x=x+1) begin
             wait(!clk);
             write_bias_reg[31:16]=16'd0;
             write_bias_reg[15:0]=mem_b[x];
@@ -769,13 +788,13 @@ integer a=0;
     task write_ifmaps(); begin
 `ifdef POOL
         $display("write ifmaps start");
-        for(x=0;x<IFMAPS_HIGHT;x=x+STRIDE) begin
-            for(y=0;y<IFMAPS_WIDTH;y=y+1) begin
-                for(z=0;z<IFMAPS_CH;z=z+6) begin
+        for(x=0;x<ifmaps_hight_now;x=x+stride_now) begin
+            for(y=0;y<ifmaps_width_now;y=y+1) begin
+                for(z=0;z<ifmaps_ch_now;z=z+6) begin
                     write_ifmaps_reg[30]=1'd0;
                     write_ifmaps_reg[31]=1'd0;
                     for(w=0;w<30;w=w+1) begin 
-                        if( (w%5 >= WEIGHT_HIGHT) || (((w/5) + z)>=IFMAPS_CH) ) begin
+                        if( (w%5 >= weight_hight_now) || (((w/5) + z)>=ifmaps_ch_now) ) begin
                             write_ifmaps_reg[w]=1'd0;
                         end
                         else begin
@@ -797,13 +816,13 @@ integer a=0;
 `endif
 `ifdef CONV
         $display("write ifmaps start");
-        for(x=0;x<OFMAPS_HIGHT;x=x+STRIDE) begin
-            for(y=0;y<IFMAPS_WIDTH;y=y+STRIDE) begin
-                for(z=0;z<IFMAPS_CH;z=z+6) begin
+        for(x=0;x<ofmaps_hight_now;x=x+stride_now) begin
+            for(y=0;y<ifmaps_width_now;y=y+stride_now) begin
+                for(z=0;z<ifmaps_ch_now;z=z+6) begin
                     write_ifmaps_reg[30]=1'd0;
                     write_ifmaps_reg[31]=1'd0;
                     for(w=0;w<30;w=w+1) begin 
-                        if( (w%5 >= WEIGHT_HIGHT) || (((w/5) + z)>=IFMAPS_CH) ) begin
+                        if( (w%5 >= weight_hight_now) || (((w/5) + z)>=ifmaps_ch_now) ) begin
                             write_ifmaps_reg[w]=1'd0;
                         end
                         else begin
@@ -827,4 +846,203 @@ integer a=0;
     end
     endtask
     
+    task update_setting(input [7:0] layer); begin
+        file_dir = {`TESTFILEDIR,"\\setting",layer,".txt"};
+        fd = $fopen(file_dir, "r");
+
+        if (!fd) $error("could not read file");
+        status = $fscanf(fd,"%s\n%d",comment,function_now);
+        $display("function=%d",function_now);
+        status = $fscanf(fd,"%s\n%d",comment,ifmaps_width_now);
+        $display("ifmaps_width_now=%d",ifmaps_width_now);
+        status = $fscanf(fd,"%s\n%d",comment,ifmaps_hight_now);
+        $display("ifmaps_hight_now=%d",ifmaps_hight_now);
+        status = $fscanf(fd,"%s\n%d",comment,ifmaps_ch_now);
+        $display("ifmaps_ch_now=%d",ifmaps_ch_now);
+        status = $fscanf(fd,"%s\n%d",comment,weight_width_now);
+        $display("weight_width_now=%d",weight_width_now);
+        status = $fscanf(fd,"%s\n%d",comment,weight_hight_now);
+        $display("weight_hight_now=%d",weight_hight_now);
+        status = $fscanf(fd,"%s\n%d",comment,weight_num_now);
+        $display("weight_num_now=%d",weight_num_now);
+        status = $fscanf(fd,"%s\n%d",comment,stride_now);
+        $display("stride_now=%d",stride_now);
+
+        if(function_now==0) begin
+            ofmaps_hight_now = ((ifmaps_width_now - weight_width_now) / stride_now + 1);
+            ofmaps_width_now = ((ifmaps_hight_now - weight_hight_now) / stride_now + 1);
+        end
+        else begin
+            ofmaps_hight_now = ((ifmaps_width_now) / weight_width_now);
+            ofmaps_width_now = ((ifmaps_hight_now) / weight_hight_now);
+        end
+
+    end
+    endtask
+
+    task read_mem_i(input [7:0] layer); begin
+        file_dir = {`TESTFILEDIR,"\\ifmaps",layer,".txt"};
+        fd = $fopen(file_dir, "r");
+
+        if (!fd) $error("could not read file");
+        for(ch=0;ch<ifmaps_ch_now;ch=ch+1) begin
+            for(h=0;h<ifmaps_hight_now;h=h+1) begin
+                for(w=0;w<ifmaps_width_now;w=w+1) begin
+                    status = $fscanf(fd,"%b",mem_i[ch][h][w]);
+                end
+            end
+        end
+
+`ifdef DEBUG
+        $write("ifmaps:\n");
+        for(ch=0;ch<ifmaps_ch_now;ch=ch+1) begin
+            for(h=0;h<ifmaps_hight_now;h=h+1) begin
+                for(w=0;w<ifmaps_width_now;w=w+1) begin
+                    $write("%h ",mem_i[ch][h][w]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+`endif 
+    end
+    endtask
+
+    task read_mem_w(input [7:0] layer); begin
+        file_dir = {`TESTFILEDIR,"\\weight",layer,".txt"};
+        fd = $fopen(file_dir, "r");
+
+        if (!fd) $error("could not read file");
+        for(n=0;n<weight_num_now;n=n+1) begin
+            for(ch=0;ch<ifmaps_ch_now;ch=ch+1) begin
+                for(h=0;h<weight_hight_now;h=h+1) begin
+                    for(w=0;w<weight_width_now;w=w+1) begin
+                        status = $fscanf(fd,"%b",mem_w[n][ch][h][w]);
+                    end
+                end
+            end
+        end
+
+`ifdef DEBUG
+        for(n=0;n<weight_num_now;n=n+1) begin
+            $write("weight %3d :\n",n);
+            for(ch=0;ch<ifmaps_ch_now;ch=ch+1) begin
+                for(h=0;h<weight_hight_now;h=h+1) begin
+                    for(w=0;w<weight_width_now;w=w+1) begin
+                        $write("%h ",mem_w[n][ch][h][w]);
+                    end
+                    $write("\n");
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+`endif 
+        
+    end
+    endtask
+
+    task read_mem_b(input [7:0] layer); begin
+        file_dir = {`TESTFILEDIR,"\\bias",layer,".txt"};
+        fd = $fopen(file_dir, "r");
+
+        if (!fd) $error("could not read file");
+        for(n=0;n<weight_num_now;n=n+1) begin
+            status = $fscanf(fd,"%h",mem_b[n]);     
+        end
+        
+`ifdef DEBUG
+        $write("bias:\n");
+        for(n=0;n<weight_num_now;n=n+1) begin
+            $write("%h ",mem_b[n]);
+        end
+        $write("\n");
+`endif 
+        
+    end
+    endtask
+
+    task read_mem_pb(input [7:0] layer); begin
+        file_dir = {`TESTFILEDIR,"\\psum_before_bias",layer,".txt"};
+        fd = $fopen(file_dir, "r");
+
+        if (!fd) $error("could not read file");
+        for(ch=0;ch<weight_num_now;ch=ch+1) begin
+            for(h=0;h<ofmaps_hight_now;h=h+1) begin
+                for(w=0;w<ofmaps_width_now;w=w+1) begin
+                    status = $fscanf(fd,"%h",mem_pb[ch][h][w]);
+                end
+            end
+        end
+
+`ifdef DEBUG
+        $write("psum_before_bias:\n");
+        for(ch=0;ch<weight_num_now;ch=ch+1) begin
+            for(h=0;h<ofmaps_hight_now;h=h+1) begin
+                for(w=0;w<ofmaps_width_now;w=w+1) begin
+                    $write("%h ",mem_pb[ch][h][w]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+`endif 
+    end
+    endtask
+
+    task read_mem_pa(input [7:0] layer); begin
+        file_dir = {`TESTFILEDIR,"\\psum_after_bias",layer,".txt"};
+        fd = $fopen(file_dir, "r");
+
+        if (!fd) $error("could not read file");
+        for(ch=0;ch<weight_num_now;ch=ch+1) begin
+            for(h=0;h<ofmaps_hight_now;h=h+1) begin
+                for(w=0;w<ofmaps_width_now;w=w+1) begin
+                    status = $fscanf(fd,"%h",mem_pa[ch][h][w]);
+                end
+            end
+        end
+
+`ifdef DEBUG
+        $write("psum_after_bias:\n");
+        for(ch=0;ch<weight_num_now;ch=ch+1) begin
+            for(h=0;h<ofmaps_hight_now;h=h+1) begin
+                for(w=0;w<ofmaps_width_now;w=w+1) begin
+                    $write("%h ",mem_pa[ch][h][w]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+`endif 
+    end
+    endtask
+
+    task read_mem_o(input [7:0] layer); begin
+        file_dir = {`TESTFILEDIR,"\\ofmaps",layer,".txt"};
+        fd = $fopen(file_dir, "r");
+
+        if (!fd) $error("could not read file");
+        for(ch=0;ch<weight_num_now;ch=ch+1) begin
+            for(h=0;h<ofmaps_hight_now;h=h+1) begin
+                for(w=0;w<ofmaps_width_now;w=w+1) begin
+                    status = $fscanf(fd,"%b",mem_o[ch][h][w]);
+                end
+            end
+        end
+
+`ifdef DEBUG
+        $write("ofmaps:\n");
+        for(ch=0;ch<weight_num_now;ch=ch+1) begin
+            for(h=0;h<ofmaps_hight_now;h=h+1) begin
+                for(w=0;w<ofmaps_width_now;w=w+1) begin
+                    $write("%h ",mem_o[ch][h][w]);
+                end
+                $write("\n");
+            end
+            $write("\n");
+        end
+`endif 
+    end
+    endtask
 endmodule

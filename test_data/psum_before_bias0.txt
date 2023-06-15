@@ -1,0 +1,70 @@
+fffffff0 1a fffffff4 8 4 6 
+10 8 ffffffee ffffffe8 fffffff6 6 
+18 a fffffffa fffffff4 2 c 
+2a 6 fffffffe fffffff0 fffffff8 fffffff8 
+fffffffc e e 8 0 fffffff4 
+fffffffc fffffff2 fffffff6 2 4 4 
+
+fffffff4 fffffff2 fffffffc 0 14 a 
+c c fffffff6 4 2 1a 
+c 6 ffffffe2 4 ffffffee fffffff4 
+fffffff6 fffffffa 1e 4 ffffffec ffffffec 
+ffffffec fffffffe fffffffe 10 14 fffffff4 
+fffffff8 fffffffa 16 ffffffee ffffffec 8 
+
+fffffff2 c fffffff6 ffffffea 6 ffffffec 
+ffffffde fffffffe 4 fffffff6 ffffffec fffffffc 
+fffffff2 fffffff8 ffffffe0 fffffffa ffffffe8 16 
+4 fffffff4 fffffff8 e 2 fffffffe 
+12 0 fffffffc fffffff2 2 e 
+fffffff6 fffffffc 10 14 fffffff2 22 
+
+fffffffe 8 fffffffe a 2 14 
+6 ffffffee 4 e 20 14 
+6 c 0 16 1c fffffff6 
+0 fffffff4 ffffffec fffffff6 2 fffffff6 
+1a ffffffec 4 16 fffffffa ffffffee 
+e fffffff8 4 8 ffffffee fffffff6 
+
+6 ffffffe8 fffffffe 26 6 fffffffc 
+6 16 fffffffc ffffffe6 fffffff4 ffffffec 
+ffffffea 0 0 2 fffffff4 a 
+0 1c fffffff0 fffffff2 ffffffee fffffffa 
+ffffffea ffffffec 10 ffffffee fffffff2 6 
+6 fffffffc 0 fffffff8 ffffffee 12 
+
+2 14 a a fffffffe fffffffc 
+fffffff6 a 10 e fffffffc 18 
+fffffffa fffffff4 fffffff0 ffffffd6 4 a 
+8 8 18 6 ffffffee a 
+e c ffffffcc 6 6 ffffffe6 
+fffffffe 0 fffffff8 fffffff0 ffffffea ffffffea 
+
+4 fffffff6 0 fffffff8 14 fffffff6 
+4 14 ffffffee 1c ffffffde 2 
+ffffffe4 6 2 ffffffec 6 ffffffec 
+12 ffffffe6 fffffff6 fffffff8 ffffffdc 8 
+c fffffff2 ffffffee 0 18 0 
+fffffffc ffffffd2 6 1e 0 fffffff4 
+
+2 fffffff0 fffffffe 16 a ffffffec 
+ffffffee fffffff2 fffffff4 2 fffffffc fffffff8 
+fffffffa 8 1c 2 0 fffffff6 
+ffffffec 4 0 6 2 2 
+6 10 fffffff4 ffffffea 2 fffffffa 
+ffffffee fffffffc ffffffe4 ffffffe0 fffffffe 16 
+
+ffffffe6 c fffffffe a 6 4 
+ffffffea 22 8 a fffffff8 10 
+e fffffff0 fffffff4 e 4 ffffffea 
+fffffff8 10 8 e ffffffea 6 
+1a ffffffec 4 fffffff2 ffffffee fffffff2 
+26 ffffffdc 4 8 1a fffffff6 
+
+24 fffffffa 4 10 fffffff4 fffffff6 
+14 c fffffff2 fffffff8 fffffffe fffffff6 
+10 6 6 fffffff4 ffffffea 0 
+1a ffffffde fffffffe fffffff4 10 4 
+8 a 6 fffffff0 1c 4 
+ffffffdc ffffffe2 e 6 fffffffc fffffffc 
+

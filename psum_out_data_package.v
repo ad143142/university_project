@@ -88,8 +88,8 @@
             write_ptr <= 5'd0;
         end
         else begin
-            write_ptr <= in_valid ? write_ptr+5'd1 : 
-                         layer_finish ? 5'd0 : write_ptr;
+            write_ptr <= layer_finish ? 5'd0 :
+                         in_valid     ? write_ptr+5'd1 : write_ptr;
         end
     end
 

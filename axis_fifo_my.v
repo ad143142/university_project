@@ -29,6 +29,7 @@
 		
 		output wire fifo_full,
 		output wire fifo_empty,
+		output reg [bit_num:0] fifo_cnt,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -68,7 +69,6 @@
 	
 	reg [C_S_AXIS_TDATA_WIDTH-1:0] fifo [0:FIFO_SIZE-1];
 
-	reg [bit_num:0] fifo_cnt;
 	reg [bit_num-1:0] fifo_write_ptr;
 	reg [bit_num-1:0] fifo_read_ptr;
 	
