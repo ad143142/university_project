@@ -1,9 +1,9 @@
 //function
 0
 //ifmaps_width
-34
+10
 //ifmaps_hight
-34
+10
 //ifmaps_channel
 128
 //weight_width
@@ -11,6 +11,6 @@
 //weight_hight
 3
 //weight_num
-256
+128
 //stride
 1
