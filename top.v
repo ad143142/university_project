@@ -7,7 +7,7 @@ module top #(
     parameter AXIS_FIFO_SIZE  = 16,
     parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
     parameter integer C_S_AXI_DATA_WIDTH	= 32,
-    parameter integer C_S_AXI_ADDR_WIDTH	= 4,
+    parameter integer C_S_AXI_ADDR_WIDTH	= 5,//FIXME:要注意我將此參數由4改為5
     parameter C_M_AXIS_TDATA_WIDTH = 32,
     parameter M_AXIS_FIFO_DEPTH = 4
 ) 
