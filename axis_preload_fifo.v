@@ -49,7 +49,7 @@ module axis_preload_fifo #(
     wire read_en;
     wire write_ptr_add;
 
-    assign write_ptr_add=((fifo_write_cnt+6)>input_channel_size);
+    assign write_ptr_add=((fifo_write_cnt+6)>=input_channel_size);
     // assign wait_input_from_preload = ~write_ptr_add;
     assign wait_input_from_preload = ~fifo_empty;
     assign ifmaps_out=preload_fifo[fifo_read_ptr];

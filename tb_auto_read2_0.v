@@ -7,7 +7,7 @@
 
 `define TESTFILEDIR    "F:\\vivado_works\\verilog_code\\git_repo\\university_project\\test_data"
 
-// `define DEBUG
+`define DEBUG
 
 module tb_auto_read2_0;
 
@@ -17,11 +17,11 @@ module tb_auto_read2_0;
     `define BIAS ;
     // `define POOL ;
 
-    parameter LAYER_CNT    = 9;
-    parameter IFMAPS_WIDTH = 34;
-    parameter IFMAPS_HIGHT = 34;
+    parameter LAYER_CNT    = 8;
 
     //input the first layer configuration
+    parameter IFMAPS_WIDTH = 256;
+    parameter IFMAPS_HIGHT = 256;
     parameter IFMAPS_CH    = 256;
     parameter WEIGHT_WIDTH = 5;
     parameter WEIGHT_HIGHT = 5;
@@ -228,19 +228,23 @@ end
         #10000;
         $finish;
     end
-`ifdef DEBUG
+
     always @(*) begin
         if(function_now==0) begin
             if(u_top.M_AXIS_TVALID) begin
+`ifdef DEBUG
                 $display("time=%7d  M_AXIS_TDATA = %h = %b, M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",$time,u_top.M_AXIS_TDATA,u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
+`endif
                 for(i=0;i<32;i=i+1) begin
-                    if(u_top.M_AXIS_TDATA[i] != mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now]) begin
-                        $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b",$time,i,u_top.M_AXIS_TDATA[i],mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now]);   
-                        error_flag = 1;
-                        error_cnt = error_cnt+1;
+                    if(ofmaps_validation_cnt < ofmaps_hight_now*ofmaps_width_now*weight_num_now) begin
+                        if(u_top.M_AXIS_TDATA[i] != mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now]) begin
+                            $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b",$time,i,u_top.M_AXIS_TDATA[i],mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now]);   
+                            error_flag = 1;
+                            error_cnt = error_cnt+1;
 
-                        #1000
-                        $stop;
+                            #1000
+                            $stop;
+                        end
                     end
                     ofmaps_validation_cnt=ofmaps_validation_cnt+1;
                 end
@@ -252,7 +256,9 @@ end
     always @(posedge clk) begin
         if(function_now==1) begin
             if(u_top.M_AXIS_TVALID) begin
+`ifdef DEBUG
                 $display("time=%7d  M_AXIS_TDATA = %h = %b, M_AXIS_TVALID = %d , M_AXIS_TLAST = %h",$time,u_top.M_AXIS_TDATA,u_top.M_AXIS_TDATA,u_top.M_AXIS_TVALID,u_top.M_AXIS_TLAST);
+`endif
                 for(i=0;i<32;i=i+1) begin
                     if(u_top.M_AXIS_TDATA[i] != TDATA_ANS[ofmaps_validation_cnt]) begin
                         $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b , at ofmaps[%d][%d][%d]",$time,i,u_top.M_AXIS_TDATA[i],TDATA_ANS[ofmaps_validation_cnt],ofmaps_validation_cnt%ifmaps_ch_now,ofmaps_validation_cnt/(ifmaps_ch_now*ofmaps_width_now),ofmaps_validation_cnt/(ifmaps_ch_now)%ofmaps_width_now);   
@@ -271,7 +277,7 @@ end
             end
         end
     end
-`endif
+
 
     reg yis0_pos_buf=0;
     reg xis0_pos_buf=0;

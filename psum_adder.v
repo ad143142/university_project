@@ -74,6 +74,7 @@ module psum_adder #(
     reg r_pipe8_last;
     reg r_pipe9_last;
     reg r_pipe10_last;
+    reg r_pipe11_last;
 
     reg signed [15:0] bias_fifo [0:7];
     reg [2:0] write_ptr;
@@ -105,7 +106,7 @@ module psum_adder #(
     assign o_data = r_pipe9_data;
     assign address_out = r_pipe9_addr;
     assign o_valid = r_pipe9_valid;
-    assign o_last = r_pipe10_last;
+    assign o_last = r_pipe11_last;
 
 //////////////////////bias_fifo//////////////////////////
 
@@ -545,6 +546,15 @@ module psum_adder #(
         end
         else begin
             r_pipe10_last <= r_pipe9_last;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            r_pipe11_last <= 1'd0;
+        end
+        else begin
+            r_pipe11_last <= r_pipe10_last;
         end
     end
 

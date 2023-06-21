@@ -84,7 +84,7 @@ module weight_bram_control #(
     assign bram_A_wen=(write_state==WVALID1 || write_state==WVALID2);
     assign bram_B_wen=(write_state==WVALID2);
 
-    assign weight_from_bram_valid=(read_state==RS1);
+    assign weight_from_bram_valid=(read_state==RVALID);
     assign weight_out=(port_sel) ? weight_from_bram_B:weight_from_bram_A;
 
     assign bram_address_B = bram_address_A+1;
@@ -116,19 +116,12 @@ module weight_bram_control #(
             read_state<=RIDLE;
         end
         else begin
-            // case (read_state)
-            //     RIDLE:    read_state<=read_FSM_start ? RS0:RIDLE;
-            //     RS0:      read_state<=RS1;
-            //     RS1:      read_state<=RVALID;
-            //     RVALID:   read_state<=(bram_control_add1 || bram_control_add2) ? RS0:
-            //                           (read_FSM_start) ? RS0:RVALID;
-            //     default:  read_state<=RIDLE;         
-            // endcase
             case (read_state)
                 RIDLE:    read_state<=read_FSM_start ? RS0:RIDLE;
                 RS0:      read_state<=RS1;
-                RS1:      read_state<=(bram_control_add1 || bram_control_add2) ? RS0:
-                                      (read_FSM_start) ? RS0:RS1;
+                RS1:      read_state<=RVALID;
+                RVALID:   read_state<=(bram_control_add1 || bram_control_add2) ? RS0:
+                                      (read_FSM_start) ? RS0:RVALID;
                 default:  read_state<=RIDLE;         
             endcase
         end

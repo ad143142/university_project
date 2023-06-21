@@ -58,6 +58,8 @@ module bias_bram_control #(
     reg [2:0] write_state;
     reg [BRAM_ADDRESS_WIDTH-1:0] write_bram_cnt;
 
+    reg layer_finish_buf;
+
     reg bias_valid_buf;
 
     wire bias_valid;
@@ -99,15 +101,13 @@ module bias_bram_control #(
         if(!rst_n) begin
             read_state<=RIDLE;
         end
-        else if(layer_finish) begin
-            read_state<=RIDLE;
-        end
         else begin
             case (read_state)
                 RIDLE:    read_state<=read_FSM_start ? RS0:RIDLE;
                 RS0:      read_state<=RS1;
                 RS1:      read_state<=RVALID;
-                RVALID:   read_state<=(bram_control_add || read_FSM_start) ? RS0:RVALID;
+                RVALID:   read_state<=(layer_finish_buf) ? RIDLE :
+                                      (bram_control_add || read_FSM_start) ? RS0 : RVALID;
                 
                 default:  read_state<=RIDLE;         
             endcase
@@ -129,6 +129,16 @@ module bias_bram_control #(
                 WVALID1     : write_state <= (!write_en) ? WIDLE:(write_bias_finish ? WIDLE:WWAITWEIGHT);
                 default     : write_state <= WIDLE;         
             endcase
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            layer_finish_buf <= 1'd0;
+        end
+        else begin
+            layer_finish_buf<= (layer_finish) ? 1'd1 :
+                               (read_state == RIDLE) ? 1'd0 : layer_finish_buf;
         end
     end
 

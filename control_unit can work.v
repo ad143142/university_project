@@ -17,8 +17,8 @@ module control_unit #(
     output reg [MAC_NUM-1:0] MAC_enable,
     output wire [1:0]operation,
     output wire [4:0]kernel_size,
-    output reg load_weight_preload,
-    output reg load_weight,
+    output wire load_weight_preload,
+    output wire load_weight,
     output wire pooling_compute,
     output wire [2:0]stride,
         //ifmaps_preload
@@ -237,58 +237,23 @@ module control_unit #(
     /////////////////////////////////////////////////
 
     //有去read bram的要等weight_from_bram_valid 其餘不用
-    //FIXME:
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            load_weight_preload<=1'd0;
-        end
-        else begin
-            load_weight_preload<=((weight_from_bram_valid) & 
-                                  (load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K3_0 || 
-                                   load_weight_state==K3_2 || load_weight_state==K4_0 || load_weight_state==K4_2 ||
-                                   load_weight_state==K5_0 || load_weight_state==K5_2 || load_weight_state==K5_4 )) 
-                               || (load_weight_state==K2_1 || load_weight_state==K3_1 || load_weight_state==K4_1 || 
-                                   load_weight_state==K4_3 || load_weight_state==K5_1 || load_weight_state==K5_3);
-            
-        end
-    end
-    // assign load_weight_preload=((weight_from_bram_valid) & 
-    //                            (load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K3_0 || 
-    //                             load_weight_state==K3_2 || load_weight_state==K4_0 || load_weight_state==K4_2 ||
-    //                             load_weight_state==K5_0 || load_weight_state==K5_2 || load_weight_state==K5_4 )) 
-    //                         || (load_weight_state==K2_1 || load_weight_state==K3_1 || load_weight_state==K4_1 || 
-    //                             load_weight_state==K4_3 || load_weight_state==K5_1 || load_weight_state==K5_3);
-    //FIXME:
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            load_weight<=1'd0;
-        end
-        else begin
-            load_weight<=(load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT ||
-                          load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
-            
-        end
-    end
-    // assign load_weight=(load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT ||
-    //                     load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
+    assign load_weight_preload=((weight_from_bram_valid) & 
+                               (load_weight_state==K1_0 || load_weight_state==K2_0 || load_weight_state==K3_0 || 
+                                load_weight_state==K3_2 || load_weight_state==K4_0 || load_weight_state==K4_2 ||
+                                load_weight_state==K5_0 || load_weight_state==K5_2 || load_weight_state==K5_4 )) 
+                            || (load_weight_state==K2_1 || load_weight_state==K3_1 || load_weight_state==K4_1 || 
+                                load_weight_state==K4_3 || load_weight_state==K5_1 || load_weight_state==K5_3);
+
+    assign load_weight=(load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K2_LOAD_WEIGHT ||
+                        load_weight_state==K3_LOAD_WEIGHT || load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT);
 
     // assign weight_bram_control_add1=weight_from_bram_valid && (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT || (load_weight_state==K3_2 && weight_from_bram_valid) || load_weight_state==K5_4);   
     assign weight_bram_control_add1=weight_from_bram_valid && (load_weight_state==K1_LOAD_WEIGHT || load_weight_state==K5_LOAD_WEIGHT || load_weight_state==K3_2 || load_weight_state==K5_4);   
-    assign weight_bram_control_add2=weight_from_bram_valid && (load_weight_state==K2_1 || load_weight_state==K3_0 || load_weight_state==K4_0 || 
+    assign weight_bram_control_add2=weight_from_bram_valid && (load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_1 || load_weight_state==K4_0 || 
                                                                load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_0 || load_weight_state==K5_2);
-    //FIXME:
-    // always @(posedge clk or negedge rst_n) begin
-    //     if(!rst_n) begin
-    //         weight_bram_port_sel<=1'd0;
-    //     end
-    //     else begin
-    //         weight_bram_port_sel<=(load_weight_state==K2_1 || load_weight_state==K3_1 || load_weight_state==K4_1 || load_weight_state==K4_3 || load_weight_state==K5_2 ||
-    //                                load_weight_state==K5_4);
-            
-    //     end
-    // end
-    assign weight_bram_port_sel=(load_weight_state==K2_LOAD_WEIGHT || load_weight_state==K3_2 || load_weight_state==K4_2 || load_weight_state==K4_LOAD_WEIGHT || load_weight_state==K5_2 ||
-                                 load_weight_state==K5_4);
+
+    assign weight_bram_port_sel=(load_weight_state==K2_1 || load_weight_state==K3_1 || load_weight_state==K4_1 || load_weight_state==K4_3 || load_weight_state==K5_1 ||
+                                 load_weight_state==K5_3);
 
     assign load_weight_FSM_start=(load_ifmaps_state==COMPUTE);
 
@@ -433,8 +398,8 @@ module control_unit #(
                 case (load_bias_state)
                     LB_IDLE        :load_bias_state <= ((load_bias_FSM_start & (~last_weight)) ? LB_RESET_ADDR:LB_IDLE);
                     LB_RESET_ADDR  :load_bias_state <= LB_WAIT;
-                    LB_WAIT        :load_bias_state <= load_weight ? LB_ADD  :
-                                                       last_weight ? LB_IDLE : LB_WAIT; 
+                    LB_WAIT        :load_bias_state <= last_weight ? LB_IDLE : 
+                                                       load_weight ? LB_ADD  : LB_WAIT; 
                     LB_ADD         :load_bias_state <= LB_WAIT;
                 endcase
             end
