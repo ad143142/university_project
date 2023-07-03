@@ -12,14 +12,11 @@
 module tb_auto_read2_0;
 
     //setting//
-    // parameter FUNC = 1;
-    `define CONV ;
-    `define BIAS ;
-    // `define POOL ;
-
     parameter LAYER_CNT    = 8;
 
-    //input the first layer configuration
+
+    
+    //register size parameter 
     parameter IFMAPS_WIDTH = 256;
     parameter IFMAPS_HIGHT = 256;
     parameter IFMAPS_CH    = 256;
@@ -30,15 +27,7 @@ module tb_auto_read2_0;
 
     parameter OFMAPS_WIDTH = IFMAPS_WIDTH;
     parameter OFMAPS_HIGHT = IFMAPS_HIGHT;
-    //////dont touch/////
-// `ifdef CONV
-//     parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH - WEIGHT_WIDTH) / STRIDE + 1);
-//     parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT - WEIGHT_HIGHT) / STRIDE + 1);
-// `elsif POOL
-//     parameter OFMAPS_WIDTH = ((IFMAPS_WIDTH) / WEIGHT_WIDTH);
-//     parameter OFMAPS_HIGHT = ((IFMAPS_HIGHT) / WEIGHT_HIGHT);
-// `endif
-
+    
     // top Parameters
     parameter PERIOD                     = 20 ;
     parameter MAC_NUM                    = 256;
@@ -53,13 +42,17 @@ module tb_auto_read2_0;
     parameter C_S_AXI_ADDR_WIDTH         = 5  ;
     parameter C_M_AXIS_TDATA_WIDTH       = 32 ;
 
+    integer w,z,x,y,i,n,ch,h; //loop variable
 
-    integer w,z,x,y;//for load mem
+    //validattion counter 
     integer ofmaps_validation_cnt=0;
     integer psum_validation_cnt=0;
-    integer i;
+
+    //error flag and count 
+    //when the error is detected the flag become 1 and stop the simulation 
     integer error_flag=0;
     integer error_cnt=0;
+
     // top Inputs
     reg   clk                                  = 0 ;
     reg   rst_n                                = 0 ;
@@ -79,6 +72,8 @@ module tb_auto_read2_0;
     reg   S_AXI_ARVALID                        = 0 ;
     reg   S_AXI_RREADY                         = 0 ;
     
+
+    //watch reg for knowing the function is been called
     reg   watch_set_kernel_size=0;
     reg   watch_set_ofmaps_channel_and_input_channel=0;
     reg   watch_set_function_and_ofmaps_width=0;
@@ -87,6 +82,8 @@ module tb_auto_read2_0;
     reg   watch_write_bias_start=0;
     reg   watch_read_AXI=0;
     reg   watch_read_FSM=0;
+
+
     // top Outputs
     wire  S_AXIS_TREADY                        ;
     wire  [1279:0]  psum_out                   ;
@@ -106,23 +103,18 @@ module tb_auto_read2_0;
     wire						          M_AXIS_TLAST;
     wire [(C_M_AXIS_TDATA_WIDTH/8)-1 : 0] M_AXIS_TSTRB ; 
 
-    reg [0:0] mem_i [0:IFMAPS_CH-1][0:IFMAPS_HIGHT-1][0:IFMAPS_WIDTH-1];
-`ifdef CONV
-    reg [0:0] mem_w [0:WEIGHT_NUM-1][0:IFMAPS_CH-1][0:WEIGHT_HIGHT-1][0:WEIGHT_WIDTH-1];
-    reg [15:0] mem_b [0:WEIGHT_NUM-1];
-    reg signed [31:0] mem_pb [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
-    reg signed [31:0] mem_pa [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
-    reg [0:0] mem_o [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
-    reg [OFMAPS_WIDTH*OFMAPS_HIGHT*WEIGHT_NUM+32:0] TDATA_ANS = 0;
-`endif
-`ifdef POOL
-    reg [0:0] mem_o [0:IFMAPS_CH-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];
-    reg [OFMAPS_WIDTH*OFMAPS_HIGHT*IFMAPS_CH*((IFMAPS_CH+31)/32)+32:0] TDATA_ANS = 0;
-    integer TDATA_NEED_OUT_TIMES = (IFMAPS_CH+31)/32; 
-    integer TDATA_NEED_OUT_CNT = 0; 
-`endif
-    reg [31:0] TDATA_buf;
+    //memory for validation 
+    //in board only need implement ifmaps weight bias memory
+    reg [0:0] mem_i [0:IFMAPS_CH-1][0:IFMAPS_HIGHT-1][0:IFMAPS_WIDTH-1];                //ifmaps
+    reg [0:0] mem_w [0:WEIGHT_NUM-1][0:IFMAPS_CH-1][0:WEIGHT_HIGHT-1][0:WEIGHT_WIDTH-1];//weight
+    reg [15:0] mem_b [0:WEIGHT_NUM-1];                                                  //bias
+    reg signed [31:0] mem_pb [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];      //psum before bias
+    reg signed [31:0] mem_pa [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];      //psum after bias
+    reg [0:0] mem_o [0:WEIGHT_NUM-1][0:OFMAPS_HIGHT-1][0:OFMAPS_WIDTH-1];               //ofmaps
+    reg [OFMAPS_WIDTH*OFMAPS_HIGHT*WEIGHT_NUM+32:0] TDATA_ANS = 0;                      //ANS register from ofmaps
+    reg [31:0] TDATA_buf;                                                               //ANS register from AXIS
 
+    //present layer setting from setting.txt 
     integer function_now;
     integer ifmaps_width_now; 
     integer ifmaps_hight_now; 
@@ -135,11 +127,12 @@ module tb_auto_read2_0;
     integer stride_now;
     integer layer;
 
+    //file reading variable
     integer status, fd;
-    integer n,ch,h;
     reg [256*8-1:0] file_dir;
     reg [256*8-1:0] comment;
 
+    //psum output from PL
     assign psum_out = u_top.u_data_path.u_psum_adder.o_data;
 
     initial
@@ -147,7 +140,13 @@ module tb_auto_read2_0;
         forever #(PERIOD/2)  clk=~clk;
     end
 
-    integer debug_flag=0;
+    //repeat LAYER_CNT times.
+    //first, read memory from file then prepare the AXIS_TDATA answer.
+    //second, setting PL configuration
+    //third, input weight if in convolution
+    //fourth, input bias if in convolution
+    //fifth, input ifmaps
+    //sixth, wait the AXI signal 
     initial
     begin
     for(layer=0;layer<LAYER_CNT;layer=layer+1) begin
@@ -155,39 +154,40 @@ module tb_auto_read2_0;
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
         load_mem_from_file(layer+48);
-        read_FSM();
+        read_FSM();//just a test
 
         ////////////////////////////////////////////////////////
 
+        //setting
         set_kernel_size(weight_width_now);
 if(function_now==1) begin
         set_ofmaps_channel_and_input_channel(0,ifmaps_ch_now);
         set_stride_function_ofmaps_width(stride_now,2'd1,ofmaps_width_now);
-
 end
 else if (function_now==0) begin
         set_ofmaps_channel_and_input_channel(weight_num_now,ifmaps_ch_now);
         set_stride_function_ofmaps_width(stride_now,2'd0,ofmaps_width_now);
 end
         
-        debug_flag=1;
+        //write weight
         #(PERIOD*5);
 if(function_now==0) begin
         write_weight_start();
         write_weight();
 
-        while(S_AXI_RDATA!=32'd1)begin
+        while(S_AXI_RDATA!=32'd1)begin//wait ack
             read_AXI(3);
         end
         $display("write weight success");
 
         read_FSM();
 
+        //write bias
         #(PERIOD*5);
         write_bias_start();
         write_bias();
 
-        while(S_AXI_RDATA!=32'd2)begin
+        while(S_AXI_RDATA!=32'd2)begin//wait ack
             read_AXI(3);
         end
         $display("write bias success");
@@ -200,14 +200,15 @@ end
         compute_start();
         #(PERIOD*2);
 
+        //wtite ifmaps 
         @(posedge clk);
         write_ifmaps();
-        while(S_AXI_RDATA!=32'hFFFFFFFF)begin
+        while(S_AXI_RDATA!=32'hFFFFFFFF)begin//wait ack
             read_AXI(3);
             #(PERIOD*100);
         end
-        debug_flag=0;
         read_FSM();
+
         if(error_flag == 0) begin
             $display("/////////////////////////////////////////////////////////////////////////////////");
             $display("//                                                                             //");
@@ -229,6 +230,7 @@ end
         $finish;
     end
 
+    //compare the answer from AXIS for convolution 
     always @(*) begin
         if(function_now==0) begin
             if(u_top.M_AXIS_TVALID) begin
@@ -252,7 +254,7 @@ end
         end
     end
 
-    integer stop_flag=0;
+    //compare the answer from AXIS for pooling
     always @(posedge clk) begin
         if(function_now==1) begin
             if(u_top.M_AXIS_TVALID) begin
@@ -263,12 +265,8 @@ end
                     if(u_top.M_AXIS_TDATA[i] != TDATA_ANS[ofmaps_validation_cnt]) begin
                         $display("time=%7d  out:M_AXIS_TDATA[%d] = %b , expect: %b , at ofmaps[%d][%d][%d]",$time,i,u_top.M_AXIS_TDATA[i],TDATA_ANS[ofmaps_validation_cnt],ofmaps_validation_cnt%ifmaps_ch_now,ofmaps_validation_cnt/(ifmaps_ch_now*ofmaps_width_now),ofmaps_validation_cnt/(ifmaps_ch_now)%ofmaps_width_now);   
                         error_flag = 1;
-                        `ifdef DEBUG
-                            if(stop_flag==0) begin
-                                // $stop;
-                                stop_flag=1;
-                            end
-                        `endif 
+                        error_cnt = error_cnt+1;
+
                         #1000
                         $stop;
                     end
@@ -278,7 +276,7 @@ end
         end
     end
 
-
+    //write the progress
     reg yis0_pos_buf=0;
     reg xis0_pos_buf=0;
     always @(posedge clk) begin
@@ -297,15 +295,18 @@ end
             end
         end
     end
-// `ifdef DEBUG
-//     always @(*) begin
-//         if(function_now==0) begin
-//             if(u_top.u_data_path.u_psum_adder.o_valid) begin
-//                 $display("time=%7d  psum_binarization_valid = %d , address_out = %h , psum_binarization_data = %h",$time,u_top.u_data_path.u_psum_adder.o_valid,u_top.u_data_path.u_psum_adder.address_out,u_top.u_data_path.u_psum_adder.o_data);
-//             end
-//         end
-//     end
-// `endif
+
+    //validate the psum after bias and binatization
+
+    // `ifdef DEBUG
+    //     always @(*) begin
+    //         if(function_now==0) begin
+    //             if(u_top.u_data_path.u_psum_adder.o_valid) begin
+    //                 $display("time=%7d  psum_binarization_valid = %d , address_out = %h , psum_binarization_data = %h",$time,u_top.u_data_path.u_psum_adder.o_valid,u_top.u_data_path.u_psum_adder.address_out,u_top.u_data_path.u_psum_adder.o_data);
+    //             end
+    //         end
+    //     end
+    // `endif
 
     // always @(*) begin
     //     if(u_top.u_data_path.u_psum_adder.r_pipe9_valid) begin
@@ -318,7 +319,6 @@ end
     //         end
     //         psum_validation_cnt=psum_validation_cnt+1;
     //     end
-
     // end
 
     top #(
@@ -616,7 +616,9 @@ end
     endtask
 
     task load_mem_from_file(input [7:0] layer);begin
-        update_setting(layer);
+        update_setting(layer); 
+
+        //this if is for sigal layer without file index  
         if(layer == "") begin
             $readmemb($sformatf("%s/ifmaps.txt",`TESTFILEDIR),mem_i);
             if(function_now == 0) begin
@@ -638,99 +640,28 @@ end
             read_mem_o(layer);
         end
 
-// `ifdef DEBUG
-//         $write("ifmaps:\n");
-//         for(z=0;z<IFMAPS_CH;z=z+1) begin
-//             for(x=0;x<IFMAPS_HIGHT;x=x+1) begin
-//                 for(y=0;y<IFMAPS_WIDTH;y=y+1) begin
-//                     $write("%h ",mem_i[z][x][y]);
-//                 end
-//                 $write("\n");
-//             end
-//             $write("\n");
-//         end
-//     `ifdef CONV
-//         $write("weight:\n");
-//         for(w=0;w<WEIGHT_NUM;w=w+1) begin
-//             for(z=0;z<IFMAPS_CH;z=z+1) begin
-//                 for(x=0;x<WEIGHT_HIGHT;x=x+1) begin
-//                     for(y=0;y<WEIGHT_WIDTH;y=y+1) begin
-//                         $write("%h ",mem_w[w][z][x][y]);
-//                     end
-//                     $write("\n");
-//                 end
-//                 $write("\n");
-//             end
-//             $write("\n");
-//         end
 
-//         $write("bias:\n");
-//         for(y=0;y<WEIGHT_NUM;y=y+1) begin
-//             $write("%h ",mem_b[y]);
-//         end
-//         $write("\n");
-
-//         $write("psum_before_bias:\n");
-//         for(z=0;z<WEIGHT_NUM;z=z+1) begin
-//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-//                     $write("%h ",mem_pb[z][x][y]);
-//                 end
-//                 $write("\n");
-//             end
-//             $write("\n");
-//         end
-
-//         $write("psum_after_bias:\n");
-//         for(z=0;z<WEIGHT_NUM;z=z+1) begin
-//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-//                     $write("%h ",mem_pa[z][x][y]);
-//                 end
-//                 $write("\n");
-//             end
-//             $write("\n");
-//         end
-
-//         $write("ofmaps:\n");
-//         for(z=0;z<WEIGHT_NUM;z=z+1) begin
-//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-//                     $write("%h ",mem_o[z][x][y]);
-//                 end
-//                 $write("\n");
-//             end
-//             $write("\n");
-//         end
-//     `endif
-//     `ifdef POOL
-//         $write("ofmaps:\n");
-//         for(z=0;z<IFMAPS_CH;z=z+1) begin
-//             for(x=0;x<OFMAPS_HIGHT;x=x+1) begin
-//                 for(y=0;y<OFMAPS_WIDTH;y=y+1) begin
-//                     $write("%h ",mem_o[z][x][y]);
-//                 end
-//                 $write("\n");
-//             end
-//             $write("\n");
-//         end
-//     `endif
-// 
-// `endif
+        //build the answer table
         if(function_now==0) begin
+`ifdef DEBUG
             $write("M_AXIS_ANS:\n");
+`endif 
             for(ofmaps_validation_cnt = 0 ; ofmaps_validation_cnt < ofmaps_hight_now*ofmaps_width_now*weight_num_now;ofmaps_validation_cnt=ofmaps_validation_cnt+1) begin
                 TDATA_ANS[ofmaps_validation_cnt] = mem_o[ofmaps_validation_cnt%weight_num_now][ofmaps_validation_cnt/(weight_num_now*ofmaps_width_now)][(ofmaps_validation_cnt/weight_num_now)%ofmaps_width_now];
             end
             ofmaps_validation_cnt = 0 ;
             for(x=0;(x * 32) < ofmaps_hight_now*ofmaps_width_now*weight_num_now;x=x+1) begin
+`ifdef DEBUG
                 $write("%h\n",TDATA_ANS[x*32 +: 32]);
+`endif 
             end
 
             $display("load test data finish");
         end
         else if(function_now==1) begin
+`ifdef DEBUG
             $write("M_AXIS_ANS:\n");
+`endif 
             ofmaps_validation_cnt=0;
             for(y=0;y<ofmaps_hight_now*ofmaps_width_now;y=y+1) begin
                 for(x=0;x<((ifmaps_ch_now+31)/32)*32;x=x+1) begin
@@ -744,14 +675,16 @@ end
 
                     if(x%32 == 31)begin
                         TDATA_ANS[(y*((ifmaps_ch_now+31)/32)+(x/32))*32 +: 32] = TDATA_buf;
+`ifdef DEBUG
                         $write("%h\n",TDATA_buf);
+`endif 
                     end
                 end
             end
             ofmaps_validation_cnt=0;
             $display("load test data finish");
         end
-            
+    
 
     end
     endtask
@@ -773,20 +706,6 @@ end
                         else begin
                             write_weight_reg[w]=mem_w[x][((w / 5) + z)][(w%5)][y];
                         end
-
-
-                        // if(((w / 5) + z)<IFMAPS_CH) begin
-                        //     if((w%5)>=WEIGHT_HIGHT) begin
-                        //         write_weight_reg[w]=1'd0;
-                        //     end
-                        //     else begin
-                        //         write_weight_reg[w]=mem_w[x][((w / 5) + z)][(w%5)][y];
-                        //     end
-                        // end
-                        // else begin
-                        //     write_weight_reg[w]=1'd0;
-                        // end
-                        
                     end
     `ifdef DEBUG
                     $display("number %3d weight = %h     %b_%b_%b_%b_%b_%b_%b",x,write_weight_reg,write_weight_reg[31:30],write_weight_reg[29:25],write_weight_reg[24:20],write_weight_reg[19:15],write_weight_reg[14:10],write_weight_reg[9:5],write_weight_reg[4:0]);
@@ -819,6 +738,7 @@ end
 
     reg[31:0] write_ifmaps_reg;
     task write_ifmaps(); begin
+        //for pooling
         if(function_now==1) begin
             $display("write ifmaps start");
             for(x=0;x<ifmaps_hight_now;x=x+stride_now) begin
@@ -847,7 +767,7 @@ end
             end
             $display("write ifmaps finish");
         end
-        
+        //for convolution
         else if(function_now==0) begin
             $display("write ifmaps start");
             for(x=0;x<ofmaps_hight_now;x=x+stride_now) begin

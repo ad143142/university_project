@@ -1,14 +1,15 @@
 大致流程：
     1.先設定系統參數，如ifmaps大小channel、weight大小channel、function等
     2.以S_AXIS輸入weight
-    3.以S_AXIS輸入ifmaps
-    4.等待M_AXIS輸出ofmaps
+    3.以S_AXIS輸入bias
+    4.以S_AXIS輸入ifmaps
+    5.等待M_AXIS輸出ofmaps
 
 注意事項M_AXIS的輸入皆以5bit對齊M_AXIS_TDATA = {2'd0,data5[4:0],data4[4:0],data3[4:0],data2[4:0],data1[4:0],data0[4:0]}
 
 系統參數設定即流程細節：請配合總波型.png
     AXI為設定參數用，以及CPU輪巡是否完成用。
-    接下來先設定kernel size, ofmaps channel input channel, function ofmaps_width(不須照順序)，後輸入write weight start(會在AXI_reg0寫入指令，可參考control unit第1,2行之define)，之後開始輸入weight，輸入完後tb會一直輪巡AXI_reg3是否有32'd1(亦即電路會在寫完weight後會在AXI_reg3寫入1)，檢查到32'd1後給入compute指令開始輸入ifmaps(會在AXI_reg0寫入指令，可參考control unit第1,2行之define)，輸入完ifmaps後會開始輪巡AXI_reg3是否有32'hffffffff(亦即電路會在寫完weight後會在AXI_reg3寫入32'hffffffff)，檢查到後電路即結束。
+    接下來先設定kernel size, ofmaps channel input channel, function ofmaps_width(不須照順序)，後輸入write weight start(會在AXI_reg0寫入指令，可參考control unit開頭之define)，之後開始輸入weight，輸入完後tb會一直輪巡AXI_reg3是否有32'd1(亦即電路會在寫完weight後會在AXI_reg3寫入1)，後輸入write bias start(會在AXI_reg0寫入指令，可參考control unit開頭之define)，之後開始輸入bias，輸入完後tb會一直輪巡AXI_reg3是否有32'd2(亦即電路會在寫完weight後會在AXI_reg3寫入2)，檢查到32'd2後給入compute指令開始輸入ifmaps(會在AXI_reg0寫入指令，可參考control unit第1,2行之define)，輸入完ifmaps後會開始輪巡AXI_reg3是否有32'hffffffff(亦即電路會在寫完weight後會在AXI_reg3寫入32'hffffffff)，檢查到後電路即結束。
 
 
 weight輸入方法：請配合ifmaps weight txt.png,load weight.png
@@ -23,6 +24,10 @@ weight輸入方法：請配合ifmaps weight txt.png,load weight.png
         第六次{27'd0,{2'd0,3'b101}} = 32'h00000005
         完成一個weight的輸入
     故在波型上第一次輸入為32'h08228000第二次為32'h00000007以此類推
+
+bias輸入方法：請配合bias.png
+    bias一次輸入一個bias如txt檔所示，且有正負號共16bit，因此第一筆資料為{16'd0,16'h0001}，第二筆為{16'd0,16'hffff}，
+    第三筆為{16'd0,16'hfffe}，以此類推
 
 ifmaps輸入方法：請配合ifmaps weight txt.png,load ifmaps.png
     和輸入weight同理因此
