@@ -14,7 +14,8 @@
 		// Total number of input data.
 		parameter FIFO_SIZE  = 16,
 		// bit_num gives the minimum number of bits needed to address 'FIFO_SIZE' size of FIFO.
-		parameter bit_num  = clogb2(FIFO_SIZE-1)
+		parameter bit_num  = 4
+		// parameter bit_num  = clogb2(FIFO_SIZE-1)
 		// Define the states of state machine
 		// The control state machine oversees the writing of input streaming data to the FIFO,
 		// and outputs the streaming data from the FIFO

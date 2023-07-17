@@ -2,7 +2,8 @@ module axis_preload_fifo #(
     parameter integer C_S_AXIS_TDATA_WIDTH	= 32,
     parameter integer MAC_NUM = 256,
     parameter integer AXIS_PRELOAD_FIFO_DEPTH = 4,
-    parameter integer bit_num  = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1)
+    parameter integer bit_num  = 2
+    // parameter integer bit_num  = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1)
 //    parameter bit_num  = 2
 )
 (

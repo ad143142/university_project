@@ -2,7 +2,8 @@ module bias_bram_control #(
     parameter integer BRAM_DATA_WIDTH = 32,
     parameter integer BRAM_ADDRESS_WIDTH = 9,
     parameter AXIS_FIFO_SIZE  = 16,
-    parameter bit_num  = clogb2(AXIS_FIFO_SIZE-1)
+    parameter bit_num  = 4
+    // parameter bit_num  = clogb2(AXIS_FIFO_SIZE-1)
 )
 (
     //golbal
@@ -78,7 +79,7 @@ module bias_bram_control #(
     assign bias_valid=(read_state==RVALID);
     assign bias_out = bias_from_bram_A;
 
-    assign write_bias_finish=(((write_bram_cnt+1)>=output_channel_size) && (output_channel_size != 12'd0));
+    assign write_bias_finish=(((write_bram_cnt)>=output_channel_size) && (output_channel_size != 12'd0));
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -117,20 +118,39 @@ module bias_bram_control #(
     //write FSM
     wire write_FSM_start;
     assign write_FSM_start=(transfer_start && (write_en));
+    // always @(posedge clk or negedge rst_n) begin
+    //     if(!rst_n) begin
+    //         write_state<=WIDLE;
+    //     end
+    //     else begin
+    //         case (write_state)
+    //             WIDLE       : write_state <= write_FSM_start ? WWAITWEIGHT :WIDLE;
+    //             WWAITWEIGHT : write_state <= (wait_input_from_axis) ? WS0:WWAITWEIGHT;
+    //             WS0         : write_state <= (!write_en) ? WIDLE:WVALID1;                                   
+    //             WVALID1     : write_state <= (!write_en) ? WIDLE:(write_bias_finish ? WIDLE:WWAITWEIGHT);
+    //             default     : write_state <= WIDLE;         
+    //         endcase
+    //     end
+    // end
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             write_state<=WIDLE;
+        end
+        else if (write_bias_finish) begin
+            write_state <= WIDLE;
         end
         else begin
             case (write_state)
                 WIDLE       : write_state <= write_FSM_start ? WWAITWEIGHT :WIDLE;
                 WWAITWEIGHT : write_state <= (wait_input_from_axis) ? WS0:WWAITWEIGHT;
                 WS0         : write_state <= (!write_en) ? WIDLE:WVALID1;                                   
-                WVALID1     : write_state <= (!write_en) ? WIDLE:(write_bias_finish ? WIDLE:WWAITWEIGHT);
+                WVALID1     : write_state <= (!write_en) ? WIDLE:WWAITWEIGHT;
                 default     : write_state <= WIDLE;         
             endcase
         end
     end
+
+    
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -156,7 +176,7 @@ module bias_bram_control #(
             write_bram_cnt<=0;
         end
         else begin
-            write_bram_cnt <= (write_state==WIDLE)   ? 0:
+            write_bram_cnt <= (write_state==WIDLE || write_bias_finish)   ? 0:
                               (write_state==WVALID1) ? write_bram_cnt+1:write_bram_cnt;
         end
         

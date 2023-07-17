@@ -154,7 +154,7 @@ module tb_auto_read2_0;
         #(PERIOD*2) rst_n  =  1;
         #(PERIOD*5);
         load_mem_from_file(layer+48);
-        read_FSM();//just a test
+        // read_FSM();//just a test
 
         ////////////////////////////////////////////////////////
 
@@ -173,6 +173,8 @@ end
         #(PERIOD*5);
 if(function_now==0) begin
         write_weight_start();
+        // read_FSM();//just a test
+        // $stop;
         write_weight();
 
         while(S_AXI_RDATA!=32'd1)begin//wait ack
@@ -445,7 +447,15 @@ end
 
         wait(S_AXI_ARREADY==1'b1) begin
             wait(S_AXI_RVALID) begin
-                $display("control_load_weight_state = %d\ncontrol_load_ifmaps_state = %d\ncontrol_write_weight_state = %d\nbram_control_read_state = %d\nbram_control_write_state = %d",S_AXI_RDATA[4:0],S_AXI_RDATA[9:5],S_AXI_RDATA[12:10],S_AXI_RDATA[14:13],S_AXI_RDATA[17:15]);
+                $display("control_load_weight_state = %d\n",S_AXI_RDATA[4:0],
+                          "control_load_ifmaps_state = %d\n",S_AXI_RDATA[9:5],
+                          "control_write_weight_state = %d\n",S_AXI_RDATA[12:10],
+                          "control_write_bias_state = %d\n",S_AXI_RDATA[15:13],
+                          "control_load_bias_state = %d\n",S_AXI_RDATA[18:16],
+                          "weight_bram_read_state = %d\n",S_AXI_RDATA[20:19],
+                          "weight_bram_write_state = %d\n",S_AXI_RDATA[23:21],
+                          "bias_bram_read_state = %d\n",S_AXI_RDATA[25:24],
+                          "bias_bram_write_state = %d\n",S_AXI_RDATA[28:26]);
 
                 S_AXI_ARVALID=1'b0;
                 S_AXI_RREADY=1'b1;
@@ -708,7 +718,7 @@ end
                         end
                     end
     `ifdef DEBUG
-                    $display("number %3d weight = %h     %b_%b_%b_%b_%b_%b_%b",x,write_weight_reg,write_weight_reg[31:30],write_weight_reg[29:25],write_weight_reg[24:20],write_weight_reg[19:15],write_weight_reg[14:10],write_weight_reg[9:5],write_weight_reg[4:0]);
+                    $display("number %3d weight = %h(h) = %d(d) = %b_%b_%b_%b_%b_%b_%b",x,write_weight_reg,write_weight_reg,write_weight_reg[31:30],write_weight_reg[29:25],write_weight_reg[24:20],write_weight_reg[19:15],write_weight_reg[14:10],write_weight_reg[9:5],write_weight_reg[4:0]);
     `endif
                     axis_in(write_weight_reg);
                 end
@@ -756,7 +766,7 @@ end
                             
                         end
 `ifdef DEBUG
-                        $display("x = %3d y = %3d,input = %h    %b_%b_%b_%b_%b_%b_%b",x,y,write_ifmaps_reg,write_ifmaps_reg[31:30],write_ifmaps_reg[29:25],write_ifmaps_reg[24:20],write_ifmaps_reg[19:15],write_ifmaps_reg[14:10],write_ifmaps_reg[9:5],write_ifmaps_reg[4:0]);
+                        $display("x = %3d y = %3d,input = %d(d) = %h(h) = %b_%b_%b_%b_%b_%b_%b",x,y,write_ifmaps_reg,write_ifmaps_reg,write_ifmaps_reg[31:30],write_ifmaps_reg[29:25],write_ifmaps_reg[24:20],write_ifmaps_reg[19:15],write_ifmaps_reg[14:10],write_ifmaps_reg[9:5],write_ifmaps_reg[4:0]);
 `endif
                         axis_in(write_ifmaps_reg);
                     end
@@ -784,7 +794,7 @@ end
                             end
                         end
 `ifdef DEBUG
-                        $display("x = %3d y = %3d,input = %h    %b_%b_%b_%b_%b_%b_%b",x,y,write_ifmaps_reg,write_ifmaps_reg[31:30],write_ifmaps_reg[29:25],write_ifmaps_reg[24:20],write_ifmaps_reg[19:15],write_ifmaps_reg[14:10],write_ifmaps_reg[9:5],write_ifmaps_reg[4:0]);
+                        $display("x = %3d y = %3d,input = %d(d) = %h(h) = %b_%b_%b_%b_%b_%b_%b",x,y,write_ifmaps_reg,write_ifmaps_reg,write_ifmaps_reg[31:30],write_ifmaps_reg[29:25],write_ifmaps_reg[24:20],write_ifmaps_reg[19:15],write_ifmaps_reg[14:10],write_ifmaps_reg[9:5],write_ifmaps_reg[4:0]);
 
 `endif
                         axis_in(write_ifmaps_reg);

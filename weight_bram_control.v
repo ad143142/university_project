@@ -2,7 +2,8 @@ module weight_bram_control #(
     parameter integer MAC_NUM = 256,
     parameter integer BRAM_ADDRESS_WIDTH = 12,
     parameter AXIS_PRELOAD_FIFO_DEPTH  = 4,
-    parameter bit_num  = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1)
+    parameter bit_num  = 2
+    // parameter bit_num  = clogb2(AXIS_PRELOAD_FIFO_DEPTH-1)
 )
 (
     //golbal

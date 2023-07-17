@@ -33,7 +33,8 @@
 	  end                                                                                
 	endfunction  
 	///////////////////localparam////////////////////////
-	localparam FIFO_ADDR_BIT = clogb2(FIFO_DEPTH-1);
+	// localparam FIFO_ADDR_BIT = clogb2(FIFO_DEPTH-1);
+	localparam FIFO_ADDR_BIT = 2;
 
 	///////////////////reg//////////////////////////
 	//MSB is tlast bit
