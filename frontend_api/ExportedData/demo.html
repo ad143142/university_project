@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Univ_Proj</title>
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../assets/css/Footer-Basic-icons.css">
-    <link rel="stylesheet" href="../assets/css/Team-images.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/Footer-Basic-icons.css">
+    <link rel="stylesheet" href="assets/css/Team-images.css">
 </head>
 
 <body>
@@ -20,17 +20,38 @@
                     <li class="nav-item"><a class="nav-link" href="index.html">首頁</a></li>
                     <li class="nav-item"><a class="nav-link active" href="#">DEMO</a></li>
                     <li class="nav-item"><a class="nav-link" href="intro.html">介紹</a></li>
-                </ul><button class="btn btn-primary" type="button">Button</button>
+                </ul><button class="btn btn-primary" type="button">回首頁</button>
             </div>
         </div>
     </nav>
-    <footer class="text-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-2 d-flex justify-content-lg-center"><button class="btn btn-primary" type="button">繪製完成</button></div>
-                <div class="col-lg-10"><img></div>
+    <div class="container py-4 py-xl-5">
+        <div class="row gy-4 gy-md-0">
+            <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
+                <div style="max-width: 350px;">
+                    <h2 class="text-uppercase fw-bold">請於框線內繪圖</h2>
+                    <p class="my-3">請揮灑您的創意，在框框中繪製任何長得像數字的圖案，讓我們的系統猜測您寫的是什麼數字。想要重來，可以按下重繪，繪製完成請案送出。</p><button class="btn btn-primary btn-lg me-2" id="submit-img" type="button">送出</button><button class="btn btn-outline-primary btn-lg" id="btn-clean" type="button">重繪</button>
+                </div>
             </div>
+            <div class="col-md-6" id="canva-container"><canvas id="demoCanvas" style="border: 1px solid; border-radius: 10px"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js" integrity="sha512-CeIsOAsgJnmevfCi2C7Zsyy6bQKi43utIjdA87Q0ZY84oDqnI0uwfM9+bKiIkI75lUeI00WG/+uJzOmuHlesMA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    let parent_element = document.getElementById('canva-container');
+    const canva_width = parent_element.clientWidth;
+    const canva_final_size = Math.min(canva_width - 20, window.innerHeight - 100);
+    const myCanvas = new fabric.Canvas("demoCanvas", {
+      width: canva_final_size ,
+      height: canva_final_size ,
+      backgroundColor: "white",
+      isDrawingMode: true,
+    });
+    
+    if(myCanvas.freeDrawingBrush){
+        myCanvas.freeDrawingBrush.width = canva_final_size / 28;
+    }
+</script></div>
         </div>
+    </div>
+    <footer class="text-center">
         <div class="container text-muted py-4 py-lg-5">
             <ul class="list-inline">
                 <li class="list-inline-item me-4"><a class="link-secondary" href="#">簡應謙</a></li>
@@ -51,9 +72,9 @@
             <p class="mb-0">Copyright © 2023 Brand</p>
         </div>
     </footer>
-    <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="../assets/js/bs-init.js"></script>
-    <script src="../assets/js/canva.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="assets/js/canva.js"></script>
 </body>
 
 </html>
