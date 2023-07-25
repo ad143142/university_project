@@ -1,12 +1,13 @@
 import random
 from thread_locker import *
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
+
+@app.post("/")
+async def root(req: Request):
+    print(req.json())
     thread_entry()
     return {"result": random.randint(0, 9), "time": 3000}
-

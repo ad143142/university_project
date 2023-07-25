@@ -1,5 +1,6 @@
 import random
 import time
+import requests
 
 from flask import *
 
@@ -39,9 +40,21 @@ def intro():
 # 不使用AJAX方法
 @app.route('/apis/submit', methods=['POST'])
 def submit():
-    # TODO:圖片處理
-    time.sleep(3)
-    return render_template('result.html', result=random.randint(0, 9))
+    form_data = request.form['gray_img']
+    gray_img = list(map(int, form_data.split(',')))
+
+    if len(gray_img) != 784:
+        return 400
+
+    print(gray_img)
+
+    # Simulate Super Long Runtime Function (3sec)
+    # time.sleep(3)
+    req = requests.post(url='http://127.0.0.1:8000', data={'data': form_data})
+    res = json.loads(req.text)
+    print()
+    print('result =', res['result'], '; time =', res['time'])
+    return render_template('result.html')
 
 
 if __name__ == '__main__':
