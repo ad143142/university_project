@@ -1,8 +1,7 @@
-import random
-import time
 import requests
 
 from flask import *
+from flask_cors import *
 
 app = Flask(__name__, static_folder='ExportedData/assets/', template_folder='ExportedData/')
 
@@ -39,22 +38,27 @@ def intro():
 
 # 不使用AJAX方法
 @app.route('/apis/submit', methods=['POST'])
+@cross_origin()
 def submit():
     form_data = request.form['gray_img']
-    gray_img = list(map(int, form_data.split(',')))
+    # gray_img = list(map(int, form_data.split(',')))
+    print(len(form_data))
+    if len(form_data) != 958:
+        return "長度不符合標準", 400
 
-    if len(gray_img) != 784:
-        return 400
-
-    print(gray_img)
+    print(form_data)
 
     # Simulate Super Long Runtime Function (3sec)
     # time.sleep(3)
+
     req = requests.post(url='http://127.0.0.1:8000', data={'data': form_data})
-    res = json.loads(req.text)
-    print()
-    print('result =', res['result'], '; time =', res['time'])
-    return render_template('result.html')
+
+    if req.status_code == 200:
+        res = json.loads(req.text)
+        print('result =', res['result'], '; time =', res['time'])
+        return render_template('result.html'), 200
+    else:
+        return 'Local Server Error!', 500
 
 
 if __name__ == '__main__':
