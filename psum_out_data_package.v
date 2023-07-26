@@ -10,6 +10,7 @@
 		input wire clk,
     	input wire rst_n,
         input wire [1:0] operation,
+        input wire [8:0] output_channel_size,
 		input wire layer_finish,
         input wire in_valid,
         input wire in_data,
@@ -32,12 +33,13 @@
 	
 
 	///////////////////reg//////////////////////////
+    reg [8:0] output_channel_cnt;
 	reg [4:0] write_ptr;
 	reg write_ptr_31_buf;
 	///////////////////wire//////////////////////////
-	
+	wire next_package;
 	/////////////////////assign////////////////////////
-	
+	assign next_package =(output_channel_cnt+9'd1 == output_channel_size);
 	///////////////////output//////////////////////////
 	always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -61,7 +63,8 @@
             out_valid <= 1'd0;
         end
         else begin
-            out_valid <= (((write_ptr != 5'd31) && write_ptr_31_buf) || (layer_finish && (operation == 2'd0)));
+            out_valid <= ((in_valid && (write_ptr == 5'd31)) || (layer_finish && (operation == 2'd0)) || (in_valid && next_package));
+            // out_valid <= (((write_ptr != 5'd31) && write_ptr_31_buf) || (layer_finish && (operation == 2'd0)));
         end
     end
     always @(posedge clk or negedge rst_n) begin
@@ -88,10 +91,18 @@
             write_ptr <= 5'd0;
         end
         else begin
-            write_ptr <= layer_finish ? 5'd0 :
-                         in_valid     ? write_ptr+5'd1 : write_ptr;
+            write_ptr <= (layer_finish) ? 5'd0 :
+                         in_valid     ? (next_package ? 5'd0 : write_ptr+5'd1) : write_ptr;
         end
     end
-
+    ////////////////////output_channel_cnt/////////////
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            output_channel_cnt <= 9'd0;
+        end
+        else begin
+            output_channel_cnt <=  in_valid ? (next_package ? 9'd0 : output_channel_cnt+9'd1) : output_channel_cnt;
+        end
+    end
 	//=================================================================================
 endmodule

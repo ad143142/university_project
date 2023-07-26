@@ -171,6 +171,7 @@ module data_path #(
         .load_axis_preload          (load_axis_preload        ),
         .input_channel_size         (input_channel_size       ),
         .axis_clear                 (axis_clear               ),
+        .kernel_size                (kernel_size              ),
         //control out      
         .fifo_cnt                   (axis_preload_fifo_cnt    ),
         .fifo_empty                 (ifmaps_fifo_empty        ),
@@ -253,6 +254,7 @@ module data_path #(
         .layer_finish            (psum_adder_o_last                        ),
         .in_valid                (psum_out_data_package_i_valid            ),
         .in_data                 (psum_adder_o_data                        ),
+        .output_channel_size     (output_channel_size                      ),
         .operation               (operation                                ),
 
         .out_valid               (psum_out_data_package_o_valid            ),

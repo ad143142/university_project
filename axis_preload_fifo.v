@@ -20,6 +20,7 @@ module axis_preload_fifo #(
     input wire load_axis_preload,
     input wire fifo_read,
     input wire axis_clear,
+    input wire [4:0]kernel_size,
 
     //control out
     output reg [bit_num:0] fifo_cnt,
@@ -38,28 +39,93 @@ module axis_preload_fifo #(
     
     integer idx;
 
+    parameter LOAD_HEIGHT_0 = 4'd1 ,LOAD_HEIGHT_1 = 4'd2, LOAD_HEIGHT_2 = 4'd3, LOAD_HEIGHT_3 = 4'd4, LOAD_HEIGHT_4 = 4'd5;
+
+    /////////////////////////////FSM///////////////////////////////
+    reg [3:0] state;
+
+    /////////////////////////////fifo//////////////////////////////
     reg [5*MAC_NUM-1:0] preload_fifo [0:AXIS_PRELOAD_FIFO_DEPTH-1];
 
     reg [bit_num-1:0] fifo_write_ptr;
-    reg [8:0] fifo_write_cnt;
+    reg [5:0] fifo_write_cnt;
     reg [bit_num-1:0] fifo_read_ptr;
-
-    
 
     wire write_en;
     wire read_en;
     wire write_ptr_add;
+    wire load_next_height;
+    wire [8:0] next_fifo_write_cnt;
 
-    assign write_ptr_add=((fifo_write_cnt+6)>=input_channel_size);
+    assign write_ptr_add = load_next_height &
+                           ((kernel_size[0] & state==LOAD_HEIGHT_0) || (kernel_size[1] & state==LOAD_HEIGHT_1) || (kernel_size[2] & state==LOAD_HEIGHT_2) || (kernel_size[3] & state==LOAD_HEIGHT_3) || (kernel_size[4] & state==LOAD_HEIGHT_4));
+    assign next_fifo_write_cnt = ({({1'd0,fifo_write_cnt[2:0]}+4'd1),5'd0});
+    assign load_next_height = (next_fifo_write_cnt >= input_channel_size);
     // assign wait_input_from_preload = ~write_ptr_add;
     assign wait_input_from_preload = ~fifo_empty;
-    assign ifmaps_out=preload_fifo[fifo_read_ptr];
 
-    assign fifo_empty=(fifo_cnt==0);
-    assign fifo_full=(fifo_cnt==AXIS_PRELOAD_FIFO_DEPTH);
+    assign fifo_empty = (fifo_cnt==0);
+    assign fifo_full = (fifo_cnt==AXIS_PRELOAD_FIFO_DEPTH);
 
-	assign write_en=load_axis_preload & ((~fifo_full) | read_en);
-    assign read_en=~fifo_empty & fifo_read;
+	assign write_en = load_axis_preload & ((~fifo_full) | read_en);
+    assign read_en = ~fifo_empty & fifo_read;
+
+    /////////////////////////////ifmaps_out////////////////////////
+    // assign ifmaps_out=preload_fifo[fifo_read_ptr];
+    wire [255:0] preload_fifo_h0;
+    wire [255:0] preload_fifo_h1;
+    wire [255:0] preload_fifo_h2;
+    wire [255:0] preload_fifo_h3;
+    wire [255:0] preload_fifo_h4;
+
+    assign preload_fifo_h0 = preload_fifo[fifo_read_ptr][255:0];
+    assign preload_fifo_h1 = preload_fifo[fifo_read_ptr][511:256];
+    assign preload_fifo_h2 = preload_fifo[fifo_read_ptr][767:512];
+    assign preload_fifo_h3 = preload_fifo[fifo_read_ptr][1023:768];
+    assign preload_fifo_h4 = preload_fifo[fifo_read_ptr][1279:1024];
+
+    genvar i;
+    generate
+        for(i=0;i<256;i=i+1) begin : ifmaps_out_loop
+            assign ifmaps_out[i*5+0] = preload_fifo_h0[i];
+            assign ifmaps_out[i*5+1] = preload_fifo_h1[i];
+            assign ifmaps_out[i*5+2] = preload_fifo_h2[i];
+            assign ifmaps_out[i*5+3] = preload_fifo_h3[i];
+            assign ifmaps_out[i*5+4] = preload_fifo_h4[i];
+        end
+    endgenerate
+
+    /////////////////////////////FSM///////////////////////////////
+
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            state <= LOAD_HEIGHT_0;
+        end
+        else begin
+            if(write_en) begin
+                case(state)
+                    LOAD_HEIGHT_0   : state <= load_next_height ? (kernel_size[0] ? LOAD_HEIGHT_0 : LOAD_HEIGHT_1)
+                                                                : LOAD_HEIGHT_0;
+
+                    LOAD_HEIGHT_1   : state <= load_next_height ? (kernel_size[1] ? LOAD_HEIGHT_0 : LOAD_HEIGHT_2) 
+                                                                : LOAD_HEIGHT_1;
+
+                    LOAD_HEIGHT_2   : state <= load_next_height ? (kernel_size[2] ? LOAD_HEIGHT_0 : LOAD_HEIGHT_3) 
+                                                                : LOAD_HEIGHT_2;
+
+                    LOAD_HEIGHT_3   : state <= load_next_height ? (kernel_size[3] ? LOAD_HEIGHT_0 : LOAD_HEIGHT_4) 
+                                                                : LOAD_HEIGHT_3;
+
+                    LOAD_HEIGHT_4   : state <= load_next_height ? LOAD_HEIGHT_0 : LOAD_HEIGHT_4;
+
+                    default         : state <= LOAD_HEIGHT_0;
+                endcase
+            end
+        end
+    end
+
+
+    /////////////////////////////fifo//////////////////////////////
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -68,8 +134,13 @@ module axis_preload_fifo #(
             end
         end
         else begin
+            if(axis_clear) begin
+                for(idx=0;idx<AXIS_PRELOAD_FIFO_DEPTH;idx=idx+1) begin
+                    preload_fifo[idx]<=0;
+                end
+            end
             if(write_en) begin
-                preload_fifo[fifo_write_ptr][(fifo_write_cnt*5)+29 -:30]<=ifmaps_from_axis[29:0];
+                preload_fifo[fifo_write_ptr][({fifo_write_cnt,5'd0})+31 -:32]<=ifmaps_from_axis;
             end
         end
     end
@@ -90,14 +161,14 @@ module axis_preload_fifo #(
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            fifo_write_cnt<=0;
+            fifo_write_cnt <= 6'd0;
         end
         else begin
-            if(axis_clear) begin
-                fifo_write_cnt<=0;
+            if(axis_clear | write_ptr_add) begin
+                fifo_write_cnt <= 6'd0;
             end
             else if(write_en) begin
-                fifo_write_cnt<=write_ptr_add? 0:fifo_write_cnt+6;
+                fifo_write_cnt <= load_next_height ? {(fifo_write_cnt[5:3]+3'd1),3'd0} : fifo_write_cnt+1;
             end
         end
     end
