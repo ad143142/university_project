@@ -1,0 +1,61 @@
+import random
+import time
+import requests
+
+from flask import *
+
+app = Flask(__name__, static_folder='ExportedData/assets/', template_folder='ExportedData/')
+
+
+@app.route('/')
+def hello_world():  # put application's code here
+    return redirect('/index')
+
+
+@app.route('/index')
+@app.route('/index.html')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/demo')
+@app.route('/demo.html')
+def demo():
+    return render_template('demo.html')
+
+
+@app.route('/intro')
+@app.route('/intro.html')
+def intro():
+    return render_template('intro.html')
+
+
+# 使用AJAX方法
+# @app.route('/api/submit', methods=['POST'])
+# def api_submit():
+#     time.sleep(1)
+#     return random.randint(0, 9)
+
+
+# 不使用AJAX方法
+@app.route('/apis/submit', methods=['POST'])
+def submit():
+    form_data = request.form['gray_img']
+    gray_img = list(map(int, form_data.split(',')))
+
+    if len(gray_img) != 784:
+        return 400
+
+    print(gray_img)
+
+    # Simulate Super Long Runtime Function (3sec)
+    # time.sleep(3)
+    req = requests.post(url='http://127.0.0.1:8000', data={'data': form_data})
+    res = json.loads(req.text)
+    print()
+    print('result =', res['result'], '; time =', res['time'])
+    return render_template('result.html')
+
+
+if __name__ == '__main__':
+    app.run()
