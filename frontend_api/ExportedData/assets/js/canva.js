@@ -95,8 +95,8 @@ $('submit-img').addEventListener('click', async () => {
     }
 
     // create and send the reqeust
-    // xhr.open('POST', '/apis/submit');
-    xhr.open('POST', 'https://495a4430-21de-4766-8cd9-c7a3c5d89cab.mock.pstmn.io');
+    xhr.open('POST', '/apis/submit');
+    // xhr.open('POST', 'https://495a4430-21de-4766-8cd9-c7a3c5d89cab.mock.pstmn.io');
 
     xhr.send(formData);
 

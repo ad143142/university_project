@@ -5,9 +5,8 @@ from fastapi import FastAPI, Request
 app = FastAPI()
 
 
-
 @app.post("/")
 async def root(req: Request):
-    # print(req.json())。
+    print(req.values())
     thread_entry()
     return {"result": random.randint(0, 9), "time": 3000}

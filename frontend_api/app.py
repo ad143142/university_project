@@ -51,7 +51,7 @@ def submit():
     # Simulate Super Long Runtime Function (3sec)
     # time.sleep(3)
 
-    req = requests.post(url='http://127.0.0.1:8000', data={'data': form_data})
+    req = requests.post(url='http://home-vpn.yinchian.com:8000', data={'data': form_data})
 
     if req.status_code == 200:
         res = json.loads(req.text)
