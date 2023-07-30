@@ -1,12 +1,17 @@
 import random
 from thread_locker import *
 from fastapi import FastAPI, Request
+from pydantic import BaseModel
 
 app = FastAPI()
 
 
+class Data(BaseModel):
+    data: str
+
+
 @app.post("/")
-async def root(req: Request):
-    print(req.values())
-    thread_entry()
-    return {"result": random.randint(0, 9), "time": 3000}
+async def root(req: Data):
+    print(req.data)
+    ret = thread_entry(req.data)
+    return ret

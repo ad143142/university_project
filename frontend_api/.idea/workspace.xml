@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c613f5e9-3475-44ed-bb9d-eabc21dabb29" name="Changes" comment="主要功能全部完成">
+    <list default="true" id="c613f5e9-3475-44ed-bb9d-eabc21dabb29" name="Changes" comment="與JinJa模板引擎結合">
+      <change beforePath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" beforeDir="false" afterPath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../LocalAPI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../LocalAPI/test_main.http" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/test_main.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,6 +106,8 @@
       <workItem from="1690406906287" duration="3768000" />
       <workItem from="1690422641187" duration="248000" />
       <workItem from="1690424058177" duration="1745000" />
+      <workItem from="1690470949171" duration="171000" />
+      <workItem from="1690718575502" duration="1831000" />
     </task>
     <task id="LOCAL-00001" summary="Web basic function DONE!">
       <created>1690239900789</created>
@@ -117,7 +123,14 @@
       <option name="project" value="LOCAL" />
       <updated>1690322721796</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="與JinJa模板引擎結合">
+      <created>1690471091250</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1690471091250</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -128,9 +141,10 @@
     <MESSAGE value="Web Done!" />
     <MESSAGE value="Web basic function DONE!" />
     <MESSAGE value="主要功能全部完成" />
-    <option name="LAST_COMMIT_MESSAGE" value="主要功能全部完成" />
+    <MESSAGE value="與JinJa模板引擎結合" />
+    <option name="LAST_COMMIT_MESSAGE" value="與JinJa模板引擎結合" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/frontend_api$frontend_api.coverage" NAME="frontend_api Coverage Results" MODIFIED="1690411698917" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/frontend_api$frontend_api.coverage" NAME="frontend_api Coverage Results" MODIFIED="1690470981473" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
