@@ -29,4 +29,4 @@ def main_function(data):
         print('Processing..', _)
 
     # JSON-like Dictionary Object
-    return {'result', random.randint(0, 9)}
+    return {'result': random.randint(0, 9)}
