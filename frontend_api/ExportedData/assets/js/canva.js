@@ -131,7 +131,7 @@ function showLoadingScreen(){
   popup.style = `
     box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px;
     background: rgba(0, 0, 0, 0.125);
-    position: absolute;
+    position: fixed;
     inset: 0px;
     backdrop-filter: blur(10px);
     `;
