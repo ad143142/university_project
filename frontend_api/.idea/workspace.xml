@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c613f5e9-3475-44ed-bb9d-eabc21dabb29" name="Changes" comment="與JinJa模板引擎結合">
+      <change beforePath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" beforeDir="false" afterPath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../LocalAPI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,6 +106,10 @@
       <workItem from="1690424058177" duration="1745000" />
       <workItem from="1690470949171" duration="171000" />
       <workItem from="1690718575502" duration="1831000" />
+      <workItem from="1691130150822" duration="168000" />
+      <workItem from="1691130331340" duration="5000" />
+      <workItem from="1691130557856" duration="3942000" />
+      <workItem from="1691136728704" duration="2092000" />
     </task>
     <task id="LOCAL-00001" summary="Web basic function DONE!">
       <created>1690239900789</created>
@@ -141,6 +147,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="與JinJa模板引擎結合" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/frontend_api$frontend_api.coverage" NAME="frontend_api Coverage Results" MODIFIED="1690470981473" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/frontend_api$frontend_api.coverage" NAME="frontend_api Coverage Results" MODIFIED="1691138165925" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

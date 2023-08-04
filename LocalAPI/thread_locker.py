@@ -1,9 +1,13 @@
 import random
 import threading
 import time
+import sys
 
+# sys.path.append('/home/xilinx/jupyter_notebooks/[TOP] Flexible University Project/')
 lock = threading.Lock()
 
+
+# import main_code
 
 def thread_entry(data):
     lock.acquire()

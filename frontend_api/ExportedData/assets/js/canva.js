@@ -70,12 +70,14 @@ $('submit-img').addEventListener('click', async () => {
       
       // Binary
       gray.push((0.299 * canvas_data.data[i] + 0.587 * canvas_data.data[i+1] + 0.114 *canvas_data.data[i+2]) > 128 ? 0 : 1); 
+      // gray.push(' ');
 
     }
 
 
     gray = await padding(gray, res_width, res_height);
 
+    console.log(gray);
 
     const formData = new FormData();
     formData.append('gray_img', gray);
@@ -191,19 +193,32 @@ async function padding(imageArray, width, height) {
   // Assuming 'imageArray' only contains 0 and 1
 
   for(let i = 0; i < width + 2; i += 1){
-    ret += i % 2;
-  }
-  ret += '\n';
-  for(let i = 0; i < width; i += 1){
     ret += 1 - i % 2;
+    ret += ' '
+  }
+  
+  ret = ret.substring(0, ret.length - 1);
+  ret += '\n';
+
+  // ret += ' ';
+  for(let i = 0; i < width; i += 1){
+    ret += i % 2;
+
+    ret += ' ';
+
     for(let j = 0; j < height; j += 1){
       ret += imageArray[i * width + j];
+
+      ret += ' ';
     }
-    ret += i % 2;
+    ret += 1 - i % 2;
     ret += '\n';
+    // ret += ' ';
   }
   for(let i = 0; i < width + 2; i += 1){
-    ret += 1 - i % 2;
+    ret += i % 2;
+    ret += ' ';
   }
+  ret = ret.substring(0, ret.length - 1);
   return ret;
 }
