@@ -103,10 +103,13 @@ $('submit-img').addEventListener('click', async () => {
 
     xhr.onload = () => {
       if(xhr.status == 200){
-        document.documentElement.innerHTML = xhr.responseText;
+        // document.documentElement.innerHTML = xhr.responseText;
+        localStorage.setItem('prevData', xhr.responseText);
+        hideLoadingScreen();
+        window.location.href = '/result.html';
 
       }else{
-        alert(`收到${xhr.status}回傳碼，原因為${xhr.responseText || '未知'}，請再試一次`);
+        alert(`收到${xhr.status}回傳碼，原因：${xhr.responseText || '未知'}，請再試一次`);
         hideLoadingScreen();
       }
     }

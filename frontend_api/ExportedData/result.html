@@ -22,7 +22,7 @@
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="index.html">首頁</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="#">DEMO</a></li>
+                    <li class="nav-item"><a class="nav-link" href="demo.html">DEMO</a></li>
                     <li class="nav-item"><a class="nav-link" href="intro.html">介紹</a></li>
                 </ul><button class="btn btn-primary" type="button">回首頁</button>
             </div>
@@ -35,39 +35,52 @@
                     <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
                         <div style="max-width: 350px;">
                             <h1 class="text-uppercase fw-bold">辨識結果</h1>
-                            <p class="my-3" style="font-size: 10vh;">{{result}}</p><a class="btn btn-primary btn-lg me-2" role="button" href="demo.html">再試一次</a><a class="btn btn-outline-primary btn-lg" role="button" href="intro.html">實作細節</a>
+                            <p id="show-result" class="my-3" style="font-size: 10vh;">pending</p><a class="btn btn-primary btn-lg me-2" role="button" href="demo.html">再試一次</a><a class="btn btn-outline-primary btn-lg" role="button" href="intro.html">實作細節</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    <div class="container">
+        <div class="row" style="padding-top: 48px;padding-bottom: 48px;">
+            <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
+                <div style="max-width: 350px;">
+                    <h2 class="text-uppercase fw-bold">機率</h2>
+                    <p id="info-text" class="my-3">根據您的輸入，我們得到的機率分布長這樣。</p>
+                </div>
+            </div>
+            <div class="col-md-6" style="padding-right: 16px;padding-left: 16px;">
+                <div><canvas data-bss-chart="{&quot;type&quot;:&quot;bar&quot;,&quot;data&quot;:{&quot;labels&quot;:[],&quot;datasets&quot;:[{&quot;label&quot;:&quot;prob&quot;,&quot;backgroundColor&quot;:&quot;rgb(13,110,253)&quot;,&quot;data&quot;:[]}]},&quot;options&quot;:{&quot;maintainAspectRatio&quot;:true,&quot;legend&quot;:{&quot;display&quot;:false,&quot;labels&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}},&quot;title&quot;:{&quot;fontStyle&quot;:&quot;bold&quot;},&quot;scales&quot;:{&quot;xAxes&quot;:[{&quot;ticks&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}}],&quot;yAxes&quot;:[{&quot;ticks&quot;:{&quot;fontStyle&quot;:&quot;normal&quot;}}]}}}"></canvas></div>
+            </div>
+        </div>
+    </div>
     <div class="col">
         <div class="container py-4 py-xl-5">
             <div class="text-center text-white-50 bg-primary border rounded border-0 p-3">
                 <div class="row row-cols-2 row-cols-md-4">
                     <div class="col">
                         <div class="p-3">
-                            <h4 class="display-5 fw-bold text-white mb-0">10ms</h4>
+                            <h4 class="display-5 fw-bold text-white mb-0" id="time-col1">pending</h4>
                             <p class="mb-0">硬體總時間</p>
                         </div>
                     </div>
                     <div class="col">
                         <div class="p-3">
-                            <h4 class="display-5 fw-bold text-white mb-0">0.1ms</h4>
-                            <p class="mb-0">捲積層平均時間</p>
+                            <h4 class="display-5 fw-bold text-white mb-0" id="time-col2">pending</h4>
+                            <p class="mb-0">資料準備時間</p>
                         </div>
                     </div>
                     <div class="col">
                         <div class="p-3">
-                            <h4 class="display-5 fw-bold text-white mb-0">0.05ms</h4>
-                            <p class="mb-0">池化層平均時間</p>
+                            <h4 class="display-5 fw-bold text-white mb-0" id="time-col3">pending</h4>
+                            <p class="mb-0">硬體捲積層時間</p>
                         </div>
                     </div>
                     <div class="col">
                         <div class="p-3">
-                            <h4 class="display-5 fw-bold text-white mb-0">0.1ms</h4>
-                            <p class="mb-0">AXI傳輸時間</p>
+                            <h4 class="display-5 fw-bold text-white mb-0" id="time-col4">pending</h4>
+                            <p class="mb-0">硬體池化層時間</p>
                         </div>
                     </div>
                 </div>
@@ -86,8 +99,9 @@
         </div>
     </footer>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/chart.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
-    <script src="assets/js/canva.js"></script>
+    <script src="assets/js/display.js"></script>
 </body>
 
 </html>
