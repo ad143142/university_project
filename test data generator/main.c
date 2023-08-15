@@ -60,38 +60,62 @@ int main()
 
 void write_file_setup()
 {
-	data_setting wf_setting;
+	data_setting wf_setting = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0,0 };
 
-	if ((wf_setting.weight_ptr = fopen("../weight.txt", "wb+")) == NULL)
+	printf("使否增加檔案index? 1為需要其餘為不需要\n");
+	int add_index = 0;
+	scanf_s("%d", &add_index);
+	char index[2]="";
+	if (add_index == 1) {
+		printf("請輸入檔案index\n");
+		scanf_s("%s", index, 2);
+	}
+
+	char file_dir[50];
+
+	sprintf(file_dir, "../weight%s.txt", index);
+	if ((wf_setting.weight_ptr = fopen(file_dir, "wb+")) == NULL)
 	{
 		printf("找不到weight.txt將自動產生檔案");
 	}
-	if ((wf_setting.bias_ptr = fopen("../bias.txt", "wb+")) == NULL)
+
+	sprintf(file_dir, "../bias%s.txt", index);
+	if ((wf_setting.bias_ptr = fopen(file_dir, "wb+")) == NULL)
 	{
 		printf("找不到bias.txt將自動產生檔案");
 	}
-	if ((wf_setting.ifmaps_ptr = fopen("../ifmaps.txt", "wb+")) == NULL)
+
+	sprintf(file_dir, "../ifmaps%s.txt", index);
+	if ((wf_setting.ifmaps_ptr = fopen(file_dir, "wb+")) == NULL)
 	{
 		printf("找不到ifmaps.txt將自動產生檔案");
 	}
-	if ((wf_setting.psum_before_bias_ptr = fopen("../psum_before_bias.txt", "wb+")) == NULL)
+
+	sprintf(file_dir, "../psum_before_bias%s.txt", index);
+	if ((wf_setting.psum_before_bias_ptr = fopen(file_dir, "wb+")) == NULL)
 	{
-		printf("找不到ifmaps.txt將自動產生檔案");
+		printf("找不到psum_before_bias.txt將自動產生檔案");
 	}
-	if ((wf_setting.psum_after_bias_ptr = fopen("../psum_after_bias.txt", "wb+")) == NULL)
+
+	sprintf(file_dir, "../psum_after_bias%s.txt", index);
+	if ((wf_setting.psum_after_bias_ptr = fopen(file_dir, "wb+")) == NULL)
 	{
-		printf("找不到ifmaps.txt將自動產生檔案");
+		printf("找不到psum_after_bias.txt將自動產生檔案");
 	}
-	if ((wf_setting.ofmaps_ptr = fopen("../ofmaps.txt", "wb+")) == NULL)
+
+	sprintf(file_dir, "../ofmaps%s.txt", index);
+	if ((wf_setting.ofmaps_ptr = fopen(file_dir, "wb+")) == NULL)
 	{
 		printf("找不到ofmaps.txt將自動產生檔案");
 	}
-	if ((wf_setting.setting_ptr = fopen("../setting.txt", "wb+")) == NULL)
+
+	sprintf(file_dir, "../setting%s.txt", index);
+	if ((wf_setting.setting_ptr = fopen(file_dir, "wb+")) == NULL)
 	{
 		printf("setting.txt將自動產生檔案");
 	}
 
-	printf("請輸入執行的function 0為convolution 1 為pooling");
+	printf("請輸入執行的function 0為convolution 1 為pooling\n");
 	scanf_s("%d", &wf_setting.function);
 	fprintf(wf_setting.setting_ptr, "//function\n%d\n", wf_setting.function);
 
@@ -143,8 +167,8 @@ void write_file_setup()
 		printf("請輸入weight高度");
 		scanf_s("%d", &wf_setting.weight_hight);
 		fprintf(wf_setting.setting_ptr, "//weight_hight\n%d\n", wf_setting.weight_hight);
-		wf_setting.weight_num = 0;
-		fprintf(wf_setting.setting_ptr, "//weight_num\n0\n");
+		wf_setting.weight_num = wf_setting.ifmaps_channel;
+		fprintf(wf_setting.setting_ptr, "//weight_num\n%d\n", wf_setting.weight_num);
 
 		printf("請輸入步距stride");
 		scanf_s("%d", &wf_setting.stride);
@@ -268,8 +292,8 @@ void using_user_data_setup()
 				}
 				psum_before_bias[o_ch][o_h][o_w] = psum;
 				psum_after_bias[o_ch][o_h][o_w] = psum + bias[o_ch];
-				fprintf(setting.psum_before_bias_ptr, "%8x ", psum);
-				fprintf(setting.psum_after_bias_ptr, "%8x ", psum + bias[o_ch]);
+				fprintf(setting.psum_before_bias_ptr, "%d ", psum);
+				fprintf(setting.psum_after_bias_ptr, "%d ", psum + bias[o_ch]);
 
 #ifdef BITCOUNT
 				psum = psum >= (setting.weight_hight * setting.weight_width * setting.ifmaps_channel / 2) ? 1 : 0;
@@ -457,13 +481,13 @@ void write_conv(data_setting* setting)
 	{
 		if (bias_en == 1)
 		{
-			random = rand() % ((setting->weight_hight * setting->weight_width * setting->ifmaps_channel / 4));
+			random = rand() % ((setting->weight_hight * setting->weight_width * setting->ifmaps_channel / 2)) - ((setting->weight_hight * setting->weight_width * setting->ifmaps_channel / 4));
 		}
 		else
 		{
 			random = 0;
 		}
-		fprintf(setting->bias_ptr, "%d ", random);
+		fprintf(setting->bias_ptr, "%x ", (random & 0x0000ffff));
 		bias[bias_cnt] = random;
 #ifdef DEBUG
 		printf("%d\n", bias[bias_cnt]);
@@ -504,13 +528,13 @@ void write_conv(data_setting* setting)
 				}
 				psum_before_bias[o_ch][o_h][o_w] = psum;
 				psum_after_bias[o_ch][o_h][o_w] = psum + bias[o_ch];
-				fprintf(setting->psum_before_bias_ptr, "%x ", psum);
-				fprintf(setting->psum_after_bias_ptr, "%x ", psum + bias[o_ch]);
+				fprintf(setting->psum_before_bias_ptr, "%d ", psum);
+				fprintf(setting->psum_after_bias_ptr, "%d ", psum + bias[o_ch]);
 
 #ifdef BITCOUNT
 				psum = psum >= (setting->weight_hight * setting->weight_width * setting->ifmaps_channel / 2) ? 1 : 0;
 #else // bitcount
-				psum = psum >= 0 ? 1 : 0;
+				psum = ((psum + bias[o_ch]) >= 0) ? 1 : 0;
 #endif
 				ofmaps[o_ch][o_h][o_w] = psum;
 				fprintf(setting->ofmaps_ptr, "%d ", psum);
