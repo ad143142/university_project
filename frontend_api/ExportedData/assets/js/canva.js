@@ -20,8 +20,8 @@ const f_canvas = new fabric.Canvas('demoCanvas', {
 
 if(f_canvas.freeDrawingBrush){
   var brush = f_canvas.freeDrawingBrush;
-  // brush.width = canvas_size / 28;
-  brush.width = 10;
+  brush.width = canvas_size / 28;
+  // brush.width = 10;
   brush.color = 'black';
 }else{
   alert('您的瀏覽器不被支援');
@@ -40,32 +40,32 @@ $('submit-img').addEventListener('click', async () => {
 
 
     // -- Get Limits --
-    var lines = [];
-    f_canvas.getObjects().forEach(function (obj) {
-        if (obj.type === 'path') {
-            lines.push(obj);
-        }
-    });
+    // var lines = [];
+    // f_canvas.getObjects().forEach(function (obj) {
+    //     if (obj.type === 'path') {
+    //         lines.push(obj);
+    //     }
+    // });
 
-    console.log(lines);
+    // console.log(lines);
     
     // Limit for one block => [left top right buttom] -> 遇到像是4之類需要兩個筆畫的物件，需要找上下左右的極值
-    var limits = [canvas.width, canvas.height, 0, 0];
+    // var limits = [canvas.width, canvas.height, 0, 0];
 
-    lines.forEach((obj) => {
-      // Left
-      f_canvas.add(new fabric.Line([obj.left, 0, obj.left, canvas.height], {stroke: 'green'}))
-      if(limits[0] > obj.left) limits[0] = obj.left;
-      // Top
-      f_canvas.add(new fabric.Line([0, obj.top, canvas.width, obj.top], {stroke: 'green'}))
-      if(limits[1] > obj.top) limits[1] = obj.top;
-      // Right
-      f_canvas.add(new fabric.Line([obj.left + obj.width + obj.strokeWidth, 0, obj.left + obj.width + obj.strokeWidth, canvas.height], {stroke: 'green'}))
-      if(limits[2] < obj.left + obj.width + obj.strokeWidth) limits[2] = obj.left + obj.width + obj.strokeWidth;
-      // Button
-      f_canvas.add(new fabric.Line([0, obj.top + obj.height + obj.strokeWidth, canvas.width, obj.top + obj.height + obj.strokeWidth], {stroke: 'green'}))
-      if(limits[3] < obj.top + obj.height + obj.strokeWidth) limits[3] = obj.top + obj.height + obj.strokeWidth;
-    })
+    // lines.forEach((obj) => {
+    //   // Left
+    //   f_canvas.add(new fabric.Line([obj.left, 0, obj.left, canvas.height], {stroke: 'green'}))
+    //   if(limits[0] > obj.left) limits[0] = obj.left;
+    //   // Top
+    //   f_canvas.add(new fabric.Line([0, obj.top, canvas.width, obj.top], {stroke: 'green'}))
+    //   if(limits[1] > obj.top) limits[1] = obj.top;
+    //   // Right
+    //   f_canvas.add(new fabric.Line([obj.left + obj.width + obj.strokeWidth, 0, obj.left + obj.width + obj.strokeWidth, canvas.height], {stroke: 'green'}))
+    //   if(limits[2] < obj.left + obj.width + obj.strokeWidth) limits[2] = obj.left + obj.width + obj.strokeWidth;
+    //   // Button
+    //   f_canvas.add(new fabric.Line([0, obj.top + obj.height + obj.strokeWidth, canvas.width, obj.top + obj.height + obj.strokeWidth], {stroke: 'green'}))
+    //   if(limits[3] < obj.top + obj.height + obj.strokeWidth) limits[3] = obj.top + obj.height + obj.strokeWidth;
+    // })
 
     // Un-Comment to show Limits
     // f_canvas.add(new fabric.Line([limits[0], 0, limits[0], canvas.height], {stroke: 'red'}));
@@ -73,14 +73,15 @@ $('submit-img').addEventListener('click', async () => {
     // f_canvas.add(new fabric.Line([limits[2], 0, limits[2], canvas.height], {stroke: 'red'}));
     // f_canvas.add(new fabric.Line([0, limits[3], canvas.width, limits[3]], {stroke: 'red'}));
 
-    console.log(limits);
+    // console.log(limits);
 
     // const size = ((limits[2] - limits[0]) > (limits[3] - limits[1]))? limits[2] - limits[0] : limits[3] - limits[1];
     // const image_input = await ctx.getImageData(limits[0], limits[1], limits[0] + size, limits[1] + size);
     const image_input = await ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     // const canvas_data = await ctx.getImageData(limits[0], limits[1], limits[0] + size, limits[1] + size);
-    const canvas_data = await resizeImageData(canvas, image_input, 28, 28, limits);
+    // const canvas_data = await resizeImageData(canvas, image_input, 28, 28, limits);
+    const canvas_data = await resizeImageData(image_input, 28, 28);
     // f_canvas.zoomToPoint({x: canvas.width / 2, y: canvas.height / 2}, 28 / size);
     // console.log(canvas_data.data);
     
@@ -237,18 +238,32 @@ function hideLoadingScreen(){
 //   return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
 // }
 
-async function resizeImageData (f_canvas, imageData, width, height, limits) {
-  const resizeWidth = width >> 0;
-  const resizeHeight = height >> 0;
-  const _canvas = document.createElement('canvas');
-  _canvas.width = resizeWidth;
-  _canvas.height = resizeHeight;
-  const _ctx = _canvas.getContext('2d');
-  _ctx.fillStyle = 'white';
-  _ctx.fillRect(0, 0, resizeWidth, resizeHeight);
-  _ctx.drawImage(f_canvas, limits[0], limits[1], limits[2], limits[3], 1, 1, resizeWidth - 1, resizeHeight - 1);
-  return _ctx.getImageData(0, 0, resizeWidth, resizeHeight);
+async function resizeImageData (imageData, width, height) {
+  const resizeWidth = width >> 0
+  const resizeHeight = height >> 0
+  const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height, {
+    resizeWidth, resizeHeight
+  })
+  const _canvas = document.createElement('canvas')
+  _canvas.width = resizeWidth
+  _canvas.height = resizeHeight
+  const _ctx = _canvas.getContext('2d')
+  _ctx.drawImage(ibm, 0, 0)
+  return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
 }
+
+// async function resizeImageData (f_canvas, imageData, width, height, limits) {
+//   const resizeWidth = width >> 0;
+//   const resizeHeight = height >> 0;
+//   const _canvas = document.createElement('canvas');
+//   _canvas.width = resizeWidth;
+//   _canvas.height = resizeHeight;
+//   const _ctx = _canvas.getContext('2d');
+//   _ctx.fillStyle = 'white';
+//   _ctx.fillRect(0, 0, resizeWidth, resizeHeight);
+//   _ctx.drawImage(f_canvas, limits[0], limits[1], limits[2], limits[3], 1, 1, resizeWidth - 1, resizeHeight - 1);
+//   return _ctx.getImageData(0, 0, resizeWidth, resizeHeight);
+// }
 
 
 async function padding(imageArray, width, height) {
