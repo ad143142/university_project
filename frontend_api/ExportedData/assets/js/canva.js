@@ -144,7 +144,7 @@ $('submit-img').addEventListener('click', async () => {
     }
 
     // create and send the reqeust
-    xhr.open('POST', '/apis/submit');
+    xhr.open('POST', 'https://u.yinchian.com/apis/submit');
     // xhr.open('POST', 'https://495a4430-21de-4766-8cd9-c7a3c5d89cab.mock.pstmn.io');
 
     xhr.send(formData);
@@ -237,19 +237,19 @@ $('submit-img').addEventListener('click', async () => {
 //   return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
 // }
 
-async function resizeImageData (imageData, width, height) {
-  const resizeWidth = width >> 0
-  const resizeHeight = height >> 0
-  const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height, {
-    resizeWidth, resizeHeight
-  })
-  const _canvas = document.createElement('canvas')
-  _canvas.width = resizeWidth
-  _canvas.height = resizeHeight
-  const _ctx = _canvas.getContext('2d')
-  _ctx.drawImage(ibm, 0, 0)
-  return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
-}
+// async function resizeImageData (imageData, width, height) {
+//   const resizeWidth = width >> 0
+//   const resizeHeight = height >> 0
+//   const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height, {
+//     resizeWidth, resizeHeight
+//   })
+//   const _canvas = document.createElement('canvas')
+//   _canvas.width = resizeWidth
+//   _canvas.height = resizeHeight
+//   const _ctx = _canvas.getContext('2d')
+//   _ctx.drawImage(ibm, 0, 0)
+//   return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
+// }
 
 // async function resizeImageData (f_canvas, imageData, width, height, limits) {
 //   const resizeWidth = width >> 0;

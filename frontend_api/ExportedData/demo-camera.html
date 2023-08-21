@@ -126,10 +126,10 @@
             <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
                 <div class="text-start" style="max-width: 350px;">
                     <h2 class="text-uppercase fw-bold">請拍下您要辨識的文字</h2>
-                    <p class="my-3">請務必允許攝影機的權限！</p><button class="btn btn-primary btn-lg me-2" id="submit-img" type="button">拍攝</button><a class="btn btn-outline-primary btn-lg me-2" role="button" id="switch-camera" href="demo.html">切換成繪圖模式</a>
+                    <p class="my-3">請務必允許攝影機的權限！並將您寫的數字放在框線中。您輸入的圖片會使用OTSU演算法計算黑白的閥值。請注意：筆畫過細、光線等因素會大幅度影響辨識結果，也請盡量避免字體過小。</p><button class="btn btn-primary btn-lg me-2" id="submit-img" type="button">拍攝</button><a class="btn btn-outline-primary btn-lg me-2" role="button" id="switch-camera" href="demo.html">切換成繪圖模式</a><button class="btn btn-outline-primary btn-lg" id="btn-clean" type="button">重拍</button>
                 </div>
             </div>
-            <div class="col-md-6" id="canva-container" style="padding: 10px;"><video class="border rounded" id="camera"></video></div>
+            <div class="col-md-6" id="canva-container" style="padding: 10px;"><canvas id='photo' style='display:none' class="border rounded"></canvas><canvas id="filter" style="z-index: inherit; position: absolute;"></canvas><video class="border rounded" id="camera"></video></div>
         </div>
     </div>
     <footer class="text-center">

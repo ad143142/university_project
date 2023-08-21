@@ -81,3 +81,17 @@ async function padding(imageArray, width, height) {
     ret = ret.substring(0, ret.length - 1);
     return ret;
 }
+
+async function resizeImageData (imageData, width, height) {
+  const resizeWidth = width >> 0
+  const resizeHeight = height >> 0
+  const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height, {
+    resizeWidth, resizeHeight
+  })
+  const _canvas = document.createElement('canvas')
+  _canvas.width = resizeWidth
+  _canvas.height = resizeHeight
+  const _ctx = _canvas.getContext('2d')
+  _ctx.drawImage(ibm, 0, 0)
+  return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
+}
