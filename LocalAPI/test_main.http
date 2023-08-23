@@ -1,6 +1,14 @@
+###
 POST http://localhost:8000
 Content-Type: application/json
 
 {
   "data": "blablabla"
 }
+
+
+###
+WEBSOCKET ws://localhost:8000/ws-api
+
+###
+WEBSOCKET ws://localhost:8000/ws-api

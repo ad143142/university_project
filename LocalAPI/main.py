@@ -1,5 +1,10 @@
+import asyncio
+import json
+
+from websockets.exceptions import ConnectionClosedOK
 from thread_locker import *
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+
 
 app = FastAPI()
 
@@ -7,15 +12,39 @@ app = FastAPI()
 @app.post("/")
 async def root(data: dict):
     print(data['data'])
-    ret = {
-        'result': '1',
-        'probability_arr': [3.4994741e-06, 9.9958432e-01, 2.4019920e-08, 1.7870320e-08,
-                            1.0729757e-05, 1.0367481e-06, 7.5637257e-07, 3.9836887e-04,
-                            5.4714109e-09, 1.2623170e-06],
-        'total_time': 0.08027005195617676,
-        'data_prep_time': 0.045114755630493164,
-        'conv_time': 0.021091222763061523,
-        'pool_time': 0.01205897331237793,
-        'fc_time': 0.0007233619689941406
-    }
+    ret = thread_entry(data['data'])
     return ret
+
+
+@app.websocket('/ws-api')
+async def websocket_handler(websocket: WebSocket):
+    await websocket.accept()
+
+    try:
+        while 1:
+            data = await websocket.receive_json()
+
+            data = data['data'].split('\n')
+            ret = []
+            for _ in range(len(data)):
+                ret.append(list(map(int, data[_].split(' '))))
+
+            try:
+                if type(ret) != list and type(ret[0]) != int:
+                    raise TypeError('型別錯誤')
+            except Exception as e:
+                raise Exception(e)
+
+            """
+                嚴正警告：如果要即時性的資料，前端傳送第二次以後的資料前，需要等到前一個回應送達再送出請求。
+                若不停傳送會拖累後面送達的資料，延遲會如滾雪球般的累積！！！
+                
+            """
+            ret = thread_entry(ret)
+
+            await websocket.send_json(ret)
+
+            await asyncio.sleep(0.01)
+
+    except (ConnectionClosedOK, WebSocketDisconnect) as e:
+        print('closed!')
