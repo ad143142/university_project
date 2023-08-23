@@ -32,7 +32,7 @@ $('btn-clean').addEventListener('click', () => {
 });
 
 // Init Websocket Connection OnLoad
-const url = "ws://rasbpi.yinchian.com:8000/ws-api";
+const url = "wss://rasbpi.yinchian.com:8000/ws-api";
 // const url = "ws://127.0.0.1:8000/ws-api";
 var Socket = new WebSocket(url);
 Socket.onopen = async () => {
@@ -49,12 +49,12 @@ Socket.onmessage = (e) => {
     // timestamp = new Date();
 
     // 送出取好的資料
-    Socket.send(JSON.stringify( {"data": gray}));
+    Socket.send(JSON.stringify({"data": gray}));
 
     // 更新網頁資料
     let prev_result = JSON.parse(e.data);
     // console.log(prev_result);
-    $('infobox').innerHTML = `${prev_result.result}: ${Math.round(Math.max(...prev_result.probability_arr) * 10000) / 100}%  硬體FPS = ${Math.round(1/prev_result.total_time * 100) / 100}`
+    $('infobox').innerHTML = `${prev_result.result}: ${Math.round(Math.max(...prev_result.probability_arr) * 1000000) / 10000}%  硬體FPS = ${Math.round(1/prev_result.total_time * 100) / 100}`
 
     // -- Chart --
     // var prob = prev_result.probability_arr;

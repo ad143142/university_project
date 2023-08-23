@@ -33,7 +33,7 @@ def demo_cam():
 
 @app.route('/demo-continuous')
 @app.route('/demo-continuous.html')
-def demo_cam():
+def demo_continuous():
     return render_template('demo-continuous.html')
 
 
