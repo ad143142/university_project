@@ -17,7 +17,7 @@ $('time-col4').innerHTML = Math.round(prev_result.pool_time * 10e5) / 10e2 + 'ms
 
 window.addEventListener('load', (e) => {
     var prob = prev_result.probability_arr;
-    chart = document.querySelector('canvas').chart;
+    chart = $('chart').getElementsByTagName('canvas')[0].chart;
     for(let i = 0; i < prob.length; i = i + 1){
         chart.data.datasets[0].data.push(prob[i]);
         chart.data.labels.push(i);

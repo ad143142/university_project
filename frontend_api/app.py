@@ -31,6 +31,12 @@ def demo_cam():
     return render_template('demo-camera.html')
 
 
+@app.route('/demo-continuous')
+@app.route('/demo-continuous.html')
+def demo_cam():
+    return render_template('demo-continuous.html')
+
+
 @app.route('/result.html')
 def result():
     return render_template('result.html')

@@ -1,6 +1,3 @@
-// Parameter
-const res_height = 28, res_width = 28;
-
 // Fast Selector Function Define
 var $ = function(id){return document.getElementById(id)};
 
@@ -145,6 +142,7 @@ $('submit-img').addEventListener('click', async () => {
 
     // create and send the reqeust
     xhr.open('POST', 'https://u.yinchian.com/apis/submit');
+    // xhr.open('POST', 'https://rasbpi.yinchian.com:8000');
     // xhr.open('POST', 'https://495a4430-21de-4766-8cd9-c7a3c5d89cab.mock.pstmn.io');
 
     xhr.send(formData);

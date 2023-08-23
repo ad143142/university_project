@@ -1,3 +1,6 @@
+// Parameter
+const res_height = 28, res_width = 28;
+
 function showLoadingScreen() {
     let popup = document.createElement('div');
     document.body.style.setProperty('overflow', 'hidden');
