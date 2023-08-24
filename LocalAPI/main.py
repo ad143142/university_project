@@ -5,7 +5,6 @@ from websockets.exceptions import ConnectionClosedOK
 from thread_locker import *
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-
 app = FastAPI()
 
 
@@ -32,6 +31,14 @@ async def websocket_handler(websocket: WebSocket):
             try:
                 if type(ret) != list and type(ret[0]) != int:
                     raise TypeError('型別錯誤')
+
+                if len(ret) == 30:
+                    for _ in ret:
+                        if len(_) != 30:
+                            raise IndexError('陣列長度錯誤')
+                else:
+                    raise IndexError('陣列高度錯誤')
+
             except Exception as e:
                 raise Exception(e)
 
@@ -44,7 +51,7 @@ async def websocket_handler(websocket: WebSocket):
 
             await websocket.send_json(ret)
 
-            await asyncio.sleep(0.01)
+            # await asyncio.sleep(0.01)
 
     except (ConnectionClosedOK, WebSocketDisconnect) as e:
         print('closed!')

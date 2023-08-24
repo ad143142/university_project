@@ -18,11 +18,16 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/select')
+@app.route('/select.html')
+def show_select():
+    return render_template('select.html')
+
+
 @app.route('/demo')
 @app.route('/demo.html')
 def demo():
     return render_template('demo.html')
-
 
 
 @app.route('/demo-camera')
@@ -35,6 +40,12 @@ def demo_cam():
 @app.route('/demo-continuous.html')
 def demo_continuous():
     return render_template('demo-continuous.html')
+
+
+@app.route('/demo-camera-continous')
+@app.route('/demo-camera-continous.html')
+def demo_camera_continous():
+    return render_template('demo-camera-continous.html')
 
 
 @app.route('/result.html')
@@ -62,10 +73,11 @@ def submit():
     #     return "長度不符合標準", 400
 
     print(ret)
-    if platform.platform() == 'Windows-10-10.0.22621-SP0':
-        req = requests.post(url='http://127.0.0.1:8000/', json={'data': ret})
-    else:
-        req = requests.post(url='http://rasbpi.yinchian.com:8000', json={'data': ret})
+    # if platform.platform() == 'Windows-10-10.0.22621-SP0':
+    #     req = requests.post(url='http://127.0.0.1:8000/', json={'data': ret})
+    # else:
+    #     req = requests.post(url='https://rasbpi.yinchian.com:8000', json={'data': ret})
+    req = requests.post(url='https://rasbpi.yinchian.com:8000', json={'data': ret})
 
     if req.status_code == 200:
         res = json.loads(req.text)

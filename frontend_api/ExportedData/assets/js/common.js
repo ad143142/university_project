@@ -2,19 +2,19 @@
 const res_height = 28, res_width = 28;
 
 function showLoadingScreen() {
-    let popup = document.createElement('div');
-    document.body.style.setProperty('overflow', 'hidden');
-    document.body.appendChild(popup);
-    popup.classList.add('animate__animated', 'animate__fadeIn');
-    popup.style = `
+  let popup = document.createElement('div');
+  document.body.style.setProperty('overflow', 'hidden');
+  document.body.appendChild(popup);
+  popup.classList.add('animate__animated', 'animate__fadeIn');
+  popup.style = `
       box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 10px;
       background: rgba(0, 0, 0, 0.125);
       position: fixed;
       inset: 0px;
       backdrop-filter: blur(10px);
       `;
-    popup.id = 'popup';
-    popup.innerHTML = `
+  popup.id = 'popup';
+  popup.innerHTML = `
     <svg id="loading">
       <g>
         <path class="ld-l" fill="#39C0C4" d="M43.6,33.2h9.2V35H41.6V15.2h2V33.2z"/>
@@ -45,47 +45,48 @@ function showLoadingScreen() {
 
 
 function hideLoadingScreen() {
-    $('popup').remove();
-    document.body.style.setProperty('overflow', 'unset');
+  $('popup').remove();
+  document.body.style.setProperty('overflow', 'unset');
 }
 
+// Array -> String
 async function padding(imageArray, width, height) {
-    let ret = '';
+  let ret = '';
 
-    // Assuming 'imageArray' only contains 0 and 1
+  // Assuming 'imageArray' only contains 0 and 1
 
-    for (let i = 0; i < width + 2; i += 1) {
-        ret += 1 - i % 2;
-        ret += ' '
+  for (let i = 0; i < width + 2; i += 1) {
+    ret += 1 - i % 2;
+    ret += ' '
+  }
+
+  ret = ret.substring(0, ret.length - 1);
+  ret += '\n';
+
+  // ret += ' ';
+  for (let i = 0; i < width; i += 1) {
+    ret += i % 2;
+
+    ret += ' ';
+
+    for (let j = 0; j < height; j += 1) {
+      ret += imageArray[i * width + j];
+
+      ret += ' ';
     }
-
-    ret = ret.substring(0, ret.length - 1);
+    ret += 1 - i % 2;
     ret += '\n';
-
     // ret += ' ';
-    for (let i = 0; i < width; i += 1) {
-        ret += i % 2;
-
-        ret += ' ';
-
-        for (let j = 0; j < height; j += 1) {
-            ret += imageArray[i * width + j];
-
-            ret += ' ';
-        }
-        ret += 1 - i % 2;
-        ret += '\n';
-        // ret += ' ';
-    }
-    for (let i = 0; i < width + 2; i += 1) {
-        ret += i % 2;
-        ret += ' ';
-    }
-    ret = ret.substring(0, ret.length - 1);
-    return ret;
+  }
+  for (let i = 0; i < width + 2; i += 1) {
+    ret += i % 2;
+    ret += ' ';
+  }
+  ret = ret.substring(0, ret.length - 1);
+  return ret;
 }
 
-async function resizeImageData (imageData, width, height) {
+async function resizeImageData(imageData, width, height) {
   const resizeWidth = width >> 0
   const resizeHeight = height >> 0
   const ibm = await window.createImageBitmap(imageData, 0, 0, imageData.width, imageData.height, {
@@ -97,4 +98,130 @@ async function resizeImageData (imageData, width, height) {
   const _ctx = _canvas.getContext('2d')
   _ctx.drawImage(ibm, 0, 0)
   return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
+}
+
+// 手刻縮放的演算法 - 輸入為imageData
+function BilinearInterpolation(imageData, res_x, res_y) {
+
+  const data = [];
+  
+    // 輸入是imageData物件
+    for (let y = 0; y < imageData.height; y++) {
+      data.push(new Array());
+      for (let x = 0; x < imageData.width * 4; x += 4) {
+        data[y].push(imageData.data[y * imageData.width * 4 + x]);
+      }
+    }
+  
+
+  // 應該相等
+  x_ratio = (data[0].length - 1) / (res_x - 1);
+  y_ratio = (data.length - 1) / (res_y - 1);
+
+  let ret = new Array(res_x);
+  for (let x = 0; x < res_x; x++) {
+    ret[x] = new Array(res_y);
+    for (let y = 0; y < res_y; y++) {
+      // 四個鄰近的座標
+      x_l = Math.floor(x_ratio * x);
+      y_l = Math.floor(y_ratio * y);
+      x_h = Math.ceil(x_ratio * x);
+      y_h = Math.ceil(y_ratio * y);
+
+      // 位置的比例當權重
+      x_ratio_weight = x_ratio * x - x_l;
+      y_ratio_weight = y_ratio * y - y_l;
+
+      ret[x][y] = (data[x_l][y_l] * (1 - x_ratio_weight) * (1 - y_ratio_weight) + data[x_h][y_l] * x_ratio_weight * (1 - y_ratio_weight) + data[x_l][y_h] * (1 - x_ratio_weight) * y_ratio_weight + data[x_h][y_h] * x_ratio_weight * y_ratio_weight);
+    }
+  }
+
+  return ret;
+}
+
+// 手刻縮放的演算法 - overding 1: 輸入是array, 可調整大小
+function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_xh, orig_yh, orig_xlen) {
+
+  const data = [];
+  for (let y = orig_yl; y < orig_yh; y++) {
+    data.push(new Array());
+    for (let x = orig_xl; x < orig_xh; x++) {
+      data[y - orig_yl].push(imageData[y * orig_xlen + x] * 1);
+    }
+  }
+
+  x_ratio = (data[0].length - 1) / (res_x - 1);
+  y_ratio = (data.length - 1) / (res_y - 1);
+
+  let ret = new Array(res_x);
+  for (let x = 0; x < res_x; x++) {
+    ret[x] = new Array(res_y);
+    for (let y = 0; y < res_y; y++) {
+      // 四個鄰近的座標
+      x_l = Math.floor(x_ratio * x);
+      y_l = Math.floor(y_ratio * y);
+      x_h = Math.ceil(x_ratio * x);
+      y_h = Math.ceil(y_ratio * y);
+
+      // 位置的比例當權重
+      x_ratio_weight = x_ratio * x - x_l;
+      y_ratio_weight = y_ratio * y - y_l;
+
+      ret[x][y] = Math.round(data[x_l][y_l] * (1 - x_ratio_weight) * (1 - y_ratio_weight) + data[x_h][y_l] * x_ratio_weight * (1 - y_ratio_weight) + data[x_l][y_h] * (1 - x_ratio_weight) * y_ratio_weight + data[x_h][y_h] * x_ratio_weight * y_ratio_weight);
+    }
+  }
+
+  return ret;
+}
+
+// Otsu's Algorithm - https://gist.github.com/zz85/2ebc8e4da705dc3244200de564ab5557
+function otsu(histData /* Array of 256 greyscale values */, total /* Total number of pixels */) {
+  let sum = 0;
+  for (let t = 0; t < 256; t++) sum += t * histData[t];
+
+  let sumB = 0;
+  let wB = 0;
+  let wF = 0;
+
+  let varMax = 0;
+  let threshold = 0;
+
+  for (let t = 0; t < 256; t++) {
+    wB += histData[t];               // Weight Background
+    if (wB == 0) continue;
+
+    wF = total - wB;                 // Weight Foreground
+    if (wF == 0) break;
+
+    sumB += t * histData[t];
+
+    let mB = sumB / wB;            // Mean Background
+    let mF = (sum - sumB) / wF;    // Mean Foreground
+
+    // Calculate Between Class Variance
+    let varBetween = wB * wF * (mB - mF) * (mB - mF);
+
+    // Check if new maximum found
+    if (varBetween > varMax) {
+      varMax = varBetween;
+      threshold = t;
+    }
+  }
+
+  return threshold;
+}
+
+function getHistData(imageData) {
+  hist = new Array(256).fill(0);
+  for (let i = 0; i < imageData.length; i += 4) {
+    hist[Math.round(0.299 * imageData[i] + 0.587 * imageData[i + 1] + 0.114 * imageData[i + 2])]++;
+  }
+  return hist;
+}
+
+// Entry Function of OTSU
+// Input: ImageData: 
+function calc_thresh(imageData) {
+  hist = getHistData(imageData);
+  return otsu(hist, imageData.length / 4);
 }

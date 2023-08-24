@@ -103,7 +103,7 @@
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="index.html">首頁</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="#">DEMO</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="select.html">DEMO</a></li>
                     <li class="nav-item"><a class="nav-link" href="intro.html">介紹</a></li>
                 </ul>
                 <div class="theme-switcher dropdown" style="padding: 8px;"><a class="dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-sun-fill mb-1">
@@ -117,7 +117,7 @@
                             </svg>Dark</a><a class="dropdown-item d-flex align-items-center" href="#" data-bs-theme-value="auto"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-circle-half opacity-50 me-2">
                                 <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"></path>
                             </svg>Auto</a></div>
-                </div><button class="btn btn-primary" type="button">回首頁</button>
+                </div><a class="btn btn-primary" role="button" href="index.html">回首頁</a>
             </div>
         </div>
     </nav>
@@ -126,7 +126,7 @@
             <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
                 <div style="max-width: 350px;">
                     <h2 class="text-uppercase fw-bold">請於框線內繪圖</h2>
-                    <p class="my-3">請揮灑您的創意，在框框中繪製任何長得像數字的圖案，讓我們的系統猜測您寫的是什麼數字。想要重來，可以按下重繪，繪製完成請按送出。</p><button class="btn btn-primary btn-lg me-2" id="submit-img" type="button">送出</button><a class="btn btn-outline-primary btn-lg me-2" role="button" id="switch-camera" href="demo-camera.html">相機</a><a class="btn btn-outline-primary btn-lg me-2" role="button" id="end-conti" href="demo-continuous.html">互動</a><button class="btn btn-outline-primary btn-lg" id="btn-clean" type="button">重繪</button>
+                    <p class="my-3">請揮灑您的創意，在框框中繪製任何長得像數字的圖案，讓我們的系統猜測您寫的是什麼數字。想要重來，可以按下重繪，繪製完成請按送出。</p><button class="btn btn-primary btn-lg me-2" id="submit-img" type="button">送出</button><button class="btn btn-outline-primary btn-lg" id="btn-clean" type="button">重繪</button>
                 </div>
             </div>
             <div class="col-md-6" id="canva-container" style="padding: 10px;"><canvas id="demoCanvas" style="border: 1px solid; border-radius: 10px;"></canvas></div>

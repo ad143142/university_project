@@ -90,6 +90,7 @@
         })();
     </script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/aos.min.css">
     <link rel="stylesheet" href="assets/css/Footer-Basic-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="assets/css/Team-images.css">
@@ -103,7 +104,7 @@
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="index.html">首頁</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="select.html">DEMO</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">DEMO</a></li>
                     <li class="nav-item"><a class="nav-link" href="intro.html">介紹</a></li>
                 </ul>
                 <div class="theme-switcher dropdown" style="padding: 8px;"><a class="dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-sun-fill mb-1">
@@ -121,17 +122,38 @@
             </div>
         </div>
     </nav>
-    <div class="container py-4 py-xl-5">
-        <div class="row gy-4 gy-md-0">
-            <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
-                <div class="text-start" style="max-width: 350px;">
-                    <h2 class="text-uppercase fw-bold">請拍下您要辨識的文字</h2>
-                    <p class="my-3">請務必允許攝影機的權限！並將您寫的數字放在框線中。您輸入的圖片會使用OTSU演算法計算黑白的閥值。請注意：筆畫過細、光線等因素會大幅度影響辨識結果，也請盡量避免字體過小。</p><button class="btn btn-primary btn-lg me-2" id="submit-img" type="button">拍攝</button><button class="btn btn-outline-primary btn-lg" id="btn-clean" type="button">重拍</button>
+    <section class="text-white py-4 py-xl-5">
+        <div class="container">
+            <div class="border rounded border-0 d-flex flex-column justify-content-center align-items-center p-4 py-5" data-bss-parallax-bg="true" style="height: 500px;background: url(&quot;assets/img/5083499.jpg&quot;);">
+                <div class="row">
+                    <div class="col-md-10 col-xl-8 text-center d-flex d-sm-flex d-md-flex justify-content-center align-items-center mx-auto justify-content-md-start align-items-md-center justify-content-xl-center">
+                        <div>
+                            <h1 class="text-uppercase fw-bold mb-3">請選擇您要使用的模式</h1>
+                            <p class="mb-4">Etiam a rutrum, mauris lectus aptent convallis. Fusce vulputate aliquam, sagittis odio metus. Nulla porttitor vivamus viverra laoreet, aliquam netus.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6" id="canva-container" style="padding: 10px;"><canvas id='photo' style='display:none' class="border rounded"></canvas><canvas id="filter" style="z-index: inherit; position: absolute;"></canvas><video class="border rounded" id="camera"></video></div>
         </div>
-    </div>
+    </section>
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6" data-aos="fade-up" style="padding: 12px;">
+                    <div class="text-center text-bg-primary border rounded" style="margin: 0px;padding: 24px;">
+                        <h1 style="margin: 12px;">繪圖模式</h1>
+                        <p>Paragraph</p><a class="btn btn-light fs-5 py-2 px-4" role="button" style="margin: 12px;margin-right: 0px;" href="demo.html">互動式</a><a class="btn btn-light fs-5 py-2 px-4" role="button" style="margin: 12px;margin-right: 0px;" href="demo-continuous.html">連續式 (BETA)</a>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="50" style="padding: 12px;">
+                    <div class="text-center text-bg-success border rounded" style="margin: 0px;padding: 24px;">
+                        <h1 style="margin: 12px;">相機模式</h1>
+                        <p style="margin-left: 14px;">Paragraph</p><a class="btn btn-light fs-5 py-2 px-4" role="button" style="margin: 12px;margin-right: 0px;" href="demo-camera.html">互動式</a><a class="btn btn-light fs-5 py-2 px-4" role="button" style="margin: 12px;margin-right: 0px;" href="demo-camera-continous.html">連續式 (BETA)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     <footer class="text-center">
         <div class="container text-muted py-4 py-lg-5">
             <ul class="list-inline">
@@ -154,10 +176,9 @@
         </div>
     </footer>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/aos.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <script src="assets/js/camera.js"></script>
-    <script src="assets/js/common.js"></script>
 </body>
 
 </html>

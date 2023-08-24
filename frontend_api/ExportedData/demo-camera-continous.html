@@ -126,10 +126,12 @@
             <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
                 <div class="text-start" style="max-width: 350px;">
                     <h2 class="text-uppercase fw-bold">請拍下您要辨識的文字</h2>
-                    <p class="my-3">請務必允許攝影機的權限！並將您寫的數字放在框線中。您輸入的圖片會使用OTSU演算法計算黑白的閥值。請注意：筆畫過細、光線等因素會大幅度影響辨識結果，也請盡量避免字體過小。</p><button class="btn btn-primary btn-lg me-2" id="submit-img" type="button">拍攝</button><button class="btn btn-outline-primary btn-lg" id="btn-clean" type="button">重拍</button>
+                    <p class="my-3">請務必允許攝影機的權限！並將您寫的數字放在框線中。您輸入的圖片會使用OTSU演算法計算黑白的閥值。請注意：筆畫過細、光線等因素會大幅度影響辨識結果，也請盡量避免字體過小。</p>
                 </div>
             </div>
-            <div class="col-md-6" id="canva-container" style="padding: 10px;"><canvas id='photo' style='display:none' class="border rounded"></canvas><canvas id="filter" style="z-index: inherit; position: absolute;"></canvas><video class="border rounded" id="camera"></video></div>
+            <div class="col-md-6" id="canva-container" style="padding: 10px;">
+                <p class="bg-primary" id="infobox" style="z-index: 2;position: absolute;/*color: #212529;*/">&nbsp;</p><canvas id="filter" style="z-index: inherit; position: absolute; border-color: blue"></canvas><canvas id='frame' class="border rounded"></canvas><video class="border rounded d-none" id="camera"></video>
+            </div>
         </div>
     </div>
     <footer class="text-center">
@@ -156,8 +158,8 @@
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <script src="assets/js/camera.js"></script>
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/camera-continous.js"></script>
 </body>
 
 </html>
