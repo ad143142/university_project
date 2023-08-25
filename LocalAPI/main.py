@@ -23,19 +23,24 @@ async def websocket_handler(websocket: WebSocket):
         while 1:
             data = await websocket.receive_json()
 
-            data = data['data'].split('\n')
-            ret = []
-            for _ in range(len(data)):
-                ret.append(list(map(int, data[_].split(' '))))
-
             try:
+                data = data['data'].split('\n')
+                ret = []
+                for _ in range(len(data)):
+                    ret.append(list(map(int, data[_].split(' '))))
+
                 if type(ret) != list and type(ret[0]) != int:
                     raise TypeError('型別錯誤')
 
                 if len(ret) == 30:
-                    for _ in ret:
-                        if len(_) != 30:
+                    for col in ret:
+                        if len(col) != 30:
                             raise IndexError('陣列長度錯誤')
+
+                        # ======= For MNIST ========
+                        for item in col:
+                            if 1 < item < 0:
+                                raise ValueError('輸入錯誤！')
                 else:
                     raise IndexError('陣列高度錯誤')
 

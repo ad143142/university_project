@@ -170,8 +170,16 @@ function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_x
       ret[x][y] = Math.round(data[x_l][y_l] * (1 - x_ratio_weight) * (1 - y_ratio_weight) + data[x_h][y_l] * x_ratio_weight * (1 - y_ratio_weight) + data[x_l][y_h] * (1 - x_ratio_weight) * y_ratio_weight + data[x_h][y_h] * x_ratio_weight * y_ratio_weight);
     }
   }
+  // sleep(1000);
+  return new Promise((res) => {
+    res(ret);
+  });
+  // return ret;
+}
 
-  return ret;
+// Testing
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Otsu's Algorithm - https://gist.github.com/zz85/2ebc8e4da705dc3244200de564ab5557

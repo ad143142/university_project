@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c613f5e9-3475-44ed-bb9d-eabc21dabb29" name="Changes" comment="又錯">
-      <change beforePath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" beforeDir="false" afterPath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../LocalAPI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExportedData/assets/js/camera.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/js/camera.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExportedData/assets/js/canva-continous.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/js/canva-continous.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExportedData/assets/js/common.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/js/common.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExportedData/demo-camera-continous.html" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/demo-camera-continous.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExportedData/select.html" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/select.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,6 +118,7 @@
       <workItem from="1692817719399" duration="2799000" />
       <workItem from="1692872221876" duration="2048000" />
       <workItem from="1692909840858" duration="90000" />
+      <workItem from="1692979787140" duration="1308000" />
     </task>
     <task id="LOCAL-00001" summary="Web basic function DONE!">
       <created>1690239900789</created>
