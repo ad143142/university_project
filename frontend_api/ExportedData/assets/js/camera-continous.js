@@ -13,6 +13,7 @@ var ctx = canva.getContext("2d", { willReadFrequently: true });
 var isReady = false;
 var black_white = [];
 
+
 // Init Function
 window.onload = () => {
     // 設定相機
@@ -132,10 +133,6 @@ async function frame() {
 }
 
 
-function ws_error_handler(){
-    res = confirm('WebSocket連線逾時\n按"確認"重新整理網頁');
-    if(res) location.reload();
-}
 
 async function image_prep() {
     // const imageData = ctx.getImageData(0, 0, canva.width, canva.width);

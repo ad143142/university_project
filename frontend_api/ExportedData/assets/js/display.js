@@ -2,7 +2,7 @@ var $ = function(id){return document.getElementById(id)};
 var g = function(data){
     let ret = JSON.parse(localStorage.getItem(data));
     if(ret == null){
-        window.location.href = '/demo.html'; // 回到上一頁
+        window.location.href = '/select.html'; // 回到上一頁
     }
     return ret;
 };
@@ -32,5 +32,7 @@ window.addEventListener('load', (e) => {
         $('info-text').innerHTML += '<br>前兩筆資料差距不大，未使用對數刻度表示y軸';
     }
     chart.update();
+
+    localStorage.removeItem('prevData');
 });
 
