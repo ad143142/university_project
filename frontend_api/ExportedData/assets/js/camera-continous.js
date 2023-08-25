@@ -38,6 +38,10 @@ window.onload = () => {
     filter_ctx.stroke();
 }
 
+$('camera').addEventListener('canplay', () => {
+    while(Socket.readyState != 1);
+    isReady = true;
+})
 
 const constraints = {
     video: {
@@ -72,9 +76,6 @@ function init_camera() {
 const url = "wss://rasbpi.yinchian.com:8000/ws-api";
 // const url = "ws://127.0.0.1:8000/ws-api";
 var Socket = new WebSocket(url);
-Socket.onopen = () => {
-    isReady = true;
-}
 
 Socket.onmessage = (e) => {
     let prev_result = JSON.parse(e.data);
@@ -83,29 +84,40 @@ Socket.onmessage = (e) => {
 }
 
 const grayer = (imageData, threshold) => {
-    return new Promise((res) => {
-        black_white = [];
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            let tmp = (0.299 * imageData.data[i] + 0.587 * imageData.data[i + 1] + 0.114 * imageData.data[i + 2]) < threshold;
-            imageData.data[i] = (!tmp) * 255;
-            imageData.data[i + 1] = (!tmp) * 255;
-            imageData.data[i + 2] = (!tmp) * 255;
-            black_white.push(tmp);
-        }
-        res(imageData);
-    });
+    // return new Promise((res) => {
+    //     black_white = [];
+    //     for (let i = 0; i < imageData.data.length; i += 4) {
+    //         let tmp = (0.299 * imageData.data[i] + 0.587 * imageData.data[i + 1] + 0.114 * imageData.data[i + 2]) < threshold;
+    //         imageData.data[i] = (!tmp) * 255;
+    //         imageData.data[i + 1] = (!tmp) * 255;
+    //         imageData.data[i + 2] = (!tmp) * 255;
+    //         black_white.push(tmp);
+    //     }
+    //     res(imageData);
+    // });
+
+    black_white = [];
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        let tmp = (0.299 * imageData.data[i] + 0.587 * imageData.data[i + 1] + 0.114 * imageData.data[i + 2]) < threshold;
+        imageData.data[i] = (!tmp) * 255;
+        imageData.data[i + 1] = (!tmp) * 255;
+        imageData.data[i + 2] = (!tmp) * 255;
+        black_white.push(tmp * 1);
+    }
+    return imageData;
+
 }
 
 async function frame() {
 
     if (camera.paused || camera.ended) return;
 
-    ctx.drawImage(camera, 0, 0, canva.width, canva.height);
+    await ctx.drawImage(camera, 0, 0, canva.width, canva.height);
 
-    let imageData = ctx.getImageData(0, 0, canva.width, canva.height);
+    let imageData = await ctx.getImageData(0, 0, canva.width, canva.height);
 
     // OTSU演算法取閥值
-    const threshold = calc_thresh(imageData.data);
+    const threshold = await calc_thresh(imageData.data);
 
     // 套用新值
     // black_white = [];
@@ -122,11 +134,14 @@ async function frame() {
     // 顯示！
     ctx.putImageData(imageData, 0, 0);
 
-    if(isReady){
+    if (isReady) {
         isReady = false;
         // Do Something
-        ret = await image_prep();
-        Socket.send(JSON.stringify({"data": ret}));
+        image_prep().then((r) => {
+            console.log('Send> ', r);
+            Socket.send(JSON.stringify({ "data": r }));
+        });
+        
     }
 
     requestAnimationFrame(frame);

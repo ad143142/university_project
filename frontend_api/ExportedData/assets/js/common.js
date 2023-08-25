@@ -146,7 +146,7 @@ function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_x
   for (let y = orig_yl; y < orig_yh; y++) {
     data.push(new Array());
     for (let x = orig_xl; x < orig_xh; x++) {
-      data[y - orig_yl].push(imageData[y * orig_xlen + x] * 1);
+      data[y - orig_yl].push(imageData[Math.round(y) * orig_xlen + Math.round(x)] * 1);
     }
   }
 
@@ -171,10 +171,10 @@ function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_x
     }
   }
   // sleep(1000);
-  return new Promise((res) => {
-    res(ret);
-  });
-  // return ret;
+  // return new Promise((res) => {
+  //   res(ret);
+  // });
+  return ret;
 }
 
 // Testing
