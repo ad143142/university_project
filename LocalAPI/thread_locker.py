@@ -28,9 +28,7 @@ def main_function(data):
     # print('Get Data>', data)
 
     # Simulate a long execution time function
-    for _ in range(0, 10):
-        time.sleep(0.1)
-        print('Processing..', _)
+    time.sleep(100)
 
     # JSON-like Dictionary Object
     return {'result': random.randint(0, 9),

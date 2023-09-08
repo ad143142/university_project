@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c613f5e9-3475-44ed-bb9d-eabc21dabb29" name="Changes" comment="又錯">
-      <change beforePath="$PROJECT_DIR$/../LocalAPI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,6 +118,7 @@
       <workItem from="1692872221876" duration="2048000" />
       <workItem from="1692909840858" duration="90000" />
       <workItem from="1692979787140" duration="1308000" />
+      <workItem from="1694074330285" duration="654000" />
     </task>
     <task id="LOCAL-00001" summary="Web basic function DONE!">
       <created>1690239900789</created>

@@ -19,10 +19,7 @@ window.onload = () => {
     // 設定相機
     init_camera();
 
-    // 隱藏清除按鈕
-    // $('btn-clean').style.display = 'none';
-
-
+    // 設定大小
     $('camera').width = video_size;
     $('camera').height = video_size;
     $('frame').width = video_size;
@@ -84,17 +81,6 @@ Socket.onmessage = (e) => {
 }
 
 const grayer = (imageData, threshold) => {
-    // return new Promise((res) => {
-    //     black_white = [];
-    //     for (let i = 0; i < imageData.data.length; i += 4) {
-    //         let tmp = (0.299 * imageData.data[i] + 0.587 * imageData.data[i + 1] + 0.114 * imageData.data[i + 2]) < threshold;
-    //         imageData.data[i] = (!tmp) * 255;
-    //         imageData.data[i + 1] = (!tmp) * 255;
-    //         imageData.data[i + 2] = (!tmp) * 255;
-    //         black_white.push(tmp);
-    //     }
-    //     res(imageData);
-    // });
 
     black_white = [];
     for (let i = 0; i < imageData.data.length; i += 4) {
@@ -112,24 +98,15 @@ async function frame() {
 
     if (camera.paused || camera.ended) return;
 
-    await ctx.drawImage(camera, 0, 0, canva.width, canva.height);
+    ctx.drawImage(camera, 0, 0, canva.width, canva.height);
 
-    let imageData = await ctx.getImageData(0, 0, canva.width, canva.height);
+    let imageData = ctx.getImageData(0, 0, canva.width, canva.height);
 
     // OTSU演算法取閥值
-    const threshold = await calc_thresh(imageData.data);
+    const threshold = calc_thresh(imageData.data);
 
-    // 套用新值
-    // black_white = [];
-    // for (let i = 0; i < imageData.data.length; i += 4) {
-    //     let tmp = (0.299 * imageData.data[i] + 0.587 * imageData.data[i + 1] + 0.114 * imageData.data[i + 2]) < threshold;
-    //     imageData.data[i] = (!tmp) * 255;
-    //     imageData.data[i + 1] = (!tmp) * 255;
-    //     imageData.data[i + 2] = (!tmp) * 255;
-    //     black_white.push(tmp);
-    // }
-
-    imageData = await grayer(imageData, threshold);
+    // 算黑白
+    imageData = grayer(imageData, threshold);
 
     // 顯示！
     ctx.putImageData(imageData, 0, 0);
@@ -138,7 +115,7 @@ async function frame() {
         isReady = false;
         // Do Something
         image_prep().then((r) => {
-            console.log('Send> ', r);
+            console.log(r);
             Socket.send(JSON.stringify({ "data": r }));
         });
         
@@ -153,8 +130,8 @@ async function image_prep() {
     // const imageData = ctx.getImageData(0, 0, canva.width, canva.width);
     // const ret = BilinearInterpolation(imageData, 28, 28)
     let ret = await BilinearInterpolation(black_white, 28, 28, video_size / 4, video_size / 4, video_size * 3 / 4, video_size * 3 / 4, canva.width);
-    // console.log(ret);
+    
     ret = await padding([].concat.apply([], ret), 28, 28);
-    console.log(ret);
+    
     return ret;
 }

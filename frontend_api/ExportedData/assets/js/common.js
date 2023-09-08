@@ -49,7 +49,7 @@ function hideLoadingScreen() {
   document.body.style.setProperty('overflow', 'unset');
 }
 
-// Array -> String
+// 1-D Array -> String
 async function padding(imageArray, width, height) {
   let ret = '';
 
@@ -100,54 +100,98 @@ async function resizeImageData(imageData, width, height) {
   return _ctx.getImageData(0, 0, resizeWidth, resizeHeight)
 }
 
-// 手刻縮放的演算法 - 輸入為imageData
-function BilinearInterpolation(imageData, res_x, res_y) {
-
-  const data = [];
+// 手刻縮放的演算法 - 輸入為imageData，僅需輸入欲設定的大小(整數)
+// function BilinearInterpolation(imageData, res_x, res_y) {
   
-    // 輸入是imageData物件
+//   // 輸入是imageData物件
+//   const data = [];
+//   for (let y = 0; y < imageData.height; y++) {
+//     data.push(new Array());
+//     for (let x = 0; x < imageData.width * 4; x += 4) {
+//       data[y].push(imageData.data[y * imageData.width * 4 + x]);
+//     }
+//   }
+
+
+//   // 應該相等
+//   x_ratio = (data[0].length - 1) / (res_x - 1);
+//   y_ratio = (data.length - 1) / (res_y - 1);
+
+//   let ret = new Array(res_x);
+//   for (let x = 0; x < res_x; x++) {
+//     ret[x] = new Array(res_y);
+//     for (let y = 0; y < res_y; y++) {
+//       // 四個鄰近的座標
+//       x_l = Math.floor(x_ratio * x);
+//       y_l = Math.floor(y_ratio * y);
+//       x_h = Math.ceil(x_ratio * x);
+//       y_h = Math.ceil(y_ratio * y);
+
+//       // 位置的比例當權重
+//       x_ratio_weight = x_ratio * x - x_l;
+//       y_ratio_weight = y_ratio * y - y_l;
+
+//       ret[x][y] = (data[x_l][y_l] * (1 - x_ratio_weight) * (1 - y_ratio_weight) + data[x_h][y_l] * x_ratio_weight * (1 - y_ratio_weight) + data[x_l][y_h] * (1 - x_ratio_weight) * y_ratio_weight + data[x_h][y_h] * x_ratio_weight * y_ratio_weight);
+//     }
+//   }
+
+//   return ret;
+// }
+
+// // 手刻縮放的演算法 - overding 1: 輸入是array, 可調整大小
+// function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_xh, orig_yh, orig_xlen) {
+
+//   const data = [];
+//   for (let y = orig_yl; y < orig_yh; y++) {
+//     data.push(new Array());
+//     for (let x = orig_xl; x < orig_xh; x++) {
+//       data[y - orig_yl].push(imageData[Math.round(y) * orig_xlen + Math.round(x)] * 1);
+//     }
+//   }
+
+//   x_ratio = (data[0].length - 1) / (res_x - 1);
+//   y_ratio = (data.length - 1) / (res_y - 1);
+
+//   let ret = new Array(res_x);
+//   for (let x = 0; x < res_x; x++) {
+//     ret[x] = new Array(res_y);
+//     for (let y = 0; y < res_y; y++) {
+//       // 四個鄰近的座標
+//       x_l = Math.floor(x_ratio * x);
+//       y_l = Math.floor(y_ratio * y);
+//       x_h = Math.ceil(x_ratio * x);
+//       y_h = Math.ceil(y_ratio * y);
+
+//       // 位置的比例當權重
+//       x_ratio_weight = x_ratio * x - x_l;
+//       y_ratio_weight = y_ratio * y - y_l;
+
+//       ret[x][y] = Math.round(data[x_l][y_l] * (1 - x_ratio_weight) * (1 - y_ratio_weight) + data[x_h][y_l] * x_ratio_weight * (1 - y_ratio_weight) + data[x_l][y_h] * (1 - x_ratio_weight) * y_ratio_weight + data[x_h][y_h] * x_ratio_weight * y_ratio_weight);
+//     }
+//   }
+//   return ret;
+// }
+
+// Function with Overloading
+function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_xh, orig_yh, orig_xlen) {
+
+  const data = new Array();
+  if(arguments.length == 8){
+    for (let y = orig_yl; y < orig_yh; y++) { // 輸入是array物件
+      data.push(new Array());
+      for (let x = orig_xl; x < orig_xh; x++) {
+        data[y - orig_yl].push(imageData[Math.round(y) * orig_xlen + Math.round(x)] * 1);
+      }
+    }
+  } else if (arguments.length == 3){  // 輸入是imageData物件
     for (let y = 0; y < imageData.height; y++) {
       data.push(new Array());
       for (let x = 0; x < imageData.width * 4; x += 4) {
         data[y].push(imageData.data[y * imageData.width * 4 + x]);
       }
     }
-  
-
-  // 應該相等
-  x_ratio = (data[0].length - 1) / (res_x - 1);
-  y_ratio = (data.length - 1) / (res_y - 1);
-
-  let ret = new Array(res_x);
-  for (let x = 0; x < res_x; x++) {
-    ret[x] = new Array(res_y);
-    for (let y = 0; y < res_y; y++) {
-      // 四個鄰近的座標
-      x_l = Math.floor(x_ratio * x);
-      y_l = Math.floor(y_ratio * y);
-      x_h = Math.ceil(x_ratio * x);
-      y_h = Math.ceil(y_ratio * y);
-
-      // 位置的比例當權重
-      x_ratio_weight = x_ratio * x - x_l;
-      y_ratio_weight = y_ratio * y - y_l;
-
-      ret[x][y] = (data[x_l][y_l] * (1 - x_ratio_weight) * (1 - y_ratio_weight) + data[x_h][y_l] * x_ratio_weight * (1 - y_ratio_weight) + data[x_l][y_h] * (1 - x_ratio_weight) * y_ratio_weight + data[x_h][y_h] * x_ratio_weight * y_ratio_weight);
-    }
-  }
-
-  return ret;
-}
-
-// 手刻縮放的演算法 - overding 1: 輸入是array, 可調整大小
-function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_xh, orig_yh, orig_xlen) {
-
-  const data = [];
-  for (let y = orig_yl; y < orig_yh; y++) {
-    data.push(new Array());
-    for (let x = orig_xl; x < orig_xh; x++) {
-      data[y - orig_yl].push(imageData[Math.round(y) * orig_xlen + Math.round(x)] * 1);
-    }
+  } else {
+    console.error(`BilinearInterpolation's argument amount suouldn't be ${arguments.length}`);
   }
 
   x_ratio = (data[0].length - 1) / (res_x - 1);
@@ -170,10 +214,6 @@ function BilinearInterpolation(imageData, res_x, res_y, orig_xl, orig_yl, orig_x
       ret[x][y] = Math.round(data[x_l][y_l] * (1 - x_ratio_weight) * (1 - y_ratio_weight) + data[x_h][y_l] * x_ratio_weight * (1 - y_ratio_weight) + data[x_l][y_h] * (1 - x_ratio_weight) * y_ratio_weight + data[x_h][y_h] * x_ratio_weight * y_ratio_weight);
     }
   }
-  // sleep(1000);
-  // return new Promise((res) => {
-  //   res(ret);
-  // });
   return ret;
 }
 
