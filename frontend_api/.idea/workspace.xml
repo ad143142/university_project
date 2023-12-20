@@ -5,7 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c613f5e9-3475-44ed-bb9d-eabc21dabb29" name="Changes" comment="又錯">
-      <change beforePath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" beforeDir="false" afterPath="$PROJECT_DIR$/../LocalAPI/thread_locker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" beforeDir="false" afterPath="$PROJECT_DIR$/../Bootstrap_Studio/Univ_Proj.bsdesign" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/assets/bootstrap/css/bootstrap.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/bootstrap/css/bootstrap.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/assets/bootstrap/js/bootstrap.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/bootstrap/js/bootstrap.min.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/assets/js/camera-continous.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/js/camera-continous.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/assets/js/camera.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/js/camera.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/assets/js/canva-continous.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/js/canva-continous.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/assets/js/canva.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/assets/js/canva.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/demo-camera-continous.html" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/demo-camera-continous.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/demo-camera.html" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/demo-camera.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/demo-continuous.html" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/demo-continuous.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExportedData/select.html" beforeDir="false" afterPath="$PROJECT_DIR$/ExportedData/select.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,12 +83,14 @@
   </component>
   <component name="RunManager">
     <configuration name="frontend_api" type="Python.FlaskServer">
+      <option name="additionalOptions" value="--host=0.0.0.0" />
       <module name="frontend_api" />
       <option name="target" value="$PROJECT_DIR$/app.py" />
       <option name="targetType" value="PATH" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="D:\University_Project\frontend_api\venv\Scripts\python.exe" />
+      <option name="SDK_NAME" value="Python 3.11 (frontend_api)" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -119,6 +133,11 @@
       <workItem from="1692909840858" duration="90000" />
       <workItem from="1692979787140" duration="1308000" />
       <workItem from="1694074330285" duration="654000" />
+      <workItem from="1702063014393" duration="5160000" />
+      <workItem from="1702106301799" duration="1086000" />
+      <workItem from="1702132696109" duration="2755000" />
+      <workItem from="1702186248280" duration="637000" />
+      <workItem from="1702273036964" duration="2356000" />
     </task>
     <task id="LOCAL-00001" summary="Web basic function DONE!">
       <created>1690239900789</created>
@@ -253,6 +272,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="又錯" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/frontend_api$frontend_api.coverage" NAME="frontend_api Coverage Results" MODIFIED="1692909846011" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/frontend_api$frontend_api.coverage" NAME="frontend_api Coverage Results" MODIFIED="1702273864761" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

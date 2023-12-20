@@ -4,6 +4,8 @@ from flask import *
 from flask_cors import *
 import platform
 
+dest_ip = '192.168.2.102'
+
 app = Flask(__name__, static_folder='ExportedData/assets/', template_folder='ExportedData/')
 
 
@@ -39,13 +41,13 @@ def demo_cam():
 @app.route('/demo-continuous')
 @app.route('/demo-continuous.html')
 def demo_continuous():
-    return render_template('demo-continuous.html')
+    return render_template('demo-continuous.html', dest_ip=dest_ip)
 
 
 @app.route('/demo-camera-continous')
 @app.route('/demo-camera-continous.html')
 def demo_camera_continous():
-    return render_template('demo-camera-continous.html')
+    return render_template('demo-camera-continous.html', dest_ip=dest_ip)
 
 
 @app.route('/result.html')
@@ -77,7 +79,9 @@ def submit():
     #     req = requests.post(url='http://127.0.0.1:8000/', json={'data': ret})
     # else:
     #     req = requests.post(url='https://rasbpi.yinchian.com:8000', json={'data': ret})
-    req = requests.post(url='https://rasbpi.yinchian.com:8000', json={'data': ret})
+
+    # req = requests.post(url='https://rasbpi.yinchian.com:8000', json={'data': ret})
+    req = requests.post(url='http://' + dest_ip + ':8000', json={'data': ret})
 
     if req.status_code == 200:
         res = json.loads(req.text)
@@ -100,4 +104,4 @@ def submit():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

@@ -70,7 +70,8 @@ function init_camera() {
 
 
 // Init Websocket Connection OnLoad
-const url = "wss://rasbpi.yinchian.com:8000/ws-api";
+// const url = "wss://rasbpi.yinchian.com:8000/ws-api";
+const url = `ws://${dest_ip}:8000/ws-api`;
 // const url = "ws://127.0.0.1:8000/ws-api";
 var Socket = new WebSocket(url);
 

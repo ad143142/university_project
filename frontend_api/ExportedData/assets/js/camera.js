@@ -210,7 +210,7 @@ $('submit-img').addEventListener('click', async () => {
         }
 
         // create and send the reqeust
-        xhr.open('POST', 'https://u.yinchian.com/apis/submit');
+        xhr.open('POST', '/apis/submit');
         xhr.send(formData);
 
         xhr.onload = () => {
